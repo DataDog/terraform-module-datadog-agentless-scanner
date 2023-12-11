@@ -12,7 +12,7 @@ variable "site" {
 variable "sidescanner_version" {
   description = "Specifies the side-scanner version installed"
   type        = string
-  default     = "50.0~rc.5~side~scanner~2023120601-1"
+  default     = "50.0~rc.5~side~scanner~2023120801-1"
 }
 
 variable "instance_profile_name" {
