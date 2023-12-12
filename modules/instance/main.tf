@@ -9,7 +9,7 @@ data "aws_ami" "al2023" {
   most_recent = true
   owners      = ["099720109477"]
   filter {
-    name   = "architecture"
+    name      = "architecture"
     values = ["arm64"]
   }
   filter {
