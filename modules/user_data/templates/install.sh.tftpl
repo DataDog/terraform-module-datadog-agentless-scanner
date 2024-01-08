@@ -25,7 +25,6 @@ DD_API_KEY=$DD_API_KEY \
 
 # Patch agent configuration
 sed -i '/.*logs_enabled:.*/a logs_enabled: true'           /etc/datadog-agent/datadog.yaml
-sed -i '/.*log_level:.*/a log_level: debug'                /etc/datadog-agent/datadog.yaml
 sed -i '/.*ec2_prefer_imdsv2:.*/a ec2_prefer_imdsv2: true' /etc/datadog-agent/datadog.yaml
 
 # Adding automatic reboot on kernel updates
