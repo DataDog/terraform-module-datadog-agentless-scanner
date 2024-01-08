@@ -67,6 +67,9 @@ EOF
 
 chown -R dd-agent: /etc/datadog-agent/conf.d/agentless-scanner.d
 
+# Activate disk usage integration of the agent
+mv /etc/datadog-agent/conf.d/disk.d/conf.yaml.default /etc/datadog-agent/conf.d/disk.d/conf.yaml
+
 # Restart the agent
 service datadog-agent restart
 
