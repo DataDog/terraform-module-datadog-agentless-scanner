@@ -228,7 +228,7 @@ data "aws_iam_policy_document" "assume_role_policy" {
 
     principals {
       type        = "AWS"
-      identifiers = [var.scanner_role_arn]
+      identifiers = var.scanner_roles
     }
   }
 }

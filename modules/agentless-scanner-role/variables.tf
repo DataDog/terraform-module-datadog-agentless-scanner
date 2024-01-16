@@ -4,8 +4,20 @@ variable "iam_role_name" {
   default     = "DatadogAgentlessScannerAgentRole"
 }
 
+variable "iam_policy_name" {
+  description = "Name to use on IAM policy created"
+  type        = string
+  default     = "DatadogAgentlessScannerAgentPolicy"
+}
+
 variable "iam_role_path" {
   description = "IAM role path"
+  type        = string
+  default     = null
+}
+
+variable "iam_policy_path" {
+  description = "IAM policy path"
   type        = string
   default     = null
 }

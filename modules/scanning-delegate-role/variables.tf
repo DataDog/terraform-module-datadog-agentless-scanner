@@ -22,9 +22,9 @@ variable "iam_policy_path" {
   default     = null
 }
 
-variable "scanner_role_arn" {
-  description = "ARN of the role allowed to assume this role"
-  type        = string
+variable "scanner_roles" {
+  description = "List of roles ARN allowed to assume this role"
+  type        = list(string)
 }
 
 variable "tags" {

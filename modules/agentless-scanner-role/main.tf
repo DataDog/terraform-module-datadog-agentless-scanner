@@ -68,7 +68,8 @@ data "aws_iam_policy_document" "scanner_policy_document" {
 }
 
 resource "aws_iam_policy" "scanner_policy" {
-  name   = "DatadogAgentlessScannerAgentPolicy"
+  name   = var.iam_policy_name
+  path   = var.iam_policy_path
   policy = data.aws_iam_policy_document.scanner_policy_document.json
 }
 
