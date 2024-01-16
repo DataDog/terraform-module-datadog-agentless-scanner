@@ -14,26 +14,26 @@ provider "aws" {
 }
 
 module "agentless_scanner_role" {
-  source = "git::https://github.com/DataDog/terraform-datadog-agentless-scanner//modules/agentless-scanner-role?ref=0.2.0"
+  source = "git::https://github.com/DataDog/terraform-datadog-agentless-scanner//modules/agentless-scanner-role?ref=0.7.0"
 
   account_roles = [module.delegate_role.role.arn]
 }
 
 module "delegate_role" {
-  source = "git::https://github.com/DataDog/terraform-datadog-agentless-scanner//modules/scanning-delegate-role?ref=0.2.0"
+  source = "git::https://github.com/DataDog/terraform-datadog-agentless-scanner//modules/scanning-delegate-role?ref=0.7.0"
 
-  scanner_role_arn = module.agentless_scanner_role.role.arn
+  scanner_roles = [module.agentless_scanner_role.role.arn]
 }
 
 module "user_data" {
-  source = "git::https://github.com/DataDog/terraform-datadog-agentless-scanner//modules/user_data?ref=0.2.0"
+  source = "git::https://github.com/DataDog/terraform-datadog-agentless-scanner//modules/user_data?ref=0.7.0"
 
   hostname = "agentless-scanning-us-east-1"
   api_key  = var.api_key
 }
 
 module "instance" {
-  source = "git::https://github.com/DataDog/terraform-datadog-agentless-scanner//modules/instance?ref=0.2.0"
+  source = "git::https://github.com/DataDog/terraform-datadog-agentless-scanner//modules/instance?ref=0.7.0"
 
   user_data            = module.user_data.install_sh
   iam_instance_profile = module.agentless_scanner_role.profile.name
