@@ -14,19 +14,19 @@ provider "aws" {
 }
 
 module "scanner_role" {
-  source = "git::https://github.com/DataDog/terraform-datadog-agentless-scanner//modules/agentless-scanner-role?ref=0.7.0"
+  source = "git::https://github.com/DataDog/terraform-datadog-agentless-scanner//modules/agentless-scanner-role?ref=0.6.0"
 
   account_roles = [module.delegate_role.role.arn]
 }
 
 module "delegate_role" {
-  source = "git::https://github.com/DataDog/terraform-datadog-agentless-scanner//modules/scanning-delegate-role?ref=0.7.0"
+  source = "git::https://github.com/DataDog/terraform-datadog-agentless-scanner//modules/scanning-delegate-role?ref=0.6.0"
 
   scanner_role = [module.scanner_role.role.arn]
 }
 
 module "agentless_scanner" {
-  source = "git::https://github.com/DataDog/terraform-datadog-agentless-scanner?ref=0.7.0"
+  source = "git::https://github.com/DataDog/terraform-datadog-agentless-scanner?ref=0.6.0"
 
   api_key               = var.api_key
   instance_profile_name = module.scanner_role.instance_profile.name
