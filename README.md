@@ -52,3 +52,7 @@ Run all checks:
 ```
 pre-commit run -a
 ```
+
+## Changelog
+
+See [changelog](CHANGELOG.md).
