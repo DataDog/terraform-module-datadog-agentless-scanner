@@ -58,6 +58,11 @@ resource "aws_autoscaling_group" "asg" {
   max_size         = var.asg_size
   desired_capacity = var.asg_size
 
+  # references:
+  #   - https://github.com/hashicorp/terraform-provider-aws/issues/29753
+  #   - https://github.com/hashicorp/terraform-provider-aws/pull/32914
+  ignore_failed_scaling_activities = true
+
   vpc_zone_identifier = [var.subnet_id]
 
   launch_template {
