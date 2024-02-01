@@ -22,7 +22,7 @@ module "scanner_role" {
 module "delegate_role" {
   source = "git::https://github.com/DataDog/terraform-datadog-agentless-scanner//modules/scanning-delegate-role?ref=0.6.0"
 
-  scanner_role = [module.scanner_role.role.arn]
+  scanner_roles = [module.scanner_role.role.arn]
 }
 
 module "agentless_scanner" {
