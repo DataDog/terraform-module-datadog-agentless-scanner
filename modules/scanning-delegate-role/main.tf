@@ -212,6 +212,12 @@ data "aws_iam_policy_document" "scanning_policy_document" {
     resources = [
       "arn:${data.aws_partition.current.partition}:lambda:*:*:function:*"
     ]
+    // Forbid scanning lambdas that does have a DatadogAgentlessScanner:false tag.
+    condition {
+      test     = "StringNotEquals"
+      variable = "aws:ResourceTag/DatadogAgentlessScanner"
+      values   = ["false"]
+    }
   }
 }
 
