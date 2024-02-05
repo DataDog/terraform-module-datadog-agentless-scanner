@@ -9,7 +9,6 @@ module "vpc" {
 
 module "user_data" {
   source             = "./modules/user_data"
-  hostname           = "agentless-scanning-${data.aws_region.current.name}"
   api_key            = var.api_key
   api_key_secret_arn = var.api_key_secret_arn
   site               = var.site
