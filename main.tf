@@ -1,5 +1,3 @@
-data "aws_region" "current" {}
-
 module "vpc" {
   source = "./modules/vpc"
 
