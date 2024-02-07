@@ -1,5 +1,9 @@
 # Changelog
 
+## Terraform 0.8.0
+
+### agentless-scanner 2024020101
+
 ## Terraform 0.7.0
 
 ### agentless-scanner 2024011701
