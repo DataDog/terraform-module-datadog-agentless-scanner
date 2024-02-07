@@ -6,7 +6,7 @@ set -o pipefail
 
 %{ if api_key_secret_arn != null }
 apt update
-apt install awscli ndb-client -y
+apt install awscli nbd-client -y
 DD_API_KEY=$(aws secretsmanager get-secret-value --secret-id "${api_key_secret_arn}" --query SecretString --region "${region}")
 %{ else }
 DD_API_KEY=${api_key}
