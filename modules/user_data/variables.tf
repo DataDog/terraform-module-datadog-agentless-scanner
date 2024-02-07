@@ -18,16 +18,16 @@ variable "site" {
   nullable    = false
 }
 
-variable "scanner_version" {
-  description = "Specifies the agentless scanner version installed"
+variable "agent_version" {
+  description = "Specifies the agent version installed"
   type        = string
-  default     = "50.0~agentless~scanner~2024020101"
+  default     = "50.3"
   nullable    = false
 }
 
-variable "agent_repo_url" {
-  description = "Specifies the agent distribution channel"
+variable "scanner_version" {
+  description = "Specifies the agentless scanner version installed"
   type        = string
-  default     = "datad0g.com"
+  default     = "7.50.0~agentless~scanner~2024020101"
   nullable    = false
 }

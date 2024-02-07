@@ -17,6 +17,12 @@ variable "site" {
   default     = null
 }
 
+variable "agent_version" {
+  description = "Specifies the agent version installed"
+  type        = string
+  default     = null
+}
+
 variable "scanner_version" {
   description = "Specifies the agentless scanner version installed"
   type        = string

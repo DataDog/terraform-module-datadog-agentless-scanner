@@ -15,10 +15,12 @@ DD_API_KEY=${api_key}
 # Install the agent
 DD_API_KEY=$DD_API_KEY \
   DD_SITE="${site}" \
-  DD_REPO_URL="${agent_repo_url}" \
-  DD_AGENT_DIST_CHANNEL="beta" \
-  DD_AGENT_MINOR_VERSION="${scanner_version}" \
+  DD_AGENT_MINOR_VERSION="${agent_version}" \
   bash -c "$(curl -L https://s3.amazonaws.com/dd-agent/scripts/install_script_agent7.sh)"
+
+# Install the agentless-scanner
+curl -sL -o /tmp/datadog-agentless-scanner_${scanner_version}-1_arm64.deb https://s3.amazonaws.com/apt.datad0g.com/pool/d/da/datadog-agentless-scanner_${scanner_version}-1_arm64.deb
+dpkg -i /tmp/datadog-agentless-scanner_${scanner_version}-1_arm64.deb
 
 # Patch agent configuration
 sed -i '/.*logs_enabled:.*/a logs_enabled: true'           /etc/datadog-agent/datadog.yaml

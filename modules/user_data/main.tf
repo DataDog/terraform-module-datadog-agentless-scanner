@@ -11,8 +11,8 @@ resource "terraform_data" "template" {
     api_key            = var.api_key,
     api_key_secret_arn = var.api_key_secret_arn
     site               = var.site,
+    agent_version      = var.agent_version,
     scanner_version    = var.scanner_version,
-    agent_repo_url     = var.agent_repo_url,
     region             = data.aws_region.current.name,
   })
 }
