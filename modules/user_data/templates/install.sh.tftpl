@@ -35,17 +35,6 @@ Unattended-Upgrade::Automatic-Reboot-WithUsers "true";
 Unattended-Upgrade::Automatic-Reboot-Time "now";
 EOF
 
-cp /etc/cron.daily/logrotate /etc/cron.hourly/logrotate
-cat <<EOF > /etc/logrotate.d/datadog
-/var/log/datadog/*.log {
-    hourly
-    rotate 12
-    compress
-    missingok
-    notifempty
-}
-EOF
-
 %{ if site == "datad0g.com" }
 cat <<EOF >> /etc/datadog-agent/datadog.yaml
 remote_configuration:
