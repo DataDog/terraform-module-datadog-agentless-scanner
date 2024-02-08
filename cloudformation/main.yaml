@@ -99,6 +99,10 @@ Resources:
               echo "agentless-scanning-${AWS::Region}" > /etc/hostname
               DD_API_KEY="${DatadogAPIKey}"
 
+              # Install requirements
+              apt update
+              apt install -y nbd-client
+
               # Install the agent
               DD_API_KEY=$DD_API_KEY \
                 DD_SITE="${DatadogSite}" \
