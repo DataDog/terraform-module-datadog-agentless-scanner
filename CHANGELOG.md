@@ -1,5 +1,17 @@
 # Changelog
 
+## Terraform 0.9.0
+
+### agentless-scanner 2024022201
+
+- Add support for scanning containers (containerd and Docker activated by default)
+- Add support for scanning AMIs
+- Add support for scanning containers app
+- Activate scanner for vulnerabilities for Java JARs in Lambdas
+- Rely on Network Block Devices (NBD) for mounting EBS volumes
+- Split agentless binary in dedicated package
+- Improve performance of OS SBOMs generation
+
 ## Terraform 0.8.0
 
 ### agentless-scanner 2024020101
