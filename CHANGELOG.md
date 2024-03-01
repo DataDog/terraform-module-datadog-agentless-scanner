@@ -1,5 +1,9 @@
 # Changelog
 
+## Terraform 0.9.1
+
+- Adds missing nbd module activation in cloud init
+
 ## Terraform 0.9.0
 
 ### agentless-scanner 2024022201
