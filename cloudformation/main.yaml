@@ -1,5 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: Datadog Agentless Scanner deployed in a dedicated VPC on one account
+Description: Datadog Agentless Scanner CloudFormation deployment template
+
 Parameters:
   DatadogAPIKey:
     Type: String
@@ -19,14 +20,29 @@ Parameters:
       - ddog-gov.com
       - datad0g.com
 
+  ScannerVPCId:
+    Type: AWS::EC2::VPC::Id
+    Description: The VPC to use for the Datadog Agentless Scanner. If not provided, a new VPC will be created (should be specified along with ScannerSubnetId).
+    Default: ''
+
+  ScannerSubnetId:
+    Type: AWS::EC2::Subnet::Id
+    Description: The subnet to use for the Datadog Agentless Scanner. If not provided, a new VPC will be created (should be specified along with ScannerVPCId).
+    Default: ''
+
+  ScannerSecurityGroupId:
+    Type: AWS::EC2::SecurityGroup::Id
+    Description: The security group to use for the Datadog Agentless Scanner. If not provided a new security group will be created.
+    Default: ''
+
   ScannerDelegateRoleName:
     Type: String
     Description: The name of the role assumed by the Datadog Agentless Scanner
     Default: DatadogAgentlessScannerDelegateRole
 
-  ScannerInstanceKeyName:
+  ScannerSSHKeyPairName:
     Type: String
-    Description: The key pair to use for the Datadog Agentless Scanner
+    Description: The key pair name to use for the Datadog Agentless Scanner. If not provided instance will not be accessible via SSH.
     Default: ''
 
   ScannerInstanceVolumeSize:
@@ -52,15 +68,45 @@ Parameters:
     Description: The number of instances in the Auto Scaling Group
     Default: 1
 
-
 Conditions:
-  UseKeyPair: !Not
+  ProvideSshKeyPair: !Not
     - !Equals
-      - !Ref 'ScannerInstanceKeyName'
+      - !Ref 'ScannerSSHKeyPairName'
       - ''
+  CreateVPCResources: !Equals
+    - !Ref 'ScannerSubnetId'
+    - ''
+  CreateSecurityGroup: !Equals
+    - !Ref 'ScannerSecurityGroupId'
+    - ''
 
+Rules:
+  ScannerVPCIdAndSubnetId:
+    AssertDescription: 'Checking arguments ScannerVPCId and ScannerSubnetId'
+    RuleCondition: !Or [!Not [!Equals [!Ref 'ScannerVPCId', '']], !Not [!Equals [!Ref 'ScannerSubnetId', '']]]
+    Assertions:
+      - Assert: !And [!Not [!Equals [!Ref 'ScannerVPCId', '']], !Not [!Equals [!Ref 'ScannerSubnetId', '']]]
+        AssertDescription: 'ScannerVPCId and ScannerSubnetId should be specified together'
 
 Resources:
+  ScannerSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Condition: CreateSecurityGroup
+    Properties:
+      GroupDescription: Security group for the Datadog Agentless Scanner
+      VpcId: !If [CreateVPCResources, !GetAtt 'VPCSubnetPrivate.VpcId', !Ref 'ScannerVPCId']
+      SecurityGroupEgress:
+        - CidrIp: '0.0.0.0/0'
+          FromPort: 0
+          ToPort: 65535
+          Description: All traffic
+          IpProtocol: 'tcp'
+      Tags:
+        - Key: Datadog
+          Value: 'true'
+        - Key: DatadogAgentlessScanner
+          Value: 'true'
+
   ScannerLaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
     Properties:
@@ -72,6 +118,13 @@ Resources:
             - Key: DatadogAgentlessScanner
               Value: 'true'
       LaunchTemplateData:
+        NetworkInterfaces:
+          - DeviceIndex: 0
+            AssociatePublicIpAddress: false
+            DeleteOnTermination: true
+            SubnetId: !If [CreateVPCResources, !Ref 'VPCSubnetPublic', !Ref 'ScannerSubnetId']
+            Groups:
+              - !If [CreateSecurityGroup, !Ref 'ScannerSecurityGroup', !Ref 'ScannerSecurityGroupId']
         TagSpecifications:
           - ResourceType: instance
             Tags:
@@ -93,10 +146,7 @@ Resources:
                 Value: 'true'
               - Key: DatadogAgentlessScanner
                 Value: 'true'
-        Keyname: !If
-          - UseKeyPair
-          - !Ref 'ScannerInstanceKeyName'
-          - !Ref 'AWS::NoValue'
+        KeyName: !If [ProvideSshKeyPair, !Ref 'ScannerSSHKeyPairName', !Ref 'AWS::NoValue']
         UserData:
           Fn::Base64:
             !Sub |
@@ -279,7 +329,7 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       Path: /
-      RoleName: !Sub '${ScannerDelegateRoleName}'
+      RoleName: !Ref 'ScannerDelegateRoleName'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -303,10 +353,13 @@ Resources:
 
   ScannerAutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
+    UpdatePolicy:
+      AutoScalingReplacingUpdate:
+        WillReplace: true
     Properties:
       LaunchTemplate:
         LaunchTemplateId: !Ref 'ScannerLaunchTemplate'
-        Version: '1'
+        Version: !GetAtt 'ScannerLaunchTemplate.LatestVersionNumber'
       MinSize: !Ref 'ScannerAutoScalingGroupSize'
       MaxSize: !Ref 'ScannerAutoScalingGroupSize'
       DesiredCapacity: !Ref 'ScannerAutoScalingGroupSize'
@@ -314,7 +367,7 @@ Resources:
       HealthCheckType: EC2
       HealthCheckGracePeriod: 300
       VPCZoneIdentifier:
-        - !Ref 'VPCSubnetPrivate'
+        - !If [CreateVPCResources, !Ref 'VPCSubnetPrivate', !Ref 'ScannerSubnetId']
       TerminationPolicies:
         - Default
       Tags:
@@ -330,13 +383,9 @@ Resources:
       MaxInstanceLifetime: 86400
       NewInstancesProtectedFromScaleIn: false
 
-
-  ########################################################
-  ## VPC and network resources
-  ########################################################
-
   VPCNatElasticIP:
     Type: AWS::EC2::EIP
+    Condition: CreateVPCResources
     Properties:
       Domain: vpc
       Tags:
@@ -349,6 +398,7 @@ Resources:
 
   VPCInternetGateway:
     Type: AWS::EC2::InternetGateway
+    Condition: CreateVPCResources
     Properties:
       Tags:
         - Key: DatadogAgentlessScanner
@@ -360,6 +410,7 @@ Resources:
 
   VPCNatGateway:
     Type: AWS::EC2::NatGateway
+    Condition: CreateVPCResources
     Properties:
       SubnetId: !Ref 'VPCSubnetPublic'
       Tags:
@@ -373,6 +424,7 @@ Resources:
 
   VPCRoutePublic:
     Type: AWS::EC2::Route
+    Condition: CreateVPCResources
     Properties:
       DestinationCidrBlock: '0.0.0.0/0'
       GatewayId: !Ref 'VPCInternetGateway'
@@ -380,6 +432,7 @@ Resources:
 
   VPCRoutePrivate:
     Type: AWS::EC2::Route
+    Condition: CreateVPCResources
     Properties:
       DestinationCidrBlock: '0.0.0.0/0'
       NatGatewayId: !Ref 'VPCNatGateway'
@@ -387,11 +440,13 @@ Resources:
 
   VPCRouteTable:
     Type: AWS::EC2::RouteTable
+    Condition: CreateVPCResources
     Properties:
       VpcId: !GetAtt 'VPCSubnetPublic.VpcId'
 
   VPCRouteTablePublic:
     Type: AWS::EC2::RouteTable
+    Condition: CreateVPCResources
     Properties:
       VpcId: !GetAtt 'VPCSubnetPublic.VpcId'
       Tags:
@@ -404,6 +459,7 @@ Resources:
 
   VPCRouteTablePrivate:
     Type: AWS::EC2::RouteTable
+    Condition: CreateVPCResources
     Properties:
       VpcId: !GetAtt 'VPCSubnetPublic.VpcId'
       Tags:
@@ -416,18 +472,21 @@ Resources:
 
   VPCSubnetRouteTableAssociationPrivate:
     Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: CreateVPCResources
     Properties:
       RouteTableId: !Ref 'VPCRouteTablePrivate'
       SubnetId: !Ref 'VPCSubnetPrivate'
 
   VPCSubnetRouteTableAssociationPublic:
     Type: AWS::EC2::SubnetRouteTableAssociation
+    Condition: CreateVPCResources
     Properties:
       RouteTableId: !Ref 'VPCRouteTablePublic'
       SubnetId: !Ref 'VPCSubnetPublic'
 
   VPCEndpointsSecurityGroup:
     Type: AWS::EC2::SecurityGroup
+    Condition: CreateVPCResources
     Properties:
       GroupDescription: VPC endpoint security group
       Tags:
@@ -445,6 +504,7 @@ Resources:
 
   VPCSubnetPublic:
     Type: AWS::EC2::Subnet
+    Condition: CreateVPCResources
     Properties:
       AvailabilityZone: !Select
         - 0
@@ -463,6 +523,7 @@ Resources:
 
   VPCSubnetPrivate:
     Type: AWS::EC2::Subnet
+    Condition: CreateVPCResources
     Properties:
       AvailabilityZone: !Select
         - 0
@@ -481,12 +542,14 @@ Resources:
 
   VPCGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
+    Condition: CreateVPCResources
     Properties:
       InternetGatewayId: !Ref 'VPCInternetGateway'
       VpcId: !GetAtt 'VPCSubnetPublic.VpcId'
 
   VPCEndpointS3:
     Type: AWS::EC2::VPCEndpoint
+    Condition: CreateVPCResources
     Properties:
       VpcEndpointType: Gateway
       VpcId: !GetAtt 'VPCSubnetPublic.VpcId'
@@ -499,6 +562,7 @@ Resources:
 
   VPCEndpointLambda:
     Type: AWS::EC2::VPCEndpoint
+    Condition: CreateVPCResources
     Properties:
       VpcEndpointType: Interface
       VpcId: !GetAtt 'VPCSubnetPublic.VpcId'
@@ -512,6 +576,7 @@ Resources:
 
   VPCEndpointEBS:
     Type: AWS::EC2::VPCEndpoint
+    Condition: CreateVPCResources
     Properties:
       VpcEndpointType: Interface
       VpcId: !GetAtt 'VPCSubnetPublic.VpcId'
@@ -525,6 +590,7 @@ Resources:
 
   VPC:
     Type: AWS::EC2::VPC
+    Condition: CreateVPCResources
     Properties:
       CidrBlock: 10.0.0.0/16
       EnableDnsSupport: true
