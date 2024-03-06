@@ -240,26 +240,24 @@ Resources:
   ScannerAgentInstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
-      Path: /
       Roles:
         - !Ref 'ScannerInstanceRole'
 
   ScannerAgentPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      Path: /
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
-          - Action: 'sts:AssumeRole'
+          - Sid: AssumeCrossAccountScanningRole
+            Action: 'sts:AssumeRole'
             Effect: Allow
             Resource: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${ScannerDelegateRoleName}'
-            Sid: AssumeCrossAccountScanningRole
 
-  ScannerDelegateRolePolicy:
+  ScannerDelegateRoleOrchestratorPolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      Path: /
+      Description: Policy for the Datadog Agentless Scanner orchestrator allowing the creation and deletion of snapshots.
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -290,10 +288,28 @@ Resources:
                 'aws:RequestTag/DatadogAgentlessScanner': 'true'
             Effect: Allow
             Resource: 'arn:aws:ec2:*:*:snapshot/*'
-          - Sid: DatadogAgentlessScannerSnapshotAccessAndCleanup
+          - Sid: DatadogAgentlessScannerSnapshotCleanup
             Action:
-              - 'ec2:DescribeSnapshotAttribute'
               - 'ec2:DeleteSnapshot'
+            Condition:
+              StringEquals:
+                'aws:ResourceTag/DatadogAgentlessScanner': 'true'
+            Effect: Allow
+            Resource: 'arn:aws:ec2:*:*:snapshot/*'
+          - Sid: DatadogAgentlessScannerDescribeSnapshots
+            Action: 'ec2:DescribeSnapshots'
+            Effect: Allow
+            Resource: '*'
+
+  ScannerDelegateRoleWorkerPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Description: Policy for the Datadog Agentless Scanner worker allowing the listing and reading of snapshots.
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: DatadogAgentlessScannerSnapshotAccess
+            Action:
               - 'ebs:ListSnapshotBlocks'
               - 'ebs:ListChangedBlocks'
               - 'ebs:GetSnapshotBlock'
@@ -318,7 +334,7 @@ Resources:
   ScannerDelegateOfflineRolePolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
-      Path: /
+      Description: Policy for the Datadog Agentless Scanner worker allowing the listing snapshots, instances, images to perform offline scans.
       PolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -346,7 +362,6 @@ Resources:
   ScannerInstanceRole:
     Type: AWS::IAM::Role
     Properties:
-      Path: /
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
@@ -368,7 +383,6 @@ Resources:
   ScannerDelegateRole:
     Type: AWS::IAM::Role
     Properties:
-      Path: /
       RoleName: !Ref 'ScannerDelegateRoleName'
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -381,7 +395,8 @@ Resources:
 
       MaxSessionDuration: 3600
       ManagedPolicyArns:
-        - !Ref 'ScannerDelegateRolePolicy'
+        - !Ref 'ScannerDelegateRoleOrchestratorPolicy'
+        - !Ref 'ScannerDelegateRoleWorkerPolicy'
         - !If [OfflineModeEnabled, !Ref 'ScannerDelegateOfflineRolePolicy', !Ref 'AWS::NoValue']
       Description: Role assumed by the Datadog Agentless scanner agent to perform scans
       Tags:
@@ -389,8 +404,6 @@ Resources:
           Value: 'true'
         - Key: Datadog
           Value: 'true'
-    DependsOn:
-      - ScannerInstanceRole
 
   ScannerAutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup

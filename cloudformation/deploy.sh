@@ -46,7 +46,9 @@ STACK_ID=$(aws cloudformation describe-stacks \
 printf "waiting for instance to scale up..."
 while true; do
   STACK_INSTANCE_IP=$(aws ec2 describe-instances \
-      --filters "Name=tag:aws:cloudformation:stack-id,Values=${STACK_ID}" \
+      --filters \
+        "Name=tag:aws:cloudformation:stack-id,Values=${STACK_ID}" \
+        "Name=instance-state-name,Values=running" \
       --query 'Reservations[0].Instances[0].PrivateIpAddress' \
       --output text)
   if [ "$STACK_INSTANCE_IP" = "None" ]; then
