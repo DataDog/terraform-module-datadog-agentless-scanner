@@ -168,7 +168,10 @@ Resources:
               set -e
               set -o pipefail
 
-              echo "agentless-scanning-${AWS::Region}" > /etc/hostname
+              INSTANCE_ID=$(cat /var/lib/cloud/data/instance-id)
+
+              DD_HOSTNAME="agentless-scanning-${AWS::Region}-$INSTANCE_ID"
+              echo $DD_HOSTNAME > /etc/hostname
               DD_API_KEY="${DatadogAPIKey}"
 
               # Enable the nbd module
@@ -183,7 +186,7 @@ Resources:
               # Install the agent
               DD_API_KEY=$DD_API_KEY \
                 DD_SITE="${DatadogSite}" \
-                DD_HOSTNAME="agentless-scanning-${AWS::Region}" \
+                DD_HOSTNAME=$DD_HOSTNAME \
                 DD_AGENT_MINOR_VERSION="50.3" \
                 bash -c "$(curl -L https://s3.amazonaws.com/dd-agent/scripts/install_script_agent7.sh)"
 
