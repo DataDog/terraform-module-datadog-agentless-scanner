@@ -215,12 +215,21 @@ Resources:
 
               chown -R dd-agent: /etc/datadog-agent/conf.d/agentless-scanner.d
 
+              if [ "${ScannerOfflineModeEnabled}" = "true" ]; then
+                cat <<EOF >> /etc/datadog-agent/datadog.yaml
+              agentless_scanner:
+                default_roles:
+                  - "arn:aws:iam::${AWS::AccountId}:role/${ScannerDelegateRoleName}"
+              EOF
+              fi
+
               # Restart the agent
               service datadog-agent restart
 
               # Enable and start datadog-agentless-scaner
               systemctl enable datadog-agentless-scanner
               systemctl start datadog-agentless-scanner
+
         BlockDeviceMappings:
           - DeviceName: /dev/sda1
             Ebs:
