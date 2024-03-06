@@ -63,10 +63,19 @@ Parameters:
     Description: Whether to enable detailed monitoring for the Datadog Agentless Scanner instances
     Default: "false"
 
+  ScannerOfflineModeEnabled:
+    Type: String
+    AllowedValues:
+      - "true"
+      - "false"
+    Description: Whether to enable the offline mode for the Datadog Agentless Scanner
+    Default: "false"
+
   ScannerAutoScalingGroupSize:
     Type: Number
     Description: The number of instances in the Auto Scaling Group
     Default: 1
+
 
 Conditions:
   ProvideSshKeyPair: !Not
@@ -79,6 +88,9 @@ Conditions:
   CreateSecurityGroup: !Equals
     - !Ref 'ScannerSecurityGroupId'
     - ''
+  OfflineModeEnabled: !Equals
+    - !Ref 'ScannerOfflineModeEnabled'
+    - 'true'
 
 Rules:
   ScannerVPCIdAndSubnetId:
@@ -303,6 +315,34 @@ Resources:
             Effect: Allow
             Resource: 'arn:aws:lambda:*:*:function:*'
 
+  ScannerDelegateOfflineRolePolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      Path: /
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: DatadogAgentlessScannerOfflineModeListLambdas
+            Action: lambda:ListFunctions
+            Effect: Allow
+            Resource: '*'
+          - Sid: DatadogAgentlessScannerOfflineModeListInstances
+            Action: ec2:DescribeInstances
+            Effect: Allow
+            Resource: '*'
+          - Sid: DatadogAgentlessScannerOfflineModeRegions
+            Action: ec2:DescribeRegions
+            Effect: Allow
+            Resource: '*'
+          - Sid: DatadogAgentlessScannerOfflineModeListVolumes
+            Action: ec2:DescribeVolumes
+            Effect: Allow
+            Resource: '*'
+          - Sid: DatadogAgentlessScannerOfflineModeListImages
+            Action: ec2:DescribeImages
+            Effect: Allow
+            Resource: '*'
+
   ScannerInstanceRole:
     Type: AWS::IAM::Role
     Properties:
@@ -342,6 +382,7 @@ Resources:
       MaxSessionDuration: 3600
       ManagedPolicyArns:
         - !Ref 'ScannerDelegateRolePolicy'
+        - !If [OfflineModeEnabled, !Ref 'ScannerDelegateOfflineRolePolicy', !Ref 'AWS::NoValue']
       Description: Role assumed by the Datadog Agentless scanner agent to perform scans
       Tags:
         - Key: DatadogAgentlessScanner

@@ -14,6 +14,7 @@ STACK_SCANNER_SSH_KEY_PAIR_NAME=${STACK_SCANNER_SSH_KEY_PAIR_NAME:-}
 STACK_SCANNER_VPC_ID=${STACK_SCANNER_VPC_ID:-}
 STACK_SCANNER_SUBNET_ID=${STACK_SCANNER_SUBNET_ID:-}
 STACK_SCANNER_SECURITY_GROUP_ID=${STACK_SCANNER_SECURITY_GROUP_ID:-}
+STACK_SCANNER_OFFLINE_MODE_ENABLED=${STACK_SCANNER_OFFLINE_MODE_ENABLED:-false}
 
 printf "validating template %s..." "${STACK_NAME}"
 aws cloudformation validate-template --template-body "${STACK_TEMPLATE_BODY}" > /dev/null
@@ -32,7 +33,8 @@ aws cloudformation deploy \
     "ScannerVPCId=${STACK_SCANNER_VPC_ID}" \
     "ScannerSubnetId=${STACK_SCANNER_SUBNET_ID}" \
     "ScannerSecurityGroupId=${STACK_SCANNER_SECURITY_GROUP_ID}" \
-    "ScannerDelegateRoleName=${STACK_NAME}DelegateRole"
+    "ScannerDelegateRoleName=${STACK_NAME}DelegateRole" \
+    "ScannerOfflineModeEnabled=${STACK_SCANNER_OFFLINE_MODE_ENABLED}"
 printf "ok.\n"
 
 STACK_ID=$(aws cloudformation describe-stacks \
