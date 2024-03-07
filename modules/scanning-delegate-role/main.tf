@@ -23,7 +23,7 @@ data "aws_iam_policy_document" "scanning_policy_document" {
     condition {
       test     = "StringEquals"
       variable = "ec2:CreateAction"
-      values   = ["CreateSnapshot", "CreateVolume"]
+      values   = ["CreateSnapshot", "CreateVolume", "CopySnapshot"]
     }
   }
 
@@ -50,6 +50,29 @@ data "aws_iam_policy_document" "scanning_policy_document" {
     effect = "Allow"
     actions = [
       "ec2:CreateSnapshot"
+    ]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:ec2:*:*:snapshot/*",
+    ]
+    // Enforcing created snapshot has DatadogAgentlessScanner tag
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestTag/DatadogAgentlessScanner"
+      values   = ["true"]
+    }
+    // Enforcing created snapshot has only tags with DatadogAgentlessScanner* prefix
+    condition {
+      test     = "ForAllValues:StringLike"
+      variable = "aws:TagKeys"
+      values   = ["DatadogAgentlessScanner*"]
+    }
+  }
+
+  statement {
+    sid    = "DatadogAgentlessScannerCopySnapshot"
+    effect = "Allow"
+    actions = [
+      "ec2:CopySnapshot"
     ]
     resources = [
       "arn:${data.aws_partition.current.partition}:ec2:*:*:snapshot/*",
