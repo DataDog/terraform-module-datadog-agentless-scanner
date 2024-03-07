@@ -287,39 +287,48 @@ Resources:
         Statement:
           - Sid: DatadogAgentlessScannerResourceTagging
             Action: 'ec2:CreateTags'
+            Effect: Allow
+            Resource:
+              - 'arn:aws:ec2:*:*:volume/*'
+              - 'arn:aws:ec2:*:*:snapshot/*'
             Condition:
               StringEquals:
                 'ec2:CreateAction':
                   - CreateSnapshot
                   - CreateVolume
-            Effect: Allow
-            Resource:
-              - 'arn:aws:ec2:*:*:volume/*'
-              - 'arn:aws:ec2:*:*:snapshot/*'
+                  - CopySnapshot
           - Sid: DatadogAgentlessScannerVolumeSnapshotCreation
             Action: 'ec2:CreateSnapshot'
+            Effect: Allow
+            Resource: 'arn:aws:ec2:*:*:volume/*'
             Condition:
               StringNotEquals:
                 'aws:ResourceTag/DatadogAgentlessScanner': 'false'
+          - Sid: DatadogAgentlessScannerCopySnapshot
+            Action: 'ec2:CopySnapshot'
             Effect: Allow
-            Resource: 'arn:aws:ec2:*:*:volume/*'
-          - Sid: DatadogAgentlessScannerSnapshotCreation
-            Action: 'ec2:CreateSnapshot'
+            Resource: 'arn:aws:ec2:*:*:snapshot/*'
             Condition:
               'ForAllValues:StringLike':
                 'aws:TagKeys': DatadogAgentlessScanner*
               StringEquals:
                 'aws:RequestTag/DatadogAgentlessScanner': 'true'
+          - Sid: DatadogAgentlessScannerSnapshotCreation
+            Action: 'ec2:CreateSnapshot'
             Effect: Allow
             Resource: 'arn:aws:ec2:*:*:snapshot/*'
+            Condition:
+              'ForAllValues:StringLike':
+                'aws:TagKeys': DatadogAgentlessScanner*
+              StringEquals:
+                'aws:RequestTag/DatadogAgentlessScanner': 'true'
           - Sid: DatadogAgentlessScannerSnapshotCleanup
-            Action:
-              - 'ec2:DeleteSnapshot'
+            Action: 'ec2:DeleteSnapshot'
+            Effect: Allow
+            Resource: 'arn:aws:ec2:*:*:snapshot/*'
             Condition:
               StringEquals:
                 'aws:ResourceTag/DatadogAgentlessScanner': 'true'
-            Effect: Allow
-            Resource: 'arn:aws:ec2:*:*:snapshot/*'
           - Sid: DatadogAgentlessScannerDescribeSnapshots
             Action: 'ec2:DescribeSnapshots'
             Effect: Allow
@@ -337,11 +346,11 @@ Resources:
               - 'ebs:ListSnapshotBlocks'
               - 'ebs:ListChangedBlocks'
               - 'ebs:GetSnapshotBlock'
+            Effect: Allow
+            Resource: 'arn:aws:ec2:*:*:snapshot/*'
             Condition:
               StringEquals:
                 'aws:ResourceTag/DatadogAgentlessScanner': 'true'
-            Effect: Allow
-            Resource: 'arn:aws:ec2:*:*:snapshot/*'
           - Sid: DatadogAgentlessScannerDescribeSnapshots
             Action: 'ec2:DescribeSnapshots'
             Effect: Allow
