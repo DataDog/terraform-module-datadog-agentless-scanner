@@ -97,13 +97,12 @@ Conditions:
   CreateSecurityGroup: !Equals
     - !Ref 'ScannerSecurityGroupId'
     - ''
+  CreateDatadogApiKeySecret: !Equals
+    - !Ref 'DatadogAPIKeySecretArn'
+    - ''
   OfflineModeEnabled: !Equals
     - !Ref 'ScannerOfflineModeEnabled'
     - 'true'
-  UseApiKeySecret: !Not
-    - !Equals
-      - !Ref 'DatadogAPIKeySecretArn'
-      - ''
 
 Rules:
   MustSetScannerVPCIdAndSubnetId:
@@ -116,9 +115,21 @@ Rules:
     AssertDescription: 'Checking arguments DatadogAPIKey and DatadogAPIKeySecretArn'
     Assertions:
       - Assert: !Or [!Not [!Equals [!Ref DatadogAPIKey, '']], !Not [!Equals [!Ref DatadogAPIKeySecretArn, '']]]
-        AssertDescription: 'DdApiKey and DdApiKeySecretArn should not be specified together'
+        AssertDescription: 'DatadogApiKey and DatadogApiKeySecretArn should not be specified together'
 
 Resources:
+  ScannerAPIKeySecret:
+    Type: AWS::SecretsManager::Secret
+    Condition: CreateDatadogApiKeySecret
+    Properties:
+      Description: Datadog API Key for the Datadog Agentless Scanner
+      SecretString: !Ref 'DatadogAPIKey'
+      Tags:
+        - Key: Datadog
+          Value: 'true'
+        - Key: DatadogAgentlessScanner
+          Value: 'true'
+
   ScannerSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Condition: CreateSecurityGroup
@@ -178,25 +189,13 @@ Resources:
                 Value: 'true'
         KeyName: !If [ProvideSshKeyPair, !Ref 'ScannerSSHKeyPairName', !Ref 'AWS::NoValue']
         UserData:
-          Fn::Base64:
-            !Sub |
+          Fn::Base64: !Sub
+            - |
               #!/bin/bash
               set +x
               set -u
               set -e
               set -o pipefail
-
-              INSTANCE_ID=$(cat /var/lib/cloud/data/instance-id)
-
-              DD_HOSTNAME="agentless-scanning-${AWS::Region}-$INSTANCE_ID"
-              DD_SITE="${DatadogSite}"
-              if [ -n "${DatadogAPIKeySecretArn}" ]; then
-                DD_API_KEY=$(aws secretsmanager get-secret-value --secret-id ${DatadogAPIKeySecretArn} --query SecretString --region "${AWS::Region}" --output text)
-              else
-                DD_API_KEY="${DatadogAPIKey}"
-              fi
-
-              echo $DD_HOSTNAME > /etc/hostname
 
               # Enable the nbd module
               modprobe nbd nbds_max=128
@@ -205,8 +204,14 @@ Resources:
 
               # Install requirements
               apt update
-              apt install -y nbd-client
+              apt install -y nbd-client awscli
 
+              INSTANCE_ID=$(cat /var/lib/cloud/data/instance-id)
+              DD_HOSTNAME="agentless-scanning-${AWS::Region}-$INSTANCE_ID"
+              DD_SITE="${DatadogSite}"
+              DD_API_KEY=$(aws secretsmanager get-secret-value --secret-id ${SecretAPIKeyArn} --query SecretString --region "${AWS::Region}" --output text)
+
+              echo $DD_HOSTNAME > /etc/hostname
               # Install the agent
               DD_API_KEY=$DD_API_KEY \
                 DD_SITE="$DD_SITE" \
@@ -266,6 +271,7 @@ Resources:
               # Enable and start datadog-agentless-scaner
               systemctl enable datadog-agentless-scanner
               systemctl start datadog-agentless-scanner
+            - SecretAPIKeyArn: !If [CreateDatadogApiKeySecret, !Ref 'ScannerAPIKeySecret', !Ref 'DatadogAPIKeySecretArn']
 
         BlockDeviceMappings:
           - DeviceName: /dev/sda1
@@ -302,7 +308,6 @@ Resources:
 
   ScannerAgentPolicyReadApiKeySecret:
     Type: AWS::IAM::ManagedPolicy
-    Condition: UseApiKeySecret
     Properties:
       PolicyDocument:
         Version: '2012-10-17'
@@ -310,7 +315,7 @@ Resources:
           - Sid: ReadDatadogConfig
             Action: 'secretsmanager:GetSecretValue'
             Effect: Allow
-            Resource: !Ref 'DatadogAPIKeySecretArn'
+            Resource: !If [CreateDatadogApiKeySecret, !Ref 'ScannerAPIKeySecret', !Ref 'DatadogAPIKeySecretArn']
 
   ScannerDelegateRoleOrchestratorPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -440,7 +445,7 @@ Resources:
       MaxSessionDuration: 3600
       ManagedPolicyArns:
         - !Ref 'ScannerAgentPolicy'
-        - !If [UseApiKeySecret, !Ref 'ScannerAgentPolicyReadApiKeySecret', !Ref 'AWS::NoValue']
+        - !Ref 'ScannerAgentPolicyReadApiKeySecret'
       Description: Role used by the Datadog agentless scanner instance
       Tags:
         - Key: Datadog
