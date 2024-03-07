@@ -7,6 +7,7 @@
 - Allow deploying scanner inside an existing VPC with the new optional parameters: `ScannerVPCId` and `ScannerSubnetId`
 - Allow associating an existing security-group to the scanner with the new optional parameter: `ScannerSecurityGroupId`
 - Allow attaching an existing SSH key-pair to the scanner with the new optional parameter: `ScannerSSHKeyPairName`
+- Allow setting the Datadog API Key via SecretManager with thew new optional paramater: `DatadogAPIKeySecretArn`
 - Creating a dedicated security-group by default with empty ingress rules
 - Add support for offline mode to scan without remote-config (deactived by default)
 - AutoScalingGroup update policy replacing instances as the launch template is being updated

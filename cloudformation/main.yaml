@@ -7,6 +7,12 @@ Parameters:
     Description: API key for the Datadog account (find at https://app.datadoghq.com/organization-settings/api-keys)
     NoEcho: true
 
+  DatadogAPIKeySecretArn:
+    Type: String
+    Description: The ARN of the secret storing the Datadog API key, if you already have it stored in Secrets Manager. You must store the secret as a plaintext, rather than a key-value pair.
+    AllowedPattern: "(arn:.*:secretsmanager:.*)?"
+    Default: ''
+
   DatadogSite:
     Type: String
     Description: The Datadog site to use for the Datadog Agentless Scanner
@@ -91,14 +97,23 @@ Conditions:
   OfflineModeEnabled: !Equals
     - !Ref 'ScannerOfflineModeEnabled'
     - 'true'
+  UseApiKeySecret: !Not
+    - !Equals
+      - !Ref 'DatadogAPIKeySecretArn'
+      - ''
 
 Rules:
-  ScannerVPCIdAndSubnetId:
+  MustSetScannerVPCIdAndSubnetId:
     AssertDescription: 'Checking arguments ScannerVPCId and ScannerSubnetId'
     RuleCondition: !Or [!Not [!Equals [!Ref 'ScannerVPCId', '']], !Not [!Equals [!Ref 'ScannerSubnetId', '']]]
     Assertions:
       - Assert: !And [!Not [!Equals [!Ref 'ScannerVPCId', '']], !Not [!Equals [!Ref 'ScannerSubnetId', '']]]
         AssertDescription: 'ScannerVPCId and ScannerSubnetId should be specified together'
+  MustSetDatadogAPIKey:
+    AssertDescription: 'Checking arguments DatadogAPIKey and DatadogAPIKeySecretArn'
+    Assertions:
+      - Assert: !Or [!Not [!Equals [!Ref DatadogAPIKey, '']], !Not [!Equals [!Ref DatadogAPIKeySecretArn, '']]]
+        AssertDescription: 'DdApiKey and DdApiKeySecretArn should not be specified together'
 
 Resources:
   ScannerSecurityGroup:
@@ -171,8 +186,12 @@ Resources:
               INSTANCE_ID=$(cat /var/lib/cloud/data/instance-id)
 
               DD_HOSTNAME="agentless-scanning-${AWS::Region}-$INSTANCE_ID"
-              DD_API_KEY="${DatadogAPIKey}"
               DD_SITE="${DatadogSite}"
+              if [ -n "${DatadogAPIKeySecretArn}" ]; then
+                DD_API_KEY=$(aws secretsmanager get-secret-value --secret-id ${DatadogAPIKeySecretArn} --query SecretString --region "${AWS::Region}" --output text)
+              else
+                DD_API_KEY="${DatadogAPIKey}"
+              fi
 
               echo $DD_HOSTNAME > /etc/hostname
 
@@ -277,6 +296,18 @@ Resources:
             Action: 'sts:AssumeRole'
             Effect: Allow
             Resource: !Sub 'arn:aws:iam::${AWS::AccountId}:role/${ScannerDelegateRoleName}'
+
+  ScannerAgentPolicyReadApiKeySecret:
+    Type: AWS::IAM::ManagedPolicy
+    Condition: UseApiKeySecret
+    Properties:
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: ReadDatadogConfig
+            Action: 'secretsmanager:GetSecretValue'
+            Effect: Allow
+            Resource: !Ref 'DatadogAPIKeySecretArn'
 
   ScannerDelegateRoleOrchestratorPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -406,6 +437,7 @@ Resources:
       MaxSessionDuration: 3600
       ManagedPolicyArns:
         - !Ref 'ScannerAgentPolicy'
+        - !If [UseApiKeySecret, !Ref 'ScannerAgentPolicyReadApiKeySecret', !Ref 'AWS::NoValue']
       Description: Role used by the Datadog agentless scanner instance
       Tags:
         - Key: Datadog
