@@ -1,4 +1,4 @@
-# Terraform Datadog Agentless Scanner Module
+# Terraform Module Datadog Agentless Scanner Module
 
 This Terraform module provides a simple and reusable configuration for installing a Datadog agentless scanner.
 
@@ -15,7 +15,7 @@ To use this module in your Terraform configuration, add the following code:
 
 ```hcl
 module "agentless_scanner" {
-  source = "github.com/DataDog/terraform-datadog-agentless-scanner"
+  source = "github.com/DataDog/terraform-module-datadog-agentless-scanner"
 
   api_key               = "YOUR_API_KEY"
   instance_profile_name = ""
