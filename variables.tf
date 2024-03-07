@@ -6,7 +6,7 @@ variable "api_key" {
 }
 
 variable "api_key_secret_arn" {
-  description = "ARN of the secret holding the Datadog API key. Takes precedence over api_key variable"
+  description = "ARNs of the secret holding the Datadog API key. Takes precedence over api_key variable"
   type        = string
   default     = null
 }

@@ -47,22 +47,22 @@ data "aws_iam_policy_document" "scanner_policy_document" {
   }
 
   dynamic "statement" {
-    for_each = var.api_key_secret_arn != null ? [1] : []
+    for_each = var.api_key_secret_arns
 
     content {
       sid       = "ReadSecret"
       actions   = ["secretsmanager:GetSecretValue"]
-      resources = [var.api_key_secret_arn]
+      resources = [statement.value]
     }
   }
 
   dynamic "statement" {
-    for_each = var.kms_key_arn != null ? [1] : []
+    for_each = var.api_key_secret_kms_key_arns
 
     content {
       sid       = "DecryptSecret"
       actions   = ["kms:Decrypt"]
-      resources = [var.kms_key_arn]
+      resources = [statement.value]
     }
   }
 }

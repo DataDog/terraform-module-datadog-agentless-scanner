@@ -28,16 +28,15 @@ variable "account_roles" {
   default     = []
 }
 
-variable "api_key_secret_arn" {
-  description = "ARN of the secret holding the Datadog API key"
-  type        = string
-  default     = null
+variable "api_key_secret_arns" {
+  description = "List of ARNs of the secrets holding the Datadog API keys"
+  type        = list(string)
 }
 
-variable "kms_key_arn" {
-  description = "ARN of the KMS key encrypting the secret"
-  type        = string
-  default     = null
+variable "api_key_secret_kms_key_arns" {
+  description = "List of ARNs of the KMS keys encrypting the secrets"
+  type        = list(string)
+  default     = []
 }
 
 variable "enable_ssm" {

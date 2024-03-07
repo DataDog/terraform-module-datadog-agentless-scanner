@@ -6,6 +6,7 @@
 
 - Add missing CopySnapshot permissions to allow AMI scanning
 - Create a dedicated security-group for scanner instead of relying on the VPC default one.
+- Always rely on SecretsManager to store the Datadog API Key
 
 ### CloudFormation
 
@@ -17,6 +18,7 @@
 - Add support for offline mode to scan without remote-config (deactived by default)
 - AutoScalingGroup update policy replacing instances as the launch template is being updated
 - Remove `agent_version` and `scanner_version` from main module to favor pinned version
+- Always rely on SecretsManager to store the Datadog API Key
 
 ## Version 0.9.1
 

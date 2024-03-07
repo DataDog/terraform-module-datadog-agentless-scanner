@@ -3,6 +3,11 @@ output "install_sh" {
   value       = terraform_data.template.output
 }
 
+output "api_key_secret_arn" {
+  description = "The ARN of the API key secret"
+  value       = local.api_key_secret_arn
+}
+
 output "agent_version" {
   description = "The version of the Datadog Agent installed"
   value       = local.agent_version

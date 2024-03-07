@@ -16,7 +16,8 @@ provider "aws" {
 module "scanner_role" {
   source = "git::https://github.com/DataDog/terraform-datadog-agentless-scanner//modules/agentless-scanner-role?ref=0.6.0"
 
-  account_roles = [module.delegate_role.role.arn]
+  account_roles       = [module.delegate_role.role.arn]
+  api_key_secret_arns = [module.agentless_scanner.api_key_secret_arn]
 }
 
 module "delegate_role" {
