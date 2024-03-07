@@ -3,6 +3,11 @@ variable "api_key" {
   type        = string
 }
 
+variable "vpc_id" {
+  description = "The VPC ID to launch in"
+  type        = string
+}
+
 variable "subnet_id" {
   description = "The VPC Subnet ID to launch in"
   type        = string

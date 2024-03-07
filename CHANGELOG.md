@@ -5,6 +5,7 @@
 ### Terraform
 
 - Add missing CopySnapshot permissions to allow AMI scanning
+- Create a dedicated security-group for scanner instead of relying on the VPC default one.
 
 ### CloudFormation
 

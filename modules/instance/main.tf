@@ -10,7 +10,7 @@ resource "aws_launch_template" "launch_template" {
   image_id               = var.instance_image_id
   instance_type          = var.instance_type
   user_data              = base64encode(var.user_data)
-  vpc_security_group_ids = var.vpc_security_group_ids
+  vpc_security_group_ids = coalescelist(var.vpc_security_group_ids, [aws_security_group.default_scanner_security_group.id])
   key_name               = var.key_name
 
   block_device_mappings {
@@ -52,6 +52,26 @@ resource "aws_launch_template" "launch_template" {
   tags = merge(var.tags, local.dd_tags)
 }
 
+resource "aws_security_group" "default_scanner_security_group" {
+  name_prefix = "datadog-agentless-scanner-sg"
+  vpc_id      = var.vpc_id
+  description = "Datadog Agentless Scanner default security group"
+  tags        = merge(var.tags, local.dd_tags)
+
+  ingress = []
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
 resource "aws_autoscaling_group" "asg" {
   name_prefix      = "datadog-agentless-scanner-asg"
   min_size         = var.asg_size
@@ -90,5 +110,9 @@ resource "aws_autoscaling_group" "asg" {
       value               = tag.value
       propagate_at_launch = false # tagging is handled by the launch template, here we only tag the ASG itself
     }
+  }
+
+  lifecycle {
+    replace_triggered_by = [aws_security_group.default_scanner_security_group]
   }
 }

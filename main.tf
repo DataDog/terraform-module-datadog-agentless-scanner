@@ -16,6 +16,7 @@ module "instance" {
   source               = "./modules/instance"
   user_data            = module.user_data.install_sh
   iam_instance_profile = var.instance_profile_name
+  vpc_id               = module.vpc.vpc.id
   subnet_id            = module.vpc.private_subnet.id
   tags                 = var.tags
 }
