@@ -149,7 +149,7 @@ Resources:
           - DeviceIndex: 0
             AssociatePublicIpAddress: false
             DeleteOnTermination: true
-            SubnetId: !If [CreateVPCResources, !Ref 'VPCSubnetPublic', !Ref 'ScannerSubnetId']
+            SubnetId: !If [CreateVPCResources, !Ref 'VPCSubnetPrivate', !Ref 'ScannerSubnetId']
             Groups:
               - !If [CreateSecurityGroup, !Ref 'ScannerSecurityGroup', !Ref 'ScannerSecurityGroupId']
         TagSpecifications:
