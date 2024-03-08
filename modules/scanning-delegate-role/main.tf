@@ -7,8 +7,11 @@ locals {
 
 data "aws_partition" "current" {}
 
+// The IAM policy for the scanning orchestrator allows to create resources
+// such as snapshots and volumes. It is also able to cleanup these resources
+// after creation. It does not allow reading the created resources.
 // reference: https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonec2.html
-data "aws_iam_policy_document" "scanning_policy_document" {
+data "aws_iam_policy_document" "scanning_orchestrator_policy_document" {
   statement {
     sid    = "DatadogAgentlessScannerResourceTagging"
     effect = "Allow"
@@ -23,7 +26,7 @@ data "aws_iam_policy_document" "scanning_policy_document" {
     condition {
       test     = "StringEquals"
       variable = "ec2:CreateAction"
-      values   = ["CreateSnapshot", "CreateVolume"]
+      values   = ["CreateSnapshot", "CreateVolume", "CopySnapshot"]
     }
   }
 
@@ -69,19 +72,34 @@ data "aws_iam_policy_document" "scanning_policy_document" {
   }
 
   statement {
-    sid    = "DatadogAgentlessScannerSnapshotAccessAndCleanup"
+    sid    = "DatadogAgentlessScannerCopySnapshot"
     effect = "Allow"
     actions = [
-      // Allow reading created snapshots' blocks from EBS direct APIs
-      "ebs:GetSnapshotBlock",
-      "ebs:ListChangedBlocks",
-      "ebs:ListSnapshotBlocks",
+      "ec2:CopySnapshot"
+    ]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:ec2:*:*:snapshot/*",
+    ]
+    // Enforcing created snapshot has DatadogAgentlessScanner tag
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestTag/DatadogAgentlessScanner"
+      values   = ["true"]
+    }
+    // Enforcing created snapshot has only tags with DatadogAgentlessScanner* prefix
+    condition {
+      test     = "ForAllValues:StringLike"
+      variable = "aws:TagKeys"
+      values   = ["DatadogAgentlessScanner*"]
+    }
+  }
 
+  statement {
+    sid    = "DatadogAgentlessScannerSnapshotCleanup"
+    effect = "Allow"
+    actions = [
       // Allow deleting created snapshots and volumes
       "ec2:DeleteSnapshot",
-
-      // Allow describing created snapshots
-      "ec2:DescribeSnapshotAttribute",
     ]
     resources = [
       "arn:${data.aws_partition.current.partition}:ec2:*:*:snapshot/*",
@@ -202,6 +220,58 @@ data "aws_iam_policy_document" "scanning_policy_document" {
   #       values   = ["true"]
   #     }
   #   }
+}
+
+// The IAM policy for the scanning worker allows to read created resources, as
+// well as lambdas.
+data "aws_iam_policy_document" "scanning_worker_policy_document" {
+  statement {
+    sid    = "DatadogAgentlessScannerDescribeSnapshots"
+    effect = "Allow"
+    actions = [
+      // Required to be able to wait for snapshots completion and cleanup. It
+      // cannot be restricted.
+      "ec2:DescribeSnapshots",
+    ]
+    resources = [
+      "*",
+    ]
+  }
+
+  statement {
+    sid    = "DatadogAgentlessScannerDescribeVolumes"
+    effect = "Allow"
+    actions = [
+      // Required to be able to wait for volumes completion and cleanup. It
+      // cannot be restricted.
+      "ec2:DescribeVolumes",
+    ]
+    resources = [
+      "*",
+    ]
+  }
+
+  statement {
+    sid    = "DatadogAgentlessScannerSnapshotAccess"
+    effect = "Allow"
+    actions = [
+      // Allow reading created snapshots' blocks from EBS direct APIs
+      "ebs:GetSnapshotBlock",
+      "ebs:ListChangedBlocks",
+      "ebs:ListSnapshotBlocks",
+    ]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:ec2:*:*:snapshot/*",
+    ]
+
+    // Enforce that any of these actions can be performed on resources
+    // (volumes and snapshots) that have the DatadogAgentlessScanner tag.
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceTag/DatadogAgentlessScanner"
+      values   = ["true"]
+    }
+  }
 
   statement {
     sid    = "GetLambdaDetails"
@@ -221,10 +291,16 @@ data "aws_iam_policy_document" "scanning_policy_document" {
   }
 }
 
-resource "aws_iam_policy" "scanning_policy" {
+resource "aws_iam_policy" "scanning_orchestrator_policy" {
   name   = var.iam_policy_name
   path   = var.iam_policy_path
-  policy = data.aws_iam_policy_document.scanning_policy_document.json
+  policy = data.aws_iam_policy_document.scanning_orchestrator_policy_document.json
+}
+
+resource "aws_iam_policy" "scanning_worker_policy" {
+  name   = var.iam_policy_name
+  path   = var.iam_policy_path
+  policy = data.aws_iam_policy_document.scanning_worker_policy_document.json
 }
 
 data "aws_iam_policy_document" "assume_role_policy" {
@@ -255,7 +331,12 @@ resource "aws_iam_role" "role" {
   tags = merge(var.tags, local.dd_tags)
 }
 
-resource "aws_iam_role_policy_attachment" "attachment" {
-  policy_arn = aws_iam_policy.scanning_policy.arn
+resource "aws_iam_role_orchestrator_policy_attachment" "attachment" {
+  policy_arn = aws_iam_policy.scanning_orchestrator_policy.arn
+  role       = aws_iam_role.role.name
+}
+
+resource "aws_iam_role_worker_policy_attachment" "attachment" {
+  policy_arn = aws_iam_policy.scanning_worker_policy.arn
   role       = aws_iam_role.role.name
 }

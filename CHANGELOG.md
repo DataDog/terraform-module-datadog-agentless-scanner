@@ -1,6 +1,10 @@
 # Changelog
 
-## TBD
+## Version TBD
+
+### Terraform
+
+- Add missing CopySnapshot permissions to allow AMI scanning
 
 ### CloudFormation
 
@@ -12,11 +16,11 @@
 - Add support for offline mode to scan without remote-config (deactived by default)
 - AutoScalingGroup update policy replacing instances as the launch template is being updated
 
-## Terraform 0.9.1
+## Version 0.9.1
 
 - Adds missing nbd module activation in cloud init
 
-## Terraform 0.9.0
+## Version 0.9.0
 
 ### agentless-scanner 2024022201
 
@@ -28,7 +32,7 @@
 - Split agentless binary in dedicated package
 - Improve performance of OS SBOMs generation
 
-## Terraform 0.8.0
+## Version 0.8.0
 
 ### agentless-scanner 2024020101
 
@@ -45,20 +49,20 @@
 - AWS volume attach: reduce the number of DeleteVolume requests when cleaning up a scan
 - NBD attach: fix occasional crashes when closing the NBD server
 
-## Terraform 0.7.0
+## Version 0.7.0
 
 ### agentless-scanner 2024011701
 
 - Execute Trivy scans in dedicated processes.
 
-## Terraform 0.6.0
+## Version 0.6.0
 
 ### agentless-scanner 2024011501
 
 - Clean up downloaded AWS Lambdas on startup.
 - Increase timeout while downloading AWS Lambda functions.
 
-## Terraform 0.5.0
+## Version 0.5.0
 
 ### agentless-scanner 2023122001
 
