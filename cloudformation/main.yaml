@@ -27,18 +27,21 @@ Parameters:
       - datad0g.com
 
   ScannerVPCId:
-    Type: AWS::EC2::VPC::Id
+    Type: String
     Description: The VPC to use for the Datadog Agentless Scanner. If not provided, a new VPC will be created (should be specified along with ScannerSubnetId).
+    AllowedPattern: "(vpc-[0-9a-fA-F]+)?"
     Default: ''
 
   ScannerSubnetId:
-    Type: AWS::EC2::Subnet::Id
+    Type: String
     Description: The subnet to use for the Datadog Agentless Scanner. If not provided, a new VPC will be created (should be specified along with ScannerVPCId).
+    AllowedPattern: "(subnet-[0-9a-fA-F]+)?"
     Default: ''
 
   ScannerSecurityGroupId:
-    Type: AWS::EC2::SecurityGroup::Id
+    Type: String
     Description: The security group to use for the Datadog Agentless Scanner. If not provided a new security group will be created.
+    AllowedPattern: "(sg-[0-9a-fA-F]+)?"
     Default: ''
 
   ScannerDelegateRoleName:
