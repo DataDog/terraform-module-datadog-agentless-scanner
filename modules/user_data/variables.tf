@@ -17,17 +17,3 @@ variable "site" {
   default     = "datadoghq.com"
   nullable    = false
 }
-
-variable "agent_version" {
-  description = "Specifies the agent version installed"
-  type        = string
-  default     = "50.3"
-  nullable    = false
-}
-
-variable "scanner_version" {
-  description = "Specifies the agentless scanner version installed"
-  type        = string
-  default     = "7.51.0~agentless~scanner~2024022201"
-  nullable    = false
-}

@@ -17,18 +17,6 @@ variable "site" {
   default     = null
 }
 
-variable "agent_version" {
-  description = "Specifies the agent version installed"
-  type        = string
-  default     = null
-}
-
-variable "scanner_version" {
-  description = "Specifies the agentless scanner version installed"
-  type        = string
-  default     = null
-}
-
 variable "instance_profile_name" {
   description = "Name of the instance profile to attach to the instance"
   type        = string
