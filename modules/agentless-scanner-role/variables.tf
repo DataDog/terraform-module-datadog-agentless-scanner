@@ -13,7 +13,7 @@ variable "iam_policy_name" {
 variable "iam_role_path" {
   description = "IAM role path"
   type        = string
-  default     = null
+  default     = "/"
 }
 
 variable "iam_policy_path" {

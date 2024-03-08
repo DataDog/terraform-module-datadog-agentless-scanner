@@ -292,15 +292,15 @@ data "aws_iam_policy_document" "scanning_worker_policy_document" {
 }
 
 resource "aws_iam_policy" "scanning_orchestrator_policy" {
-  name   = var.iam_policy_name
-  path   = var.iam_policy_path
-  policy = data.aws_iam_policy_document.scanning_orchestrator_policy_document.json
+  name_prefix = "${var.iam_role_name}OrchestratorPolicy"
+  path        = var.iam_role_path
+  policy      = data.aws_iam_policy_document.scanning_orchestrator_policy_document.json
 }
 
 resource "aws_iam_policy" "scanning_worker_policy" {
-  name   = var.iam_policy_name
-  path   = var.iam_policy_path
-  policy = data.aws_iam_policy_document.scanning_worker_policy_document.json
+  name_prefix = "${var.iam_role_name}WorkerPolicy"
+  path        = var.iam_role_path
+  policy      = data.aws_iam_policy_document.scanning_worker_policy_document.json
 }
 
 data "aws_iam_policy_document" "assume_role_policy" {
@@ -331,12 +331,12 @@ resource "aws_iam_role" "role" {
   tags = merge(var.tags, local.dd_tags)
 }
 
-resource "aws_iam_role_orchestrator_policy_attachment" "attachment" {
+resource "aws_iam_role_policy_attachment" "orchestrator_attachment" {
   policy_arn = aws_iam_policy.scanning_orchestrator_policy.arn
   role       = aws_iam_role.role.name
 }
 
-resource "aws_iam_role_worker_policy_attachment" "attachment" {
+resource "aws_iam_role_policy_attachment" "worker_attachment" {
   policy_arn = aws_iam_policy.scanning_worker_policy.arn
   role       = aws_iam_role.role.name
 }
