@@ -231,11 +231,6 @@ Resources:
 
               hostnamectl hostname $DD_HOSTNAME
 
-              INSTANCE_ID=$(cat /var/lib/cloud/data/instance-id)
-              DD_HOSTNAME="agentless-scanning-${AWS::Region}-$INSTANCE_ID"
-              DD_SITE="${DatadogSite}"
-              DD_API_KEY=$(aws secretsmanager get-secret-value --secret-id ${SecretAPIKeyArn} --query SecretString --region "${AWS::Region}" --output text)
-
               echo $DD_HOSTNAME > /etc/hostname
               # Install the agent
               DD_API_KEY=$DD_API_KEY \
