@@ -46,14 +46,10 @@ data "aws_iam_policy_document" "scanner_policy_document" {
     resources = var.account_roles
   }
 
-  dynamic "statement" {
-    for_each = var.api_key_secret_arns
-
-    content {
-      sid       = "ReadSecret"
-      actions   = ["secretsmanager:GetSecretValue"]
-      resources = [statement.value]
-    }
+  statement {
+    sid       = "ReadSecret"
+    actions   = ["secretsmanager:GetSecretValue"]
+    resources = var.api_key_secret_arns
   }
 
   dynamic "statement" {
