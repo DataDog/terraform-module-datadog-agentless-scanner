@@ -16,6 +16,13 @@ data "aws_iam_policy_document" "assume_role_policy" {
       type        = "Service"
       identifiers = ["ec2.${data.aws_partition.current.dns_suffix}"]
     }
+
+    // Enforce that the role can only be assumed by an instance with the right tags.
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceTag/DatadogAgentlessScanner"
+      values   = ["true"]
+    }
   }
 }
 
