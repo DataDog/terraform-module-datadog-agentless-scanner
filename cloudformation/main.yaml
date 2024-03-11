@@ -437,6 +437,9 @@ Resources:
             Effect: Allow
             Principal:
               Service: ec2.amazonaws.com
+            Condition:
+                StringEquals:
+                  'aws:ResourceTag/DatadogAgentlessScanner': 'true'
       MaxSessionDuration: 3600
       ManagedPolicyArns:
         - !Ref 'ScannerAgentPolicy'
