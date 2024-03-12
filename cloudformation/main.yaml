@@ -26,6 +26,11 @@ Parameters:
       - ddog-gov.com
       - datad0g.com
 
+  DatadogStackDeploymentId:
+    Type: String
+    Description: An UUID of the stack deployment in Datadog
+    Default: ''
+
   ScannerVPCId:
     Type: String
     Description: The VPC to use for the Datadog Agentless Scanner. If not provided, a new VPC will be created (should be specified along with ScannerSubnetId).
@@ -475,6 +480,8 @@ Resources:
           Value: 'true'
         - Key: DatadogAgentlessScanner
           Value: 'true'
+        - Key: DatadogAgentlessScannerDeploymentId:
+          Value: !Ref 'DatadogStackDeploymentId'
 
   ScannerDelegateRole:
     Type: AWS::IAM::Role
@@ -500,6 +507,8 @@ Resources:
           Value: 'true'
         - Key: Datadog
           Value: 'true'
+        - Key: DatadogAgentlessScannerDeploymentId:
+          Value: !Ref 'DatadogStackDeploymentId'
 
   ScannerAutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
