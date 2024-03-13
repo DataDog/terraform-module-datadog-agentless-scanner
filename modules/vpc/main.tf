@@ -36,8 +36,9 @@ resource "aws_internet_gateway" "internet_gateway" {
 resource "aws_subnet" "public" {
   for_each = local.azs_cidrs
 
-  vpc_id     = aws_vpc.vpc.id
-  cidr_block = each.value.public_cidr
+  vpc_id            = aws_vpc.vpc.id
+  availability_zone = each.key
+  cidr_block        = each.value.public_cidr
 
   tags = merge({ "Name" = "${var.name}-${each.key}-public" }, var.tags, local.dd_tags)
 }
@@ -80,8 +81,9 @@ resource "aws_route_table_association" "public" {
 resource "aws_subnet" "private" {
   for_each = local.azs_cidrs
 
-  vpc_id     = aws_vpc.vpc.id
-  cidr_block = each.value.private_cidr
+  vpc_id            = aws_vpc.vpc.id
+  availability_zone = each.key
+  cidr_block        = each.value.private_cidr
 
   tags = merge({ "Name" = "${var.name}-${each.key}-private" }, var.tags, local.dd_tags)
 }
