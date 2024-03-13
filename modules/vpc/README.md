@@ -37,6 +37,7 @@ No modules.
 | [aws_vpc_endpoint.lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_endpoint) | resource |
 | [aws_vpc_endpoint.s3](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_endpoint) | resource |
 | [aws_vpc_endpoint.ssm](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/vpc_endpoint) | resource |
+| [aws_availability_zones.available](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/availability_zones) | data source |
 | [aws_vpc_endpoint_service.ebs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc_endpoint_service) | data source |
 | [aws_vpc_endpoint_service.lambda](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc_endpoint_service) | data source |
 | [aws_vpc_endpoint_service.s3](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/vpc_endpoint_service) | data source |
@@ -56,7 +57,8 @@ No modules.
 | Name | Description |
 |------|-------------|
 | <a name="output_nap_public_id"></a> [nap\_public\_id](#output\_nap\_public\_id) | The public IP associated with the VPC's NAT |
-| <a name="output_private_subnet"></a> [private\_subnet](#output\_private\_subnet) | The private subnet of the created VPC |
-| <a name="output_public_subnet"></a> [public\_subnet](#output\_public\_subnet) | The public subnet of the created VPC |
+| <a name="output_private_subnets"></a> [private\_subnets](#output\_private\_subnets) | The private subnets of the created VPC |
+| <a name="output_public_subnets"></a> [public\_subnets](#output\_public\_subnets) | The public subnets of the created VPC |
+| <a name="output_routing_ready"></a> [routing\_ready](#output\_routing\_ready) | Allows to depends on completion of routing resources |
 | <a name="output_vpc"></a> [vpc](#output\_vpc) | The VPC created for the Datadog agentless scanner |
 <!-- END_TF_DOCS -->
