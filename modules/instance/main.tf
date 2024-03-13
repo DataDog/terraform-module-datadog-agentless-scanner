@@ -83,7 +83,7 @@ resource "aws_autoscaling_group" "asg" {
   #   - https://github.com/hashicorp/terraform-provider-aws/pull/32914
   ignore_failed_scaling_activities = true
 
-  vpc_zone_identifier = [var.subnet_id]
+  vpc_zone_identifier = var.subnet_ids
 
   launch_template {
     id      = aws_launch_template.launch_template.id

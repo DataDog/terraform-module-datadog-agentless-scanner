@@ -1,10 +1,21 @@
+data "aws_availability_zones" "available" {}
+
 locals {
   dd_tags = {
     Datadog                 = "true"
     DatadogAgentlessScanner = "true"
   }
-  public_cidr               = cidrsubnet(var.cidr, 3, 0)
-  private_cidr              = cidrsubnet(var.cidr, 3, 4)
+
+  max_azs             = 3 # Limit to a maximum of 3 AZs on that region
+  private_cidr_offset = 3
+  azs_cidrs = {
+    for idx, az in slice(data.aws_availability_zones.available.names, 0, local.max_azs) :
+    az => {
+      public_cidr  = cidrsubnet("10.0.0.0/16", 3, idx),
+      private_cidr = cidrsubnet("10.0.0.0/16", 3, idx + local.private_cidr_offset)
+    }
+  }
+
   ssm_vpc_endpoint_services = ["ec2messages", "ssmmessages", "ssm"]
 }
 
@@ -23,10 +34,12 @@ resource "aws_internet_gateway" "internet_gateway" {
 }
 
 resource "aws_subnet" "public" {
-  vpc_id     = aws_vpc.vpc.id
-  cidr_block = local.public_cidr
+  for_each = local.azs_cidrs
 
-  tags = merge({ "Name" = "${var.name}-public" }, var.tags, local.dd_tags)
+  vpc_id     = aws_vpc.vpc.id
+  cidr_block = each.value.public_cidr
+
+  tags = merge({ "Name" = "${var.name}-${each.key}-public" }, var.tags, local.dd_tags)
 }
 
 resource "aws_eip" "nat" {
@@ -37,7 +50,8 @@ resource "aws_eip" "nat" {
 
 resource "aws_nat_gateway" "nat_gateway" {
   allocation_id = aws_eip.nat.id
-  subnet_id     = aws_subnet.public.id
+  # NAT gateway are expensive, keep only one until we can remove it entirely
+  subnet_id = values(aws_subnet.public)[0].id
 
   tags = merge({ "Name" = var.name }, var.tags, local.dd_tags)
 
@@ -57,15 +71,19 @@ resource "aws_route" "public" {
 }
 
 resource "aws_route_table_association" "public" {
-  subnet_id      = aws_subnet.public.id
+  for_each = aws_subnet.public
+
+  subnet_id      = each.value.id
   route_table_id = aws_route_table.public.id
 }
 
 resource "aws_subnet" "private" {
-  vpc_id     = aws_vpc.vpc.id
-  cidr_block = local.private_cidr
+  for_each = local.azs_cidrs
 
-  tags = merge({ "Name" = "${var.name}-private" }, var.tags, local.dd_tags)
+  vpc_id     = aws_vpc.vpc.id
+  cidr_block = each.value.private_cidr
+
+  tags = merge({ "Name" = "${var.name}-${each.key}-private" }, var.tags, local.dd_tags)
 }
 
 resource "aws_route_table" "private" {
@@ -81,7 +99,9 @@ resource "aws_route" "private" {
 }
 
 resource "aws_route_table_association" "private" {
-  subnet_id      = aws_subnet.private.id
+  for_each = aws_subnet.private
+
+  subnet_id      = each.value.id
   route_table_id = aws_route_table.private.id
 }
 
@@ -128,7 +148,7 @@ resource "aws_vpc_endpoint" "lambda" {
   service_name        = data.aws_vpc_endpoint_service.lambda.service_name
   vpc_endpoint_type   = data.aws_vpc_endpoint_service.lambda.service_type
   vpc_id              = aws_vpc.vpc.id
-  subnet_ids          = [aws_subnet.private.id]
+  subnet_ids          = [for s in aws_subnet.private : s.id]
   security_group_ids  = [aws_security_group.endpoint_sg.id]
   private_dns_enabled = true
 
@@ -144,7 +164,7 @@ resource "aws_vpc_endpoint" "ebs" {
   service_name        = data.aws_vpc_endpoint_service.ebs.service_name
   vpc_endpoint_type   = data.aws_vpc_endpoint_service.ebs.service_type
   vpc_id              = aws_vpc.vpc.id
-  subnet_ids          = [aws_subnet.private.id]
+  subnet_ids          = [for s in aws_subnet.private : s.id]
   security_group_ids  = [aws_security_group.endpoint_sg.id]
   private_dns_enabled = true
 
@@ -164,7 +184,7 @@ resource "aws_vpc_endpoint" "ssm" {
   service_name        = data.aws_vpc_endpoint_service.ssm[each.value].service_name
   vpc_endpoint_type   = data.aws_vpc_endpoint_service.ssm[each.value].service_type
   vpc_id              = aws_vpc.vpc.id
-  subnet_ids          = [aws_subnet.private.id]
+  subnet_ids          = [for s in aws_subnet.private : s.id]
   private_dns_enabled = true
   security_group_ids  = [aws_security_group.endpoint_sg.id]
 

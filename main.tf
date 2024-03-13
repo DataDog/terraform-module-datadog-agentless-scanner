@@ -16,7 +16,9 @@ module "instance" {
   source               = "./modules/instance"
   user_data            = module.user_data.install_sh
   vpc_id               = module.vpc.vpc.id
-  subnet_id            = module.vpc.private_subnet.id
+  subnet_ids           = [for s in module.vpc.private_subnets : s.id]
   iam_instance_profile = var.instance_profile_name
   tags                 = var.tags
+
+  depends_on = [module.vpc.routing_ready]
 }

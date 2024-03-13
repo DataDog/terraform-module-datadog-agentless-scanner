@@ -3,17 +3,27 @@ output "vpc" {
   value       = aws_vpc.vpc
 }
 
-output "public_subnet" {
-  description = "The public subnet of the created VPC"
+output "public_subnets" {
+  description = "The public subnets of the created VPC"
   value       = aws_subnet.public
 }
 
-output "private_subnet" {
-  description = "The private subnet of the created VPC"
+output "private_subnets" {
+  description = "The private subnets of the created VPC"
   value       = aws_subnet.private
 }
 
 output "nap_public_id" {
   description = "The public IP associated with the VPC's NAT"
   value       = aws_eip.nat.public_ip
+}
+
+output "routing_ready" {
+  description = "Allows to depends on completion of routing resources"
+  value       = true
+
+  depends_on = [
+    aws_route.private,
+    aws_route.public
+  ]
 }
