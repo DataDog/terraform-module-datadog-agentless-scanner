@@ -197,6 +197,13 @@ Resources:
               set -e
               set -o pipefail
 
+              fatal_error () {
+                printf "FATAL ERROR: shutting down\n"
+                shutdown -h now
+              }
+
+              trap 'fatal_error' ERR
+
               # Enable the nbd module
               modprobe nbd nbds_max=128
               echo "nbd" > /etc/modules-load.d/nbd.conf
