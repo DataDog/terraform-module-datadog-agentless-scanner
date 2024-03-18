@@ -19,7 +19,7 @@ output "nap_public_id" {
 }
 
 output "routing_ready" {
-  description = "Allows to depends on completion of routing resources"
+  description = "Indicates whether routing resources have been successfully provisioned"
   value       = true
 
   depends_on = [

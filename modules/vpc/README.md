@@ -59,6 +59,6 @@ No modules.
 | <a name="output_nap_public_id"></a> [nap\_public\_id](#output\_nap\_public\_id) | The public IP associated with the VPC's NAT |
 | <a name="output_private_subnets"></a> [private\_subnets](#output\_private\_subnets) | The private subnets of the created VPC |
 | <a name="output_public_subnets"></a> [public\_subnets](#output\_public\_subnets) | The public subnets of the created VPC |
-| <a name="output_routing_ready"></a> [routing\_ready](#output\_routing\_ready) | Allows to depends on completion of routing resources |
+| <a name="output_routing_ready"></a> [routing\_ready](#output\_routing\_ready) | Indicates whether routing resources have been successfully provisioned |
 | <a name="output_vpc"></a> [vpc](#output\_vpc) | The VPC created for the Datadog agentless scanner |
 <!-- END_TF_DOCS -->
