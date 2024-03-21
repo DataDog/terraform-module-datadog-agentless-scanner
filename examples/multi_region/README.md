@@ -13,4 +13,4 @@ To deploy a Datadog agentless scanner:
 
 1. Run `terraform init`.
 1. Run `terraform apply`.
-1. Set your datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/).
+1. Set your Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/).
