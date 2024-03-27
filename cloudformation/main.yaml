@@ -7,6 +7,11 @@ Parameters:
     Description: API key for the Datadog account (find at https://app.datadoghq.com/organization-settings/api-keys)
     NoEcho: true
 
+  DatadogAPPKey:
+    Type: String
+    Description: APP key for the Datadog account
+    NoEcho: true
+
   DatadogAPIKeySecretArn:
     Type: String
     Description: The ARN of the secret storing the Datadog API key, if you already have it stored in Secrets Manager. You must store the secret as a plaintext, rather than a key-value pair.
@@ -805,8 +810,8 @@ Resources:
     Type: "Custom::DatadogAgentlessAPICall"
     Properties:
       ServiceToken: !GetAtt DatadogAgentlessAPICallFunction.Arn
-      APIKey: !Ref DatadogApiKey
-      APPKey: !Ref DatadogAppKey
+      APIKey: !Ref DatadogAPIKey
+      APPKey: !Ref DatadogAPPKey
       ApiURL: !Ref DatadogSite
       AccountId: !Ref AWS::AccountId
       Containers: !Ref Containers
