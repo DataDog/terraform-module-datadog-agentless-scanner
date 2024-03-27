@@ -899,7 +899,6 @@ Resources:
                           send_response(event, context, "SUCCESS",
                                         {
                                             "Message": "Datadog AWS Agentless Scanning Integration created successfully.",
-                                            "ExternalId": json_response["external_id"],
                                         })
                       else:
                           LOGGER.info('Failed - exception thrown during processing.')
