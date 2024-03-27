@@ -425,7 +425,21 @@ Resources:
             Action: 'ec2:DescribeVolumes'
             Effect: Allow
             Resource: '*'
-          - Sid: GetLambdaDetails
+          - Sid: DatadogAgentlessScannerDecryptEncryptedSnapshots
+            Action: 'kms:Decrypt'
+            Effect: Allow
+            Resource: 'arn:aws:kms:*:*:key/*'
+            Condition:
+              'ForAnyValue:StringEquals':
+                'kms:EncryptionContextKeys': 'aws:ebs:id'
+              StringLike:
+                'kms:EncryptionContext:aws:ebs:id': 'snap-*'
+                'kms:ViaService': 'ec2.*.amazonaws.com'
+          - Sid: DatadogAgentlessScannerKMSDescribe
+            Action: 'kms:DescribeKey'
+            Effect: Allow
+            Resource: 'arn:aws:kms:*:*:key/*'
+          - Sid: DatadogAgentlessScannerGetLambdaDetails
             Action: 'lambda:GetFunction'
             Effect: Allow
             Resource: 'arn:aws:lambda:*:*:function:*'
