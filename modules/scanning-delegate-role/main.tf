@@ -274,7 +274,41 @@ data "aws_iam_policy_document" "scanning_worker_policy_document" {
   }
 
   statement {
-    sid    = "GetLambdaDetails"
+    sid       = "DatadogAgentlessScannerDecryptEncryptedSnapshots"
+    effect    = "Allow"
+    actions   = ["kms:Decrypt"]
+    resources = ["arn:${data.aws_partition.current.partition}:kms:*:*:key/*"]
+
+    // The following conditions enforce that decrypt action
+    // can only be performed on snapshots from calls by ebs API.
+    condition {
+      test     = "ForAnyValue:StringEquals"
+      variable = "kms:EncryptionContextKeys"
+      values   = ["aws:ebs:id"]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "kms:EncryptionContext:aws:ebs:id"
+      values   = ["snap-*"]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "kms:ViaService"
+      values   = ["ec2.*.amazonaws.com"]
+    }
+  }
+
+  statement {
+    sid       = "DatadogAgentlessScannerKMSDescribe"
+    effect    = "Allow"
+    actions   = ["kms:DescribeKey"]
+    resources = ["arn:${data.aws_partition.current.partition}:kms:*:*:key/*"]
+  }
+
+  statement {
+    sid    = "DatadogAgentlessScannerGetLambdaDetails"
     effect = "Allow"
     actions = [
       "lambda:GetFunction",

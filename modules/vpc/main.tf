@@ -6,7 +6,8 @@ locals {
     DatadogAgentlessScanner = "true"
   }
 
-  max_azs             = 3 # Limit to a maximum of 3 AZs on that region
+  # Limit to a maximum of 3 AZs on that region
+  max_azs             = min(3, length(data.aws_availability_zones.available.names))
   private_cidr_offset = 3
   azs_cidrs = {
     for idx, az in slice(data.aws_availability_zones.available.names, 0, local.max_azs) :
