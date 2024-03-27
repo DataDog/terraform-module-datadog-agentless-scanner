@@ -870,9 +870,9 @@ Resources:
                           "id": account_id,
                           "type": "aws_scan_options",
                           "attributes": {
-                              "vuln_containers_os": containers,
-                              "vuln_host_os": hosts,
-                              "lambda": lambdas,
+                              "vuln_containers_os": containers == 'true',
+                              "vuln_host_os": hosts == 'true',
+                              "lambda": lambdas == 'true',
                           }
                       }
                   }
