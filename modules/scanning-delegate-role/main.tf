@@ -277,7 +277,7 @@ data "aws_iam_policy_document" "scanning_worker_policy_document" {
     sid       = "DatadogAgentlessScannerDecryptEncryptedSnapshots"
     effect    = "Allow"
     actions   = ["kms:Decrypt"]
-    resources = ["arn:${data.aws_partition.current.partition}:ec2:*:*:key/*"]
+    resources = ["arn:${data.aws_partition.current.partition}:kms:*:*:key/*"]
 
     // The following conditions enforce that decrypt action
     // can only be performed on snapshots from calls by ebs API.
@@ -304,7 +304,7 @@ data "aws_iam_policy_document" "scanning_worker_policy_document" {
     sid       = "DatadogAgentlessScannerKMSDescribe"
     effect    = "Allow"
     actions   = ["kms:DescribeKey"]
-    resources = ["arn:${data.aws_partition.current.partition}:ec2:*:*:key/*"]
+    resources = ["arn:${data.aws_partition.current.partition}:kms:*:*:key/*"]
   }
 
   statement {
