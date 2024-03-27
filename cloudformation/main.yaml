@@ -90,29 +90,26 @@ Parameters:
     Description: The number of instances in the Auto Scaling Group
     Default: 1
 
-  Containers:
+  ContainersScanningEnabled:
     Type: String
     AllowedValues:
-      - true
-      - false
+      - "true"
+      - "false"
     Description: Enable Container scanning.
-    Default: false
 
-  Hosts:
+  HostsScanningEnabled:
     Type: String
     AllowedValues:
-      - true
-      - false
+      - "true"
+      - "false"
     Description: Enable Host Vulnerability scanning.
-    Default: false
 
-  Lambdas:
+  LambdasScanningEnabled:
     Type: String
     AllowedValues:
-      - true
-      - false
+      - "true"
+      - "false"
     Description: Enable Lambda Vulnerability scanning.
-    Default: false
 
 Conditions:
   ProvideSshKeyPair: !Not
@@ -814,9 +811,9 @@ Resources:
       APPKey: !Ref DatadogAPPKey
       ApiURL: !Ref DatadogSite
       AccountId: !Ref AWS::AccountId
-      Containers: !Ref Containers
-      Hosts: !Ref Hosts
-      Lambdas: !Ref Lambdas
+      Containers: !Ref ContainersScanningEnabled
+      Hosts: !Ref HostsScanningEnabled
+      Lambdas: !Ref LambdasScanningEnabled
 
   DatadogAgentlessAPICallFunction:
     Type: "AWS::Lambda::Function"
