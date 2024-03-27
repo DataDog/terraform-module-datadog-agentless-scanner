@@ -4,6 +4,6 @@ variable "api_key" {
 }
 
 variable "cross_account_delegate_arn" {
-  description = "Specifies the API keys required by the Datadog Agent to submit vulnerabilities to Datadog"
+  description = "Specifies the ARN of the delegate role created for cross account scanning"
   type        = string
 }

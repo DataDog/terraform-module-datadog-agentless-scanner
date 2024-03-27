@@ -35,7 +35,9 @@ module "agentless_scanner" {
 ```
 
 And run:
-```
+```sh
+terraform init
+terraform plan
 ```
 
 > [!IMPORTANT]
