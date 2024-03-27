@@ -1,6 +1,6 @@
 # Multi Region Example
 
-This folder shows an example of Terraform code that uses the [datadog-agentless-scanner module](https://github.com/Datadog/terraform-module-datadog-agentless-scanner) to deploy a Datadog agentless scanner in mutiple region in your [AWS](https://aws.amazon.com/) account.
+This folder shows an example of Terraform code that uses the [datadog-agentless-scanner module](https://github.com/Datadog/terraform-module-datadog-agentless-scanner) to deploy a Datadog Agentless scanner in multiple regions in your [AWS](https://aws.amazon.com/) account.
 
 In this example the full scanner setup is deployed in the `us-east-1` and `eu-central-1`.
 You will need to leverage the [multiple provider configurations](https://developer.hashicorp.com/terraform/language/providers/configuration#alias-multiple-provider-configurations) feature of Terraform.

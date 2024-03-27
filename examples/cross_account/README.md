@@ -1,14 +1,14 @@
 # Cross Account Example
 
-This folder shows an example of Terraform code that uses the [datadog-agentless-scanner module](https://github.com/Datadog/terraform-module-datadog-agentless-scanner) to deploy a Datadog agentless scanner in a main [AWS](https://aws.amazon.com/) account and cross account role in your other accounts.
+This folder shows an example of Terraform code that uses the [datadog-agentless-scanner module](https://github.com/Datadog/terraform-module-datadog-agentless-scanner) to deploy a Datadog Agentless scanner in a main [AWS](https://aws.amazon.com/) account and cross account role in your other accounts.
 
-In this example the full scanner setup is deployed in a single account dedicated for the scanning purpose.
+In this example, the full scanner setup is deployed in an account designated for scanning.
 All your other accounts can be scanned from that account by deploying a single IAM role.
 
 
 ## Quick start
 
-To deploy a Datadog agentless scanner:
+To deploy a Datadog Agentless scanner:
 
 1. Go to the `scanner_account` folder
 1. Run `terraform init`.
@@ -19,14 +19,14 @@ To deploy a Datadog agentless scanner:
 
 To deploy the delegate role:
 
-1. Go to the `other_account` folder
+1. Go to the `other_account` folder.
 1. Run `terraform init`.
 1. Run `terraform apply`.
 1. Set the ARN of the scanner role you got from the previous step.
-1. Run `terraform output delegate_role` and copy that ARN
+1. Run `terraform output delegate_role` and copy that ARN.
 
-Finally since cross account delegate role need bi-directional permission:
+Finally, because cross-account delegate roles need bidirectional permission:
 
-1. Go back to the `scanner_account` folder
+1. Go back to the `scanner_account` folder.
 1. Run `terraform apply`.
 1. Set the ARN of the delegate role you created in your other account.
