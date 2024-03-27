@@ -1,6 +1,6 @@
 # Single Region Example
 
-This folder shows an example of Terraform code that uses the [datadog-agentless-scanner module](https://github.com/Datadog/terraform-module-datadog-agentless-scanner) to deploy a Datadog agentless scanner in your [AWS](https://aws.amazon.com/) account.
+This folder shows an example of Terraform code that uses the [datadog-agentless-scanner module](https://github.com/Datadog/terraform-module-datadog-agentless-scanner) to deploy a Datadog Agentless scanner in your [AWS](https://aws.amazon.com/) account.
 
 ## Quick start
 
