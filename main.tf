@@ -1,24 +1,40 @@
-module "vpc" {
-  source                  = "./modules/vpc"
-  enable_ssm_vpc_endpoint = var.enable_ssm && var.enable_ssm_vpc_endpoint
-  tags                    = var.tags
+module "resource_group" {
+  source   = "./modules/azure/resource-group"
+  name     = var.resource_group_name
+  location = var.location
+  tags     = var.tags
 }
 
-module "user_data" {
-  source             = "./modules/user_data"
-  api_key            = var.api_key
-  api_key_secret_arn = var.api_key_secret_arn
-  site               = var.site
-  tags               = var.tags
+module "virtual_network" {
+  source              = "./modules/azure/virtual-network"
+  resource_group_name = module.resource_group.resource_group.name
+  location            = var.location
+  tags                = var.tags
 }
 
-module "instance" {
-  source               = "./modules/instance"
-  user_data            = module.user_data.install_sh
-  vpc_id               = module.vpc.vpc.id
-  subnet_ids           = [for s in module.vpc.private_subnets : s.id]
-  iam_instance_profile = var.instance_profile_name
-  tags                 = var.tags
+module "custom_data" {
+  source   = "./modules/azure/custom-data"
+  location = var.location
+  api_key  = var.api_key
+  site     = var.site
+  tags     = var.tags
+}
 
-  depends_on = [module.vpc.routing_ready]
+module "managed_identity" {
+  source              = "./modules/azure/managed-identity"
+  resource_group_name = module.resource_group.resource_group.name
+  resource_group_id   = module.resource_group.resource_group.id
+  location            = var.location
+  tags                = var.tags
+}
+
+module "virtual_machine" {
+  source                 = "./modules/azure/virtual-machine"
+  location               = var.location
+  resource_group_name    = module.resource_group.resource_group.name
+  admin_ssh_key          = var.admin_ssh_key
+  custom_data            = module.custom_data.install_sh
+  subnet_id              = module.virtual_network.subnet.id
+  user_assigned_identity = module.managed_identity.identity.id
+  tags                   = var.tags
 }

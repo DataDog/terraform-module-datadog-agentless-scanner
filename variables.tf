@@ -1,14 +1,20 @@
+variable "resource_group_name" {
+  description = ""
+  type        = string
+  nullable    = false
+}
+
+
+variable "admin_ssh_key" {
+  description = "SSH public key of the admin user"
+  type        = string
+}
+
+
 variable "api_key" {
   description = "Specifies the API keys required by the Datadog Agent to submit vulnerabilities to Datadog"
   type        = string
   sensitive   = true
-  default     = null
-}
-
-variable "api_key_secret_arn" {
-  description = "ARN of the secret holding the Datadog API key. Takes precedence over api_key variable"
-  type        = string
-  default     = null
 }
 
 variable "site" {
@@ -17,21 +23,10 @@ variable "site" {
   default     = null
 }
 
-variable "instance_profile_name" {
-  description = "Name of the instance profile to attach to the instance"
+variable "location" {
+  description = "The location where the Datadog Agentless Scanner resources will be created"
   type        = string
-}
-
-variable "enable_ssm" {
-  description = "Whether to enable AWS SSM to facilitate executing troubleshooting commands on the instance"
-  type        = bool
-  default     = false
-}
-
-variable "enable_ssm_vpc_endpoint" {
-  description = "Whether to enable AWS SSM VPC endpoint (only applicable if enable_ssm is true)"
-  type        = bool
-  default     = true
+  nullable    = false
 }
 
 variable "tags" {
