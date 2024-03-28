@@ -2,6 +2,10 @@
 
 ## Version TBD
 
+### agentless-scanner 2024032202
+
+- Bump Trivy to version 2024-02-28.
+
 ### Terraform
 
 - Add missing CopySnapshot permissions to allow AMI scanning

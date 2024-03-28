@@ -260,8 +260,8 @@ Resources:
               DD_HOSTNAME="agentless-scanning-$IMDS_AWS_REGION-$IMDS_INSTANCE_ID"
               DD_SITE="${DatadogSite}"
               DD_API_KEY="$(jq -r '.SecretString' <<< "$AWS_SECRET_JSON")"
-              DD_AGENT_MINOR_VERSION="50.3"
-              DD_SCANNER_VERSION="7.51.0~agentless~scanner~2024022201"
+              DD_AGENT_MINOR_VERSION="52.0"
+              DD_SCANNER_VERSION="7.53.0~agentless~scanner~2024032202"
 
               hostnamectl hostname $DD_HOSTNAME
 

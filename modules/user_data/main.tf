@@ -8,8 +8,8 @@ locals {
 data "aws_region" "current" {}
 
 locals {
-  agent_version      = "50.3"
-  scanner_version    = "7.51.0~agentless~scanner~2024022201"
+  agent_version      = "52.0"
+  scanner_version    = "7.53.0~agentless~scanner~2024032202"
   api_key_secret_arn = var.api_key_secret_arn != null ? var.api_key_secret_arn : aws_secretsmanager_secret.api_key[0].arn
 }
 
