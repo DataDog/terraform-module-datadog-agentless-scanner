@@ -28,13 +28,17 @@ aws cloudformation deploy \
   --capabilities CAPABILITY_NAMED_IAM \
   --parameter-overrides \
     "DatadogAPIKey=${STACK_DATADOG_API_KEY}" \
+    "DatadogAPPKey=${STACK_DATADOG_APP_KEY}" \
     "DatadogSite=${STACK_DATADOG_SITE}" \
     "ScannerSSHKeyPairName=${STACK_SCANNER_SSH_KEY_PAIR_NAME}" \
     "ScannerVPCId=${STACK_SCANNER_VPC_ID}" \
     "ScannerSubnetId=${STACK_SCANNER_SUBNET_ID}" \
     "ScannerSecurityGroupId=${STACK_SCANNER_SECURITY_GROUP_ID}" \
     "ScannerDelegateRoleName=${STACK_NAME}DelegateRole" \
-    "ScannerOfflineModeEnabled=${STACK_SCANNER_OFFLINE_MODE_ENABLED}"
+    "ScannerOfflineModeEnabled=${STACK_SCANNER_OFFLINE_MODE_ENABLED}" \
+    "HostsScanningEnabled=true" \
+    "LambdasScanningEnabled=true" \
+    "ContainersScanningEnabled=true"
 printf "ok.\n"
 
 STACK_ID=$(aws cloudformation describe-stacks \
