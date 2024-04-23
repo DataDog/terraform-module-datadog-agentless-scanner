@@ -36,9 +36,9 @@ aws cloudformation deploy \
     "ScannerSecurityGroupId=${STACK_SCANNER_SECURITY_GROUP_ID}" \
     "ScannerDelegateRoleName=${STACK_NAME}DelegateRole" \
     "ScannerOfflineModeEnabled=${STACK_SCANNER_OFFLINE_MODE_ENABLED}" \
-    "HostsScanningEnabled=true" \
-    "LambdasScanningEnabled=true" \
-    "ContainersScanningEnabled=true"
+    "AgentlessHostScanning=true" \
+    "AgentlessContainerScanning=true" \
+    "AgentlessLambdaScanning=true"
 printf "ok.\n"
 
 STACK_ID=$(aws cloudformation describe-stacks \

@@ -1,16 +1,45 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Description: Datadog Agentless Scanner CloudFormation deployment template
-
 Parameters:
   DatadogAPIKey:
     Type: String
-    Description: API key for the Datadog account (find at https://app.datadoghq.com/organization-settings/api-keys)
+    Description: >-
+      API key for the Datadog account (find at https://app.datadoghq.com/organization-settings/api-keys).
+      To enable Agentless Scanning (find at https://docs.datadoghq.com/security/cloud_security_management/agentless_scanning),
+      you must use a Remote Configuration-enabled API key (find at https://docs.datadoghq.com/security/cloud_security_management/setup/agentless_scanning/)
     NoEcho: true
 
   DatadogAPPKey:
     Type: String
     Description: APP key for the Datadog account
     NoEcho: true
+
+  AgentlessHostScanning:
+    Type: String
+    AllowedValues:
+      - true
+      - false
+    Description: >-
+      Enable Agentless Scanning of host vulnerabilities. "CloudSecurityPostureManagement" must be set to 'true'.
+    Default: false
+
+  AgentlessContainerScanning:
+    Type: String
+    AllowedValues:
+      - true
+      - false
+    Description: >-
+      Enable Agentless Scanning of container vulnerabilities. "CloudSecurityPostureManagement" must be set to 'true'.
+    Default: false
+
+  AgentlessLambdaScanning:
+    Type: String
+    AllowedValues:
+      - true
+      - false
+    Description: >-
+      Enable Agentless Scanning of Lambda vulnerabilities. "CloudSecurityPostureManagement" must be set to 'true'.
+    Default: false
 
   DatadogAPIKeySecretArn:
     Type: String
@@ -28,7 +57,6 @@ Parameters:
       - us3.datadoghq.com
       - us5.datadoghq.com
       - ap1.datadoghq.com
-      - ddog-gov.com
       - datad0g.com
 
   ScannerVPCId:
@@ -89,27 +117,6 @@ Parameters:
     Type: Number
     Description: The number of instances in the Auto Scaling Group
     Default: 1
-
-  ContainersScanningEnabled:
-    Type: String
-    AllowedValues:
-      - "true"
-      - "false"
-    Description: Enable Container scanning.
-
-  HostsScanningEnabled:
-    Type: String
-    AllowedValues:
-      - "true"
-      - "false"
-    Description: Enable Host Vulnerability scanning.
-
-  LambdasScanningEnabled:
-    Type: String
-    AllowedValues:
-      - "true"
-      - "false"
-    Description: Enable Lambda Vulnerability scanning.
 
 Conditions:
   ProvideSshKeyPair: !Not
@@ -261,7 +268,7 @@ Resources:
               DD_SITE="${DatadogSite}"
               DD_API_KEY="$(jq -r '.SecretString' <<< "$AWS_SECRET_JSON")"
               DD_AGENT_MINOR_VERSION="52.0"
-              DD_SCANNER_VERSION="7.53.0~agentless~scanner~2024041001"
+              DD_SCANNER_VERSION="7.53.0~agentless~scanner~2024032202"
 
               hostnamectl hostname $DD_HOSTNAME
 
@@ -525,8 +532,8 @@ Resources:
             Principal:
               Service: ec2.amazonaws.com
             Condition:
-                StringEquals:
-                  'aws:ResourceTag/DatadogAgentlessScanner': 'true'
+              StringEquals:
+                'aws:ResourceTag/DatadogAgentlessScanner': 'true'
       MaxSessionDuration: 3600
       ManagedPolicyArns:
         - !Ref 'ScannerAgentPolicy'
@@ -841,9 +848,9 @@ Resources:
       APPKey: !Ref DatadogAPPKey
       ApiURL: !Ref DatadogSite
       AccountId: !Ref AWS::AccountId
-      Containers: !Ref ContainersScanningEnabled
-      Hosts: !Ref HostsScanningEnabled
-      Lambdas: !Ref LambdasScanningEnabled
+      Hosts: !Ref AgentlessHostScanning
+      Containers: !Ref AgentlessContainerScanning
+      Lambdas: !Ref AgentlessLambdaScanning
 
   DatadogAgentlessAPICallFunction:
     Type: "AWS::Lambda::Function"
@@ -873,8 +880,8 @@ Resources:
               app_key = event['ResourceProperties']['APPKey']
               api_url = event['ResourceProperties']['ApiURL']
               account_id = event['ResourceProperties']['AccountId']
-              containers = event['ResourceProperties']['Containers']
               hosts = event['ResourceProperties']['Hosts']
+              containers = event['ResourceProperties']['Containers']
               lambdas = event['ResourceProperties']['Lambdas']
 
               # Make the url Request
@@ -992,3 +999,42 @@ Resources:
 
 
           signal.signal(signal.SIGALRM, timeout_handler)
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Required
+        Parameters:
+          - DatadogAPIKey
+          - DatadogAPPKey
+          - DatadogSite
+          - AgentlessHostScanning
+          - AgentlessContainerScanning
+          - AgentlessLambdaScanning
+      - Label:
+          default: Advanced
+        Parameters:
+          - DatadogAPIKeySecretArn
+          - ScannerAutoScalingGroupSize
+          - ScannerDelegateRoleName
+          - ScannerInstanceMonitoring
+          - ScannerInstanceType
+          - ScannerInstanceVolumeSize
+          - ScannerOfflineModeEnabled
+          - ScannerSSHKeyPairName
+          - ScannerSecurityGroupId
+          - ScannerSubnetId
+          - ScannerVPCId
+    ParameterLabels:
+      DatadogAPIKey:
+        default: "DatadogApiKey *"
+      DatadogAPPKey:
+        default: "DatadogAppKey *"
+      DatadogSite:
+        default: "DatadogSite *"
+      AgentlessHostScanning:
+        default: "AgentlessHostScanning *"
+      AgentlessContainerScanning:
+        default: "AgentlessContainerScanning *"
+      AgentlessLambdaScanning:
+        default: "AgentlessLambdaScanning *"
