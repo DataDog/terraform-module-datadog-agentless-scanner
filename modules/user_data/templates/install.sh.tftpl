@@ -55,7 +55,7 @@ DD_API_KEY="$DD_API_KEY" \
   bash -c "$(curl -L https://s3.amazonaws.com/dd-agent/scripts/install_script_agent7.sh)"
 
 # Install the agentless-scanner
-curl -sL -o "/tmp/datadog-agentless-scanner_$DD_SCANNER_VERSION-1_arm64.deb" "https://s3.amazonaws.com/apt.datad0g.com/pool/d/da/datadog-agentless-scanner_$DD_SCANNER_VERSION-1_arm64.deb"
+curl -sL -o "/tmp/datadog-agentless-scanner_$DD_SCANNER_VERSION-1_arm64.deb" "https://apt.datadoghq.com/pool/d/da/datadog-agentless-scanner_$DD_SCANNER_VERSION-1_arm64.deb"
 dpkg -i "/tmp/datadog-agentless-scanner_$DD_SCANNER_VERSION-1_arm64.deb"
 
 # Patch agent configuration
@@ -76,7 +76,8 @@ logs:
   - type: file
     path: "/var/log/datadog/agentless-scanner.log"
     service: "agentless-scanner"
-    source: "datadog-agent"
+    source: go
+    sourcecategory: sourcecode
 EOF
 
 chown -R dd-agent: /etc/datadog-agent/conf.d/agentless-scanner.d
@@ -102,6 +103,9 @@ chmod 600 /etc/datadog-agent/agentless-scanner.yaml
 
 # Restart the agent
 service datadog-agent restart
+
+# Give some room to the agent to start to not miss logs
+sleep 5
 
 # Enable and start datadog-agentless-scaner
 systemctl enable datadog-agentless-scanner
