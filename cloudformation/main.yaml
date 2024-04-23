@@ -316,13 +316,17 @@ Resources:
               EOF
               fi
 
-              if [ "${ScannerOfflineModeEnabled}" = "true" ]; then
-                cat <<EOF >> /etc/datadog-agent/datadog.yaml
-              agentless_scanner:
-                default_roles:
-                  - "arn:aws:iam::${AWS::AccountId}:role/${ScannerDelegateRoleName}"
+              cat <<EOF >> /etc/datadog-agent/agentless-scanner.yaml
+              hostname: $DD_HOSTNAME
+              api_key: $DD_API_KEY
+              site: $DD_SITE
+              installation_mode: cloudformation
+              installation_version: 0.11.0
+              default_roles:
+                - "arn:aws:iam::${AWS::AccountId}:role/${ScannerDelegateRoleName}"
               EOF
-              fi
+
+              chmod 600 /etc/datadog-agent/agentless-scanner.yaml
 
               # Restart the agent
               service datadog-agent restart
