@@ -140,6 +140,46 @@ data "aws_iam_policy_document" "scanning_orchestrator_policy_document" {
     ]
   }
 
+  statement {
+    sid       = "DatadogAgentlessScannerCopyEncryptedSnapshotGrantKey"
+    effect    = "Allow"
+    actions   = ["kms:CreateGrant"]
+    resources = ["arn:${data.aws_partition.current.partition}:kms:*:*:key/*"]
+
+    // The following conditions enforce that decrypt action
+    // can only be performed on snapshots from calls by ebs API.
+    condition {
+      test     = "ForAnyValue:StringEquals"
+      variable = "kms:EncryptionContextKeys"
+      values   = ["aws:ebs:id"]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "kms:EncryptionContext:aws:ebs:id"
+      values   = ["snap-*"]
+    }
+
+    condition {
+      test     = "StringLike"
+      variable = "kms:ViaService"
+      values   = ["ec2.*.amazonaws.com"]
+    }
+
+    condition {
+      test     = "Bool"
+      variable = "kms:GrantIsForAWSResource"
+      values   = ["true"]
+    }
+  }
+
+  statement {
+    sid       = "DatadogAgentlessScannerCopyEncryptedSnapshotDescribeKey"
+    effect    = "Allow"
+    actions   = ["kms:DescribeKey"]
+    resources = ["arn:${data.aws_partition.current.partition}:kms:*:*:key/*"]
+  }
+
   # Uncomment this block to allow volume-attach mode of the scanner:
   #
   #   statement {

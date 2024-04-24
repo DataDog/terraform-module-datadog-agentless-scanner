@@ -424,6 +424,22 @@ Resources:
             Action: 'ec2:DescribeSnapshots'
             Effect: Allow
             Resource: '*'
+          - Sid: DatadogAgentlessScannerEncryptedCopyGrant
+            Action: 'kms:CreateGrant'
+            Effect: Allow
+            Resource: 'arn:aws:kms:*:*:key/*'
+            Condition:
+              'ForAnyValue:StringEquals':
+                'kms:EncryptionContextKeys': 'aws:ebs:id'
+              StringLike:
+                'kms:EncryptionContext:aws:ebs:id': 'snap-*'
+                'kms:ViaService': 'ec2.*.amazonaws.com'
+              Bool:
+                'kms:GrantIsForAWSResource': true
+          - Sid: DatadogAgentlessScannerEncryptedCopyDescribe
+            Action: 'kms:DescribeKey'
+            Effect: Allow
+            Resource: 'arn:aws:kms:*:*:key/*'
 
   ScannerDelegateRoleWorkerPolicy:
     Type: AWS::IAM::ManagedPolicy
