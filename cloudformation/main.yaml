@@ -268,7 +268,7 @@ Resources:
               DD_SITE="${DatadogSite}"
               DD_API_KEY="$(jq -r '.SecretString' <<< "$AWS_SECRET_JSON")"
               DD_AGENT_MINOR_VERSION="52.0"
-              DD_SCANNER_VERSION="0.11.0~rc.3"
+              DD_SCANNER_VERSION="0.11.0~rc.4"
 
               hostnamectl hostname $DD_HOSTNAME
 
