@@ -17,6 +17,21 @@ repos:
       - id: terraform-docs-go
         name: terraform docs for the 'vpc' module
         args: ["markdown", "table", "--output-file", "README.md", "./modules/vpc"]
+      - id: terraform-docs-go
+        name: terraform docs for the 'azure/custom-data' module
+        args: ["markdown", "table", "--output-file", "README.md", "./modules/azure/custom-data"]
+      - id: terraform-docs-go
+        name: terraform docs for the 'azure/managed-identity' module
+        args: ["markdown", "table", "--output-file", "README.md", "./modules/azure/managed-identity"]
+      - id: terraform-docs-go
+        name: terraform docs for the 'azure/resource-group' module
+        args: ["markdown", "table", "--output-file", "README.md", "./modules/azure/resource-group"]
+      - id: terraform-docs-go
+        name: terraform docs for the 'azure/virtual-machine' module
+        args: ["markdown", "table", "--output-file", "README.md", "./modules/azure/virtual-machine"]
+      - id: terraform-docs-go
+        name: terraform docs for the 'azure/virtual-network' module
+        args: ["markdown", "table", "--output-file", "README.md", "./modules/azure/virtual-network"]
   
   - repo: https://github.com/antonbabenko/pre-commit-terraform
     rev: "v1.83.6"
