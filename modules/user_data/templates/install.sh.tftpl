@@ -52,7 +52,7 @@ DD_API_KEY="$DD_API_KEY" \
   DD_SITE="$DD_SITE" \
   DD_HOSTNAME="$DD_HOSTNAME" \
   DD_AGENT_MINOR_VERSION="$DD_AGENT_MINOR_VERSION" \
-  bash -c "$(curl -L https://s3.amazonaws.com/dd-agent/scripts/install_script_agent7.sh)"›
+  bash -c "$(curl -L https://s3.amazonaws.com/dd-agent/scripts/install_script_agent7.sh)"
 
 # Patch agent configuration
 sed -i '/.*logs_enabled:.*/a logs_enabled: true'           /etc/datadog-agent/datadog.yaml
