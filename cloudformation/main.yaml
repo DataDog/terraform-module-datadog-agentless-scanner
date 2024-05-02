@@ -289,10 +289,10 @@ Resources:
               agentless_pkg_pattern="([[:digit:]]:)?$DD_AGENTLESS_VERSION(\.[[:digit:]]+){0,1}(-[[:digit:]])?"
               agentless_version_custom="$(apt-cache madison datadog-agentless-scanner | grep -E "$agentless_pkg_pattern" -om1)"
               if [ -z "$agentless_version_custom" ]; then
-                printf "Could not find a version of datadog-agentless-scanner from $DD_AGENTLESS_VERSION"
+                printf "Could not find a version of datadog-agentless-scanner from %s" "$DD_AGENTLESS_VERSION"
                 exit 1
               fi
-              apt install -y datadog-agentless-scanner=$agentless_version_custom
+              apt install -y "datadog-agentless-scanner=$agentless_version_custom"
 
               # Adding automatic reboot on kernel updates
               cat << EOF >> /etc/apt/apt.conf.d/50unattended-upgrades
