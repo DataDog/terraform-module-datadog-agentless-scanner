@@ -8,7 +8,7 @@ locals {
 data "aws_region" "current" {}
 
 locals {
-  agent_version      = "52.0"
+  agent_version      = "53.0"
   scanner_version    = "0.11.0"
   api_key_secret_arn = var.api_key_secret_arn != null ? var.api_key_secret_arn : aws_secretsmanager_secret.api_key[0].arn
 }
