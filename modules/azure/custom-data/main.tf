@@ -1,6 +1,6 @@
 locals {
-  agent_version   = "52.0"
-  scanner_version = "0.11.0"
+  agent_version   = "53.0"
+  scanner_version = "0.11"
 }
 
 resource "terraform_data" "template" {
