@@ -287,7 +287,7 @@ Resources:
               echo "deb [signed-by=/usr/share/keyrings/datadog-archive-keyring.gpg] https://apt.datadoghq.com/ stable agentless-scanner" >> /etc/apt/sources.list.d/datadog.list
               apt update
               agentless_pkg_pattern="([[:digit:]]:)?$DD_AGENTLESS_VERSION(\.[[:digit:]]+){0,1}(-[[:digit:]])?"
-              agentless_version_custom="$(apt-cache madison datadog-agentless-scanner | grep -E "$agentless_pkg_pattern" -om1)"
+              agentless_version_custom="$(apt-cache madison datadog-agentless-scanner | grep -E "$agentless_pkg_pattern" -om1)" || true
               if [ -z "$agentless_version_custom" ]; then
                 printf "Could not find a version of datadog-agentless-scanner from %s" "$DD_AGENTLESS_VERSION"
                 exit 1
