@@ -23,7 +23,7 @@ resource "azurerm_orchestrated_virtual_machine_scale_set" "vmss" {
   }
   os_profile {
     linux_configuration {
-      computer_name_prefix            = "dd-agentless-"
+      computer_name_prefix            = "agentless-scanning-"
       admin_username                  = var.admin_username
       disable_password_authentication = true
       admin_ssh_key {
