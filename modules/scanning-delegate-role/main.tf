@@ -363,6 +363,23 @@ data "aws_iam_policy_document" "scanning_worker_policy_document" {
       values   = ["false"]
     }
   }
+
+  statement {
+    sid    = "DatadogAgentlessScannerGetLambdaLayersDetails"
+    effect = "Allow"
+    actions = [
+      "lambda:GetLayerVersionByArn",
+    ]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:lambda:*:*:layer:*:*"
+    ]
+    // Forbid scanning lambdas that does have a DatadogAgentlessScanner:false tag.
+    condition {
+      test     = "StringNotEquals"
+      variable = "aws:ResourceTag/DatadogAgentlessScanner"
+      values   = ["false"]
+    }
+  }
 }
 
 resource "aws_iam_policy" "scanning_orchestrator_policy" {
