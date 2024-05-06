@@ -25,6 +25,7 @@ resource "azurerm_nat_gateway" "natgw" {
   location            = azurerm_virtual_network.vnet.location
   resource_group_name = azurerm_virtual_network.vnet.resource_group_name
   sku_name            = "Standard"
+  tags                = merge(var.tags, local.dd_tags)
 }
 
 resource "azurerm_public_ip" "natgw_ip" {
