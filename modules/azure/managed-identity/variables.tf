@@ -19,6 +19,12 @@ variable "resource_group_id" {
   type        = string
 }
 
+variable "scan_scopes" {
+  description = "The set of scopes that the Agentless Scanner should be allowed to scan"
+  type        = list(string)
+  nullable    = false
+}
+
 variable "tags" {
   description = "A map of additional tags to add to the managed identity"
   type        = map(string)

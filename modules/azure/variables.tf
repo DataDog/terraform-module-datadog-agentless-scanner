@@ -27,6 +27,13 @@ variable "location" {
   nullable    = false
 }
 
+variable "scan_scopes" {
+  description = "The set of scopes that the Agentless Scanner should be allowed to scan. Defaults to the scanner subscription."
+  type        = list(string)
+  nullable    = false
+  default     = []
+}
+
 variable "bastion" {
   description = "Create a bastion in the subnet"
   type        = bool

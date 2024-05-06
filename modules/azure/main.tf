@@ -1,3 +1,5 @@
+data "azurerm_subscription" "current" {}
+
 module "resource_group" {
   source   = "./resource-group"
   name     = var.resource_group_name
@@ -25,6 +27,7 @@ module "managed_identity" {
   resource_group_name = module.resource_group.resource_group.name
   resource_group_id   = module.resource_group.resource_group.id
   location            = var.location
+  scan_scopes         = coalescelist(var.scan_scopes, [data.azurerm_subscription.current.id])
   tags                = var.tags
 }
 
