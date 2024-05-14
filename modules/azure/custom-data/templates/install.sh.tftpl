@@ -20,9 +20,20 @@ echo "options nbd nbds_max=128" > /etc/modprobe.d/nbd.conf
 apt update
 apt install -y nbd-client
 
+re='@Microsoft.KeyVault\(SecretUri=(https://.*)\)'
+if [[ ${api_key} =~ $re ]]; then
+  echo "Datadog API key is a Key Vault reference"
+  API_KEY_URI=$${BASH_REMATCH[1]}
+  curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+  echo "Retrieving Datadog API key from Azure Key Vault: $API_KEY_URI"
+  az login --identity --username "${azure_client_id}"
+  DD_API_KEY=$(az keyvault secret show --id "$API_KEY_URI" --query value --output tsv)
+else
+  DD_API_KEY=$api_key
+fi
+
 DD_HOSTNAME="$(hostname)"
 DD_SITE="${site}"
-DD_API_KEY="${api_key}"
 DD_AGENT_MINOR_VERSION="${agent_version}"
 DD_AGENTLESS_VERSION="${scanner_version}"
 
@@ -82,7 +93,7 @@ cat <<EOF >> /etc/datadog-agent/agentless-scanner.yaml
 hostname: $DD_HOSTNAME
 api_key: $DD_API_KEY
 site: $DD_SITE
-azure_client_id: $AZURE_CLIENT_ID
+azure_client_id: ${azure_client_id}
 installation_mode: terraform
 installation_version: 0.11.0
 EOF
