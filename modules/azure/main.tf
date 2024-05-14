@@ -16,10 +16,11 @@ module "virtual_network" {
 }
 
 module "custom_data" {
-  source   = "./custom-data"
-  location = var.location
-  api_key  = var.api_key
-  site     = var.site
+  source    = "./custom-data"
+  location  = var.location
+  api_key   = var.api_key
+  site      = var.site
+  client_id = module.managed_identity.identity.client_id
 }
 
 module "managed_identity" {

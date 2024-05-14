@@ -15,3 +15,9 @@ variable "site" {
   default     = "datadoghq.com"
   nullable    = false
 }
+
+variable "client_id" {
+  description = "Client ID of the managed identity used by the Datadog Agentless Scanner"
+  type        = string
+  nullable    = false
+}
