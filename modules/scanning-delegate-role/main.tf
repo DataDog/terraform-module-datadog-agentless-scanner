@@ -365,7 +365,7 @@ data "aws_iam_policy_document" "scanning_worker_policy_document" {
   }
 
   statement {
-    sid    = "DatadogAgentlessScannerGetLambdaLayersDetails"
+    sid    = "DatadogAgentlessScannerGetLambdaLayerDetails"
     effect = "Allow"
     actions = [
       "lambda:GetLayerVersionByArn",

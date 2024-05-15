@@ -505,7 +505,7 @@ Resources:
             Action: 'lambda:GetFunction'
             Effect: Allow
             Resource: 'arn:aws:lambda:*:*:function:*'
-          - Sid: DatadogAgentlessScannerGetLambdaDetails
+          - Sid: DatadogAgentlessScannerGetLambdaLayerDetails
             Action: 'lambda:GetLayerVersionByArn'
             Effect: Allow
             Resource: 'arn:aws:lambda:*:*:layer:*:*'
