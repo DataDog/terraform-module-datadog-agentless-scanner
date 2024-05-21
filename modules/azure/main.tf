@@ -1,5 +1,10 @@
 data "azurerm_subscription" "current" {}
 
+data "azurerm_key_vault_secret" "api_key" {
+  name         = var.api_key_secret_name
+  key_vault_id = var.api_key_vault_id
+}
+
 module "resource_group" {
   source   = "./resource-group"
   name     = var.resource_group_name
@@ -18,7 +23,7 @@ module "virtual_network" {
 module "custom_data" {
   source    = "./custom-data"
   location  = var.location
-  api_key   = var.api_key
+  api_key   = "@Microsoft.KeyVault(SecretUri=${data.azurerm_key_vault_secret.api_key.id})"
   site      = var.site
   client_id = module.managed_identity.identity.client_id
 }
@@ -28,6 +33,7 @@ module "managed_identity" {
   resource_group_name = module.resource_group.resource_group.name
   resource_group_id   = module.resource_group.resource_group.id
   location            = var.location
+  api_key_secret_id   = data.azurerm_key_vault_secret.api_key.resource_versionless_id
   scan_scopes         = coalescelist(var.scan_scopes, [data.azurerm_subscription.current.id])
   tags                = var.tags
 }

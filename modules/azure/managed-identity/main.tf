@@ -85,3 +85,10 @@ resource "azurerm_role_assignment" "worker_role_assignments" {
   principal_id       = azurerm_user_assigned_identity.managed_identity.principal_id
   principal_type     = "ServicePrincipal"
 }
+
+resource "azurerm_role_assignment" "api_key_role_assignment" {
+  scope                = var.api_key_secret_id
+  role_definition_name = "Key Vault Secrets User"
+  principal_id         = azurerm_user_assigned_identity.managed_identity.principal_id
+  principal_type       = "ServicePrincipal"
+}

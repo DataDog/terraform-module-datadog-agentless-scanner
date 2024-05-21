@@ -9,8 +9,14 @@ variable "admin_ssh_key" {
   type        = string
 }
 
-variable "api_key" {
-  description = "Specifies the API key required by the Agentless Scanner to submit vulnerabilities to Datadog"
+variable "api_key_vault_id" {
+  description = "The resource ID of the Key Vault holding the Datadog API key"
+  type        = string
+  sensitive   = true
+}
+
+variable "api_key_secret_name" {
+  description = "The name of the secret in the Key Vault holding the Datadog API key"
   type        = string
   sensitive   = true
 }

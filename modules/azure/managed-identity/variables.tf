@@ -19,6 +19,11 @@ variable "resource_group_id" {
   type        = string
 }
 
+variable "api_key_secret_id" {
+  description = "The resource ID of the Key Vault secret holding the Datadog API key"
+  type        = string
+}
+
 variable "scan_scopes" {
   description = "The set of scopes that the Agentless Scanner should be allowed to scan"
   type        = list(string)
