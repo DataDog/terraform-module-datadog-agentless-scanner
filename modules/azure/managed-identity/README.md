@@ -31,7 +31,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_api_key_secret_id"></a> [api\_key\_secret\_id](#input\_api\_key\_secret\_id) | The resource ID of the Key Vault secret holding the Datadog API key | `string` | n/a | yes |
+| <a name="input_api_key_secret_id"></a> [api\_key\_secret\_id](#input\_api\_key\_secret\_id) | The resource ID of the Key Vault secret holding the Datadog API key | `string` | `null` | no |
 | <a name="input_location"></a> [location](#input\_location) | The location where the Datadog Agentless Scanner resources will be created | `string` | n/a | yes |
 | <a name="input_name"></a> [name](#input\_name) | Name of the managed identity to be assigned to the Datadog Agentless Scanner virtual machine instances | `string` | `"DatatogAgentlessScanner"` | no |
 | <a name="input_resource_group_id"></a> [resource\_group\_id](#input\_resource\_group\_id) | The ID of the resource group to which the role assignment will be scoped | `string` | n/a | yes |

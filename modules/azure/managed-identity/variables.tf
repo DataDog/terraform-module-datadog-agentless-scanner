@@ -22,6 +22,8 @@ variable "resource_group_id" {
 variable "api_key_secret_id" {
   description = "The resource ID of the Key Vault secret holding the Datadog API key"
   type        = string
+  nullable    = true
+  default     = null
 }
 
 variable "scan_scopes" {

@@ -1,6 +1,7 @@
 data "azurerm_subscription" "current" {}
 
 data "azurerm_key_vault_secret" "api_key" {
+  count        = var.api_key == null ? 1 : 0
   name         = var.api_key_secret_name
   key_vault_id = var.api_key_vault_id
 }
@@ -23,7 +24,7 @@ module "virtual_network" {
 module "custom_data" {
   source    = "./custom-data"
   location  = var.location
-  api_key   = "@Microsoft.KeyVault(SecretUri=${data.azurerm_key_vault_secret.api_key.id})"
+  api_key   = var.api_key != null ? var.api_key : "@Microsoft.KeyVault(SecretUri=${data.azurerm_key_vault_secret.api_key[0].id})"
   site      = var.site
   client_id = module.managed_identity.identity.client_id
 }
@@ -33,7 +34,7 @@ module "managed_identity" {
   resource_group_name = module.resource_group.resource_group.name
   resource_group_id   = module.resource_group.resource_group.id
   location            = var.location
-  api_key_secret_id   = data.azurerm_key_vault_secret.api_key.resource_versionless_id
+  api_key_secret_id   = var.api_key != null ? null : data.azurerm_key_vault_secret.api_key[0].resource_versionless_id
   scan_scopes         = coalescelist(var.scan_scopes, [data.azurerm_subscription.current.id])
   tags                = var.tags
 }
