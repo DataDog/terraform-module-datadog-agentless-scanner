@@ -5,6 +5,26 @@ variable "api_key" {
   default     = null
 }
 
+variable "scanner_version" {
+  description = "Specifies the version of the scanner to install"
+  type        = string
+  default     = "0.11"
+  validation {
+    condition     = can(regex("^[0-9]+\\.[0-9]+$", var.scanner_version))
+    error_message = "The scanner version must be in the format of X.Y"
+  }
+}
+
+variable "scanner_channel" {
+  description = "Specifies the channel to use for installing the scanner"
+  type        = string
+  default     = "stable"
+  validation {
+    condition     = contains(["stable", "beta"], var.scanner_channel)
+    error_message = "The scanner channel must be either 'stable' or 'beta'"
+  }
+}
+
 variable "api_key_secret_arn" {
   description = "ARN of the secret holding the Datadog API key. Takes precedence over api_key variable"
   type        = string

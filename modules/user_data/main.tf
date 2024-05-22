@@ -9,7 +9,6 @@ data "aws_region" "current" {}
 
 locals {
   agent_version      = "53.0"
-  scanner_version    = "0.11"
   api_key_secret_arn = var.api_key_secret_arn != null ? var.api_key_secret_arn : aws_secretsmanager_secret.api_key[0].arn
 }
 
@@ -37,7 +36,8 @@ resource "terraform_data" "template" {
     api_key_secret_arn = local.api_key_secret_arn
     site               = var.site,
     agent_version      = local.agent_version,
-    scanner_version    = local.scanner_version,
+    scanner_version    = var.scanner_version,
+    scanner_channel    = var.scanner_channel,
     region             = data.aws_region.current.name,
   })
 }

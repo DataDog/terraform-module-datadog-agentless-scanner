@@ -44,6 +44,7 @@ DD_SITE="${site}"
 DD_API_KEY="$(jq -r '.SecretString' <<< "$AWS_SECRET_JSON")"
 DD_AGENT_MINOR_VERSION="${agent_version}"
 DD_AGENTLESS_VERSION="${scanner_version}"
+DD_AGENTLESS_CHANNEL="${scanner_channel}"
 
 hostnamectl hostname "$DD_HOSTNAME"
 
@@ -59,9 +60,9 @@ sed -i '/.*logs_enabled:.*/a logs_enabled: true'           /etc/datadog-agent/da
 sed -i '/.*ec2_prefer_imdsv2:.*/a ec2_prefer_imdsv2: true' /etc/datadog-agent/datadog.yaml
 
 # Install the agentless-scanner
-echo "deb [signed-by=/usr/share/keyrings/datadog-archive-keyring.gpg] https://apt.datadoghq.com/ stable agentless-scanner" >> /etc/apt/sources.list.d/datadog.list
+echo "deb [signed-by=/usr/share/keyrings/datadog-archive-keyring.gpg] https://apt.datadoghq.com/ $DD_AGENTLESS_CHANNEL agentless-scanner" >> /etc/apt/sources.list.d/datadog.list
 apt update
-agentless_pkg_pattern="([[:digit:]]:)?$DD_AGENTLESS_VERSION(\.[[:digit:]]+){0,1}(-[[:digit:]])?"
+agentless_pkg_pattern="([[:digit:]]:)?$DD_AGENTLESS_VERSION(\.[[:digit:]]+){0,1}(~rc\.[[:digit:]]+)?(-[[:digit:]])?"
 agentless_version_custom="$(apt-cache madison datadog-agentless-scanner | grep -E "$agentless_pkg_pattern" -om1)" || true
 if [ -z "$agentless_version_custom" ]; then
   printf "Could not find a version of datadog-agentless-scanner from %s" "$DD_AGENTLESS_VERSION"

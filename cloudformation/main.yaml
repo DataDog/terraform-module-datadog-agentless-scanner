@@ -118,6 +118,20 @@ Parameters:
     Description: The number of instances in the Auto Scaling Group
     Default: 1
 
+  ScannerVersion:
+    Type: String
+    Description: The version of the Agentless Scanner to install
+    Default: 0.11
+    AllowedPattern: "^[0-9]+\\.[0-9]+$"
+
+  ScannerChannel:
+    Type: String
+    Description: The channel of the Agentless Scanner to install from
+    Default: stable
+    AllowedValues:
+      - stable
+      - beta
+
 Conditions:
   ProvideSshKeyPair: !Not
     - !Equals
@@ -268,7 +282,8 @@ Resources:
               DD_SITE="${DatadogSite}"
               DD_API_KEY="$(jq -r '.SecretString' <<< "$AWS_SECRET_JSON")"
               DD_AGENT_MINOR_VERSION="53.0"
-              DD_AGENTLESS_VERSION="0.11"
+              DD_AGENTLESS_VERSION="${ScannerVersion}"
+              DD_AGENTLESS_CHANNEL="${ScannerChannel}"
 
               hostnamectl hostname "$DD_HOSTNAME"
 
@@ -284,9 +299,9 @@ Resources:
               sed -i '/.*ec2_prefer_imdsv2:.*/a ec2_prefer_imdsv2: true' /etc/datadog-agent/datadog.yaml
 
               # Install the agentless-scanner
-              echo "deb [signed-by=/usr/share/keyrings/datadog-archive-keyring.gpg] https://apt.datadoghq.com/ stable agentless-scanner" >> /etc/apt/sources.list.d/datadog.list
+              echo "deb [signed-by=/usr/share/keyrings/datadog-archive-keyring.gpg] https://apt.datadoghq.com/ $DD_AGENTLESS_CHANNEL agentless-scanner" >> /etc/apt/sources.list.d/datadog.list
               apt update
-              agentless_pkg_pattern="([[:digit:]]:)?$DD_AGENTLESS_VERSION(\.[[:digit:]]+){0,1}(-[[:digit:]])?"
+              agentless_pkg_pattern="([[:digit:]]:)?$DD_AGENTLESS_VERSION(\.[[:digit:]]+){0,1}(~rc\.[[:digit:]]+)?(-[[:digit:]])?"
               agentless_version_custom="$(apt-cache madison datadog-agentless-scanner | grep -E "$agentless_pkg_pattern" -om1)" || true
               if [ -z "$agentless_version_custom" ]; then
                 printf "Could not find a version of datadog-agentless-scanner from %s" "$DD_AGENTLESS_VERSION"
@@ -345,6 +360,8 @@ Resources:
               systemctl enable datadog-agentless-scanner
               systemctl start datadog-agentless-scanner
             - SecretAPIKeyArn: !If [CreateDatadogApiKeySecret, !Ref 'ScannerAPIKeySecret', !Ref 'DatadogAPIKeySecretArn']
+              ScannerVersion: !Ref 'ScannerVersion'
+              ScannerChannel: !Ref 'ScannerChannel'
 
         BlockDeviceMappings:
           - DeviceName: /dev/sda1
