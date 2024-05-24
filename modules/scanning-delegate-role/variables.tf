@@ -10,6 +10,12 @@ variable "iam_role_path" {
   default     = "/"
 }
 
+variable "datastores_scanning_enabled" {
+  description = "Installs specific permissions to enable scanning of datastores (S3 buckets and RDS instances)"
+  type        = bool
+  default     = false
+}
+
 variable "scanner_roles" {
   description = "List of roles ARN allowed to assume this role"
   type        = list(string)

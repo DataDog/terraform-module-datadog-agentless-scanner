@@ -382,6 +382,47 @@ data "aws_iam_policy_document" "scanning_worker_policy_document" {
   }
 }
 
+data "aws_iam_policy_document" "scanning_worker_dspm_policy_document" {
+  statement {
+    sid    = "DatadogAgentlessScannerAccessS3Objects"
+    effect = "Allow"
+    actions = [
+      "s3:GetObject"
+    ]
+    resources = [
+      "arn:aws:s3:::*/*"
+    ]
+  }
+
+  statement {
+    sid    = "DatadogAgentlessScannerListS3Buckets"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket"
+    ]
+    resources = [
+      "arn:aws:s3:::*"
+    ]
+  }
+
+  statement {
+    sid    = "DatadogAgentlessScannerDecryptS3Objects"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:GenerateDataKey"
+    ]
+    resources = [
+      "arn:aws:kms:*:*:key/*"
+    ]
+    condition {
+      test     = "StringLike"
+      variable = "kms:ViaService"
+      values   = ["s3.*.amazonaws.com"]
+    }
+  }
+}
+
 resource "aws_iam_policy" "scanning_orchestrator_policy" {
   name_prefix = "${var.iam_role_name}OrchestratorPolicy"
   path        = var.iam_role_path
@@ -392,6 +433,13 @@ resource "aws_iam_policy" "scanning_worker_policy" {
   name_prefix = "${var.iam_role_name}WorkerPolicy"
   path        = var.iam_role_path
   policy      = data.aws_iam_policy_document.scanning_worker_policy_document.json
+}
+
+resource "aws_iam_policy" "scanning_worker_dspm_policy" {
+  count       = var.datastores_scanning_enabled ? 1 : 0
+  name_prefix = "${var.iam_role_name}WorkerDSPMPolicy"
+  path        = var.iam_role_path
+  policy      = data.aws_iam_policy_document.scanning_worker_dspm_policy_document.json
 }
 
 data "aws_iam_policy_document" "assume_role_policy" {
@@ -429,5 +477,11 @@ resource "aws_iam_role_policy_attachment" "orchestrator_attachment" {
 
 resource "aws_iam_role_policy_attachment" "worker_attachment" {
   policy_arn = aws_iam_policy.scanning_worker_policy.arn
+  role       = aws_iam_role.role.name
+}
+
+resource "aws_iam_role_policy_attachment" "workers_dspm_attachment" {
+  count      = var.datastores_scanning_enabled ? 1 : 0
+  policy_arn = aws_iam_policy.scanning_worker_dspm_policy[0].arn
   role       = aws_iam_role.role.name
 }

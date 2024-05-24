@@ -41,6 +41,15 @@ Parameters:
       Enable Agentless Scanning of Lambda vulnerabilities. "CloudSecurityPostureManagement" must be set to 'true'.
     Default: false
 
+  AgentlessDatastoresScanning:
+    Type: String
+    AllowedValues:
+      - true
+      - false
+    Description: >-
+      Enable Agentless Scanning of datastores (S3 buckets, RDS databases). "CloudSecurityPostureManagement" must be set to 'true'.
+    Default: false
+
   DatadogAPIKeySecretArn:
     Type: String
     Description: The ARN of the secret storing the Datadog API key, if you already have it stored in Secrets Manager. You must store the secret as a plaintext, rather than a key-value pair.
@@ -148,6 +157,9 @@ Conditions:
     - ''
   OfflineModeEnabled: !Equals
     - !Ref 'ScannerOfflineModeEnabled'
+    - 'true'
+  DSPMEnabled: !Equals
+    - !Ref 'AgentlessDatastoresScanning'
     - 'true'
 
 Rules:
@@ -533,6 +545,32 @@ Resources:
               StringNotEquals:
                 'aws:ResourceTag/DatadogAgentlessScanner': 'false'
 
+  ScannerDelegateRoleWorkerDSPMPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Condition: DSPMEnabled
+    Properties:
+      Description: Policy for the Datadog Agentless Scanner worker allowing the listing and reading of S3 buckets.
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: DatadogAgentlessScannerAccessS3Objects
+            Action: 's3:GetObject'
+            Effect: Allow
+            Resource: 'arn:aws:s3:::*/*'
+          - Sid: DatadogAgentlessScannerListS3Buckets
+            Action: 's3:ListBucket'
+            Effect: Allow
+            Resource: 'arn:aws:s3:::*'
+          - Sid: DatadogAgentlessScannerDecryptS3Objects
+            Action:
+              - 'kms:Decrypt'
+              - 'kms:GenerateDataKey'
+            Effect: Allow
+            Resource: 'arn:aws:kms:*:*:key/*'
+            Condition:
+              StringLike:
+                'kms:ViaService': 's3.*.amazonaws.com'
+
   ScannerDelegateOfflineRolePolicy:
     Type: AWS::IAM::ManagedPolicy
     Properties:
@@ -558,6 +596,14 @@ Resources:
             Resource: '*'
           - Sid: DatadogAgentlessScannerOfflineModeListImages
             Action: ec2:DescribeImages
+            Effect: Allow
+            Resource: '*'
+          - Sid: DatadogAgentlessScannerOfflineModeListAllMyBuckets
+            Action: s3:ListAllMyBuckets
+            Effect: Allow
+            Resource: '*'
+          - Sid: DatadogAgentlessScannerOfflineModeGetBucketTags
+            Action: s3:GetBucketTagging
             Effect: Allow
             Resource: '*'
 
@@ -603,6 +649,7 @@ Resources:
       ManagedPolicyArns:
         - !Ref 'ScannerDelegateRoleOrchestratorPolicy'
         - !Ref 'ScannerDelegateRoleWorkerPolicy'
+        - !If [DSPMEnabled, !Ref 'ScannerDelegateRoleWorkerDSPMPolicy', !Ref 'AWS::NoValue']
         - !If [OfflineModeEnabled, !Ref 'ScannerDelegateOfflineRolePolicy', !Ref 'AWS::NoValue']
       Description: Role assumed by the Datadog Agentless scanner agent to perform scans
       Tags:
