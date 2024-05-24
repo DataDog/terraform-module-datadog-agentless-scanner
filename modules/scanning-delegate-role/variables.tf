@@ -10,7 +10,7 @@ variable "iam_role_path" {
   default     = "/"
 }
 
-variable "datastores_scanning_enabled" {
+variable "sensitive_data_scanning_enabled" {
   description = "Installs specific permissions to enable scanning of datastores (S3 buckets and RDS instances)"
   type        = bool
   default     = false

@@ -41,7 +41,7 @@ Parameters:
       Enable Agentless Scanning of Lambda vulnerabilities. "CloudSecurityPostureManagement" must be set to 'true'.
     Default: false
 
-  AgentlessDatastoresScanning:
+  AgentlessSensitiveDataScanning:
     Type: String
     AllowedValues:
       - true
@@ -159,7 +159,7 @@ Conditions:
     - !Ref 'ScannerOfflineModeEnabled'
     - 'true'
   DSPMEnabled: !Equals
-    - !Ref 'AgentlessDatastoresScanning'
+    - !Ref 'AgentlessSensitiveDataScanning'
     - 'true'
 
 Rules:

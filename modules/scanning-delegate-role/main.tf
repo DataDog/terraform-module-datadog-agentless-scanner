@@ -436,7 +436,7 @@ resource "aws_iam_policy" "scanning_worker_policy" {
 }
 
 resource "aws_iam_policy" "scanning_worker_dspm_policy" {
-  count       = var.datastores_scanning_enabled ? 1 : 0
+  count       = var.sensitive_data_scanning_enabled ? 1 : 0
   name_prefix = "${var.iam_role_name}WorkerDSPMPolicy"
   path        = var.iam_role_path
   policy      = data.aws_iam_policy_document.scanning_worker_dspm_policy_document.json
@@ -481,7 +481,7 @@ resource "aws_iam_role_policy_attachment" "worker_attachment" {
 }
 
 resource "aws_iam_role_policy_attachment" "workers_dspm_attachment" {
-  count      = var.datastores_scanning_enabled ? 1 : 0
+  count      = var.sensitive_data_scanning_enabled ? 1 : 0
   policy_arn = aws_iam_policy.scanning_worker_dspm_policy[0].arn
   role       = aws_iam_role.role.name
 }
