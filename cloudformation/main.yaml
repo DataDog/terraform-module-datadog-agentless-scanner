@@ -522,10 +522,16 @@ Resources:
             Action: 'lambda:GetFunction'
             Effect: Allow
             Resource: 'arn:aws:lambda:*:*:function:*'
+            Condition:
+              StringNotEquals:
+                'aws:ResourceTag/DatadogAgentlessScanner': 'false'
           - Sid: DatadogAgentlessScannerGetLambdaLayerDetails
-            Action: 'lambda:GetLayerVersionByArn'
+            Action: 'lambda:GetLayerVersion'
             Effect: Allow
             Resource: 'arn:aws:lambda:*:*:layer:*:*'
+            Condition:
+              StringNotEquals:
+                'aws:ResourceTag/DatadogAgentlessScanner': 'false'
 
   ScannerDelegateOfflineRolePolicy:
     Type: AWS::IAM::ManagedPolicy
