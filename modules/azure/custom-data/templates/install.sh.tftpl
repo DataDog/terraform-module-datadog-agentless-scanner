@@ -21,7 +21,7 @@ apt update
 apt install -y nbd-client
 
 re='@Microsoft.KeyVault\(SecretUri=(https://.*)\)'
-if [[ ${api_key} =~ $re ]]; then
+if [[ "${api_key}" =~ $re ]]; then
   echo "Datadog API key is a Key Vault reference"
   API_KEY_URI=$${BASH_REMATCH[1]}
   curl -sL https://aka.ms/InstallAzureCLIDeb | bash
