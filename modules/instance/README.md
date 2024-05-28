@@ -30,7 +30,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_asg_size"></a> [asg\_size](#input\_asg\_size) | Size of the autoscaling group the instance is in (i.e. number of instances to run) | `number` | `1` | no |
 | <a name="input_iam_instance_profile"></a> [iam\_instance\_profile](#input\_iam\_instance\_profile) | IAM Instance Profile to launch the instance with. Specified as the name of the Instance Profile | `string` | n/a | yes |
-| <a name="input_instance_image_id"></a> [instance\_image\_id](#input\_instance\_image\_id) | The Image ID (aka. AMI) used as baseline for the instance - SSM parameter path is allowed | `string` | `"resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/arm64/hvm/ebs-gp2/ami-id"` | no |
+| <a name="input_instance_image_id"></a> [instance\_image\_id](#input\_instance\_image\_id) | The Image ID (aka. AMI) used as baseline for the instance - SSM parameter path is allowed | `string` | `"resolve:ssm:/aws/service/canonical/ubuntu/server/24.04/stable/current/arm64/hvm/ebs-gp3/ami-id"` | no |
 | <a name="input_instance_root_volume_size"></a> [instance\_root\_volume\_size](#input\_instance\_root\_volume\_size) | The instance root volume size in GiB | `number` | `30` | no |
 | <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | The type of instance | `string` | `"t4g.large"` | no |
 | <a name="input_key_name"></a> [key\_name](#input\_key\_name) | Key name of the Key Pair to use for the instance; which can be managed using the `aws_key_pair` resource | `string` | `null` | no |

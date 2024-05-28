@@ -19,7 +19,7 @@ resource "aws_launch_template" "launch_template" {
       delete_on_termination = true
       encrypted             = true
       volume_size           = var.instance_root_volume_size
-      volume_type           = "gp2"
+      volume_type           = "gp3"
     }
   }
 

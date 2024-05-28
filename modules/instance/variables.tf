@@ -13,7 +13,7 @@ variable "instance_type" {
 variable "instance_image_id" {
   description = "The Image ID (aka. AMI) used as baseline for the instance - SSM parameter path is allowed"
   type        = string
-  default     = "resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/arm64/hvm/ebs-gp2/ami-id"
+  default     = "resolve:ssm:/aws/service/canonical/ubuntu/server/24.04/stable/current/arm64/hvm/ebs-gp3/ami-id"
 }
 
 variable "instance_root_volume_size" {

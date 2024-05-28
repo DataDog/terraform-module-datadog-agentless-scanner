@@ -369,10 +369,10 @@ Resources:
               Encrypted: true
               DeleteOnTermination: true
               VolumeSize: !Ref 'ScannerInstanceVolumeSize'
-              VolumeType: gp2
+              VolumeType: gp3
         IamInstanceProfile:
           Name: !Ref 'ScannerAgentInstanceProfile'
-        ImageId: resolve:ssm:/aws/service/canonical/ubuntu/server/22.04/stable/current/arm64/hvm/ebs-gp2/ami-id
+        ImageId: resolve:ssm:/aws/service/canonical/ubuntu/server/24.04/stable/current/arm64/hvm/ebs-gp3/ami-id
         InstanceType: !Ref 'ScannerInstanceType'
         Monitoring:
           Enabled: !Ref 'ScannerInstanceMonitoring'
