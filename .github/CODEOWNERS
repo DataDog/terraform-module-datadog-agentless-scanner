@@ -9,7 +9,7 @@
 # Rules are matched bottom-to-top, so one team can own subdirectories
 # and another the rest of the directory.
 
-*       @Datadog/k9-cloud-security-posture-management
+*       @Datadog/k9-agentless
 
 ## Docs
 
