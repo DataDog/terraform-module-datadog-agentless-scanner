@@ -40,7 +40,8 @@ aws cloudformation deploy \
     "ScannerOfflineModeEnabled=${STACK_SCANNER_OFFLINE_MODE_ENABLED}" \
     "AgentlessHostScanning=true" \
     "AgentlessContainerScanning=true" \
-    "AgentlessLambdaScanning=true"
+    "AgentlessLambdaScanning=true" \
+    "AgentlessSensitiveDataScanning=true"
 printf "ok.\n"
 
 STACK_ID=$(aws cloudformation describe-stacks \
