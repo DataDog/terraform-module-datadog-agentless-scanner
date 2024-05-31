@@ -939,6 +939,7 @@ Resources:
       Hosts: !Ref AgentlessHostScanning
       Containers: !Ref AgentlessContainerScanning
       Lambdas: !Ref AgentlessLambdaScanning
+      SensitiveData: !Ref AgentlessSensitiveDataScanning
 
   DatadogAgentlessAPICallFunction:
     Type: "AWS::Lambda::Function"
@@ -971,6 +972,7 @@ Resources:
               hosts = event['ResourceProperties']['Hosts']
               containers = event['ResourceProperties']['Containers']
               lambdas = event['ResourceProperties']['Lambdas']
+              sensitive_data = event['ResourceProperties']['SensitiveData']
 
               # Make the url Request
               url = 'https://api.' + api_url + '/api/v2/agentless_scanning/accounts/aws'
@@ -995,6 +997,7 @@ Resources:
                               "vuln_containers_os": containers == 'true',
                               "vuln_host_os": hosts == 'true',
                               "lambda": lambdas == 'true',
+                              "sensitive_data": sensitive_data == 'true',
                           }
                       }
                   }
@@ -1099,6 +1102,7 @@ Metadata:
           - AgentlessHostScanning
           - AgentlessContainerScanning
           - AgentlessLambdaScanning
+          - AgentlessSensitiveDataScanning
       - Label:
           default: Advanced
         Parameters:
@@ -1126,3 +1130,5 @@ Metadata:
         default: "AgentlessContainerScanning *"
       AgentlessLambdaScanning:
         default: "AgentlessLambdaScanning *"
+      AgentlessSensitiveDataScanning:
+        default: "AgentlessSensitiveDataScanning *"
