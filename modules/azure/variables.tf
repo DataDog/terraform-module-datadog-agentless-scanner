@@ -16,14 +16,8 @@ variable "api_key" {
   default     = null
 }
 
-variable "api_key_vault_id" {
-  description = "The resource ID of the Key Vault holding the Datadog API key. Ignored if api_key is specified."
-  type        = string
-  default     = null
-}
-
-variable "api_key_secret_name" {
-  description = "The name of the secret in the Key Vault holding the Datadog API key. Ignored if api_key is specified."
+variable "api_key_secret_id" {
+  description = "The versionless resource ID of the Azure Key Vault secret holding the Datadog API key. Ignored if api_key is specified."
   type        = string
   default     = null
 }

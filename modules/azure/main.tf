@@ -1,9 +1,25 @@
 data "azurerm_subscription" "current" {}
 
-data "azurerm_key_vault_secret" "api_key" {
-  count        = var.api_key == null ? 1 : 0
-  name         = var.api_key_secret_name
-  key_vault_id = var.api_key_vault_id
+data "azapi_resource_id" "api_key_id" {
+  count       = var.api_key == null ? 1 : 0
+  type        = "Microsoft.KeyVault/vaults/secrets@2023-07-01"
+  resource_id = var.api_key_secret_id
+}
+
+data "azapi_resource_id" "key_vault_id" {
+  count       = length(data.azapi_resource_id.api_key_id)
+  type        = "Microsoft.KeyVault/vaults@2023-07-01"
+  resource_id = data.azapi_resource_id.api_key_id[count.index].parent_id
+}
+
+data "azurerm_key_vault" "key_vault" {
+  count               = length(data.azapi_resource_id.key_vault_id)
+  name                = data.azapi_resource_id.key_vault_id[count.index].name
+  resource_group_name = data.azapi_resource_id.key_vault_id[count.index].resource_group_name
+}
+
+locals {
+  api_key_uri = var.api_key != null ? null : "${data.azurerm_key_vault.key_vault[0].vault_uri}secrets/${data.azapi_resource_id.api_key_id[0].name}"
 }
 
 module "resource_group" {
@@ -24,7 +40,7 @@ module "virtual_network" {
 module "custom_data" {
   source    = "./custom-data"
   location  = var.location
-  api_key   = var.api_key != null ? var.api_key : "@Microsoft.KeyVault(SecretUri=${data.azurerm_key_vault_secret.api_key[0].id})"
+  api_key   = var.api_key != null ? var.api_key : "@Microsoft.KeyVault(SecretUri=${local.api_key_uri})"
   site      = var.site
   client_id = module.managed_identity.identity.client_id
 }
@@ -34,7 +50,7 @@ module "managed_identity" {
   resource_group_name = module.resource_group.resource_group.name
   resource_group_id   = module.resource_group.resource_group.id
   location            = var.location
-  api_key_secret_id   = var.api_key != null ? null : data.azurerm_key_vault_secret.api_key[0].resource_versionless_id
+  api_key_secret_id   = one(data.azapi_resource_id.api_key_id[*].resource_id)
   scan_scopes         = coalescelist(var.scan_scopes, [data.azurerm_subscription.current.id])
   tags                = var.tags
 }
