@@ -21,27 +21,39 @@ printf "validating template %s..." "${STACK_NAME}"
 aws cloudformation validate-template --template-body "${STACK_TEMPLATE_BODY}" > /dev/null
 printf " ok.\n"
 
-printf "deploying stack %s..." "${STACK_NAME}"
+PARAMETER_OVERRIDES=(
+  "DatadogAPIKey=${STACK_DATADOG_API_KEY}" \
+  "DatadogAPPKey=${STACK_DATADOG_APP_KEY}" \
+  "DatadogSite=${STACK_DATADOG_SITE}" \
+  "ScannerSSHKeyPairName=${STACK_SCANNER_SSH_KEY_PAIR_NAME}" \
+  "ScannerChannel=${STACK_SCANNER_CHANNEL}" \
+  "ScannerVPCId=${STACK_SCANNER_VPC_ID}" \
+  "ScannerSubnetId=${STACK_SCANNER_SUBNET_ID}" \
+  "ScannerSecurityGroupId=${STACK_SCANNER_SECURITY_GROUP_ID}" \
+  "ScannerDelegateRoleName=${STACK_NAME}DelegateRole" \
+  "ScannerOfflineModeEnabled=${STACK_SCANNER_OFFLINE_MODE_ENABLED}" \
+  "AgentlessHostScanning=true" \
+  "AgentlessContainerScanning=true" \
+  "AgentlessLambdaScanning=true" \
+  "AgentlessSensitiveDataScanning=true"
+)
+
+printf "deploying stack %s in region %s with parameters:\n" "${STACK_NAME}" "${STACK_AWS_REGION}"
+printf "  DatadogAPIKey=%s\n" "***$(echo -n "${STACK_DATADOG_API_KEY}" | tail -c 4)"
+printf "  DatadogAPPKey=%s\n" "***$(echo -n "${STACK_DATADOG_APP_KEY}" | tail -c 4)"
+for param_override in "${PARAMETER_OVERRIDES[@]}"; do
+  if [[ "${param_override}" != "DatadogAPIKey="* ]] && [[ "${param_override}" != "DatadogAPPKey="* ]]; then
+    printf "  %s\n" "${param_override}"
+  fi
+done
+
 aws cloudformation deploy \
   --stack-name "$STACK_NAME" \
   --template-file "$STACK_TEMPLATE_FILE" \
   --region "$STACK_AWS_REGION" \
   --capabilities CAPABILITY_NAMED_IAM \
-  --parameter-overrides \
-    "DatadogAPIKey=${STACK_DATADOG_API_KEY}" \
-    "DatadogAPPKey=${STACK_DATADOG_APP_KEY}" \
-    "DatadogSite=${STACK_DATADOG_SITE}" \
-    "ScannerSSHKeyPairName=${STACK_SCANNER_SSH_KEY_PAIR_NAME}" \
-    "ScannerChannel=${STACK_SCANNER_CHANNEL}" \
-    "ScannerVPCId=${STACK_SCANNER_VPC_ID}" \
-    "ScannerSubnetId=${STACK_SCANNER_SUBNET_ID}" \
-    "ScannerSecurityGroupId=${STACK_SCANNER_SECURITY_GROUP_ID}" \
-    "ScannerDelegateRoleName=${STACK_NAME}DelegateRole" \
-    "ScannerOfflineModeEnabled=${STACK_SCANNER_OFFLINE_MODE_ENABLED}" \
-    "AgentlessHostScanning=true" \
-    "AgentlessContainerScanning=true" \
-    "AgentlessLambdaScanning=true" \
-    "AgentlessSensitiveDataScanning=true"
+  --parameter-overrides "${PARAMETER_OVERRIDES[@]}"
+
 printf "ok.\n"
 
 STACK_ID=$(aws cloudformation describe-stacks \
