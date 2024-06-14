@@ -3,11 +3,6 @@ output "install_sh" {
   value       = terraform_data.template.output
 }
 
-output "agent_version" {
-  description = "The version of the Datadog Agent installed"
-  value       = local.agent_version
-}
-
 output "scanner_version" {
   description = "The version of the Datadog Agentless Scanner installed"
   value       = local.scanner_version

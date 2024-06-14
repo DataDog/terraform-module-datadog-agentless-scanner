@@ -34,7 +34,6 @@ fi
 
 DD_HOSTNAME="$(hostname)"
 DD_SITE="${site}"
-DD_AGENT_MINOR_VERSION="${agent_version}"
 DD_AGENTLESS_VERSION="${scanner_version}"
 
 hostnamectl hostname "$DD_HOSTNAME"
@@ -43,7 +42,6 @@ hostnamectl hostname "$DD_HOSTNAME"
 DD_API_KEY="$DD_API_KEY" \
   DD_SITE="$DD_SITE" \
   DD_HOSTNAME="$DD_HOSTNAME" \
-  DD_AGENT_MINOR_VERSION="$DD_AGENT_MINOR_VERSION" \
   bash -c "$(curl -L https://s3.amazonaws.com/dd-agent/scripts/install_script_agent7.sh)"
 
 # Patch agent configuration

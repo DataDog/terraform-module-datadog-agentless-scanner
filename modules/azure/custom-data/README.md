@@ -34,7 +34,6 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_agent_version"></a> [agent\_version](#output\_agent\_version) | The version of the Datadog Agent installed |
 | <a name="output_install_sh"></a> [install\_sh](#output\_install\_sh) | The installation script for the Datadog agentless scanner |
 | <a name="output_scanner_version"></a> [scanner\_version](#output\_scanner\_version) | The version of the Datadog Agentless Scanner installed |
 <!-- END_TF_DOCS -->

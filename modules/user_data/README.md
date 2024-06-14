@@ -41,7 +41,6 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_agent_version"></a> [agent\_version](#output\_agent\_version) | The version of the Datadog Agent installed |
 | <a name="output_api_key_secret_arn"></a> [api\_key\_secret\_arn](#output\_api\_key\_secret\_arn) | The ARN of the API key secret |
 | <a name="output_install_sh"></a> [install\_sh](#output\_install\_sh) | The installation script for the Datadog agentless scanner |
 | <a name="output_scanner_version"></a> [scanner\_version](#output\_scanner\_version) | The version of the Datadog Agentless Scanner installed |
