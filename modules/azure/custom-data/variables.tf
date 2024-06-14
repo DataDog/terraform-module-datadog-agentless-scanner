@@ -21,3 +21,13 @@ variable "client_id" {
   type        = string
   nullable    = false
 }
+
+variable "scanner_channel" {
+  description = "Channel of the scanner to install from (stable or beta)"
+  type        = string
+  default     = "stable"
+  validation {
+    condition     = contains(["stable", "beta"], var.scanner_channel)
+    error_message = "The scanner channel must be either 'stable' or 'beta'"
+  }
+}

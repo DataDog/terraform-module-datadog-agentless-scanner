@@ -10,6 +10,7 @@ resource "terraform_data" "template" {
     azure_client_id = var.client_id,
     agent_version   = local.agent_version,
     scanner_version = local.scanner_version,
+    scanner_channel = var.scanner_channel,
     region          = var.location,
   })
 }
