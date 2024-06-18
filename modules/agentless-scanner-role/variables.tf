@@ -31,6 +31,10 @@ variable "account_roles" {
 variable "api_key_secret_arns" {
   description = "List of ARNs of the secrets holding the Datadog API keys"
   type        = list(string)
+  validation {
+    condition     = length(var.api_key_secret_arns) > 0
+    error_message = "api_key_secret_arns must not be empty"
+  }
 }
 
 variable "api_key_secret_kms_key_arns" {
