@@ -21,6 +21,7 @@ No modules.
 | Name | Type |
 |------|------|
 | [azurerm_role_assignment.api_key_role_assignment](https://registry.terraform.io/providers/hashicorp/azurerm/3.101.0/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.builtin_worker_role_assignments](https://registry.terraform.io/providers/hashicorp/azurerm/3.101.0/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.orchestrator_role_assignment](https://registry.terraform.io/providers/hashicorp/azurerm/3.101.0/docs/resources/role_assignment) | resource |
 | [azurerm_role_assignment.worker_role_assignments](https://registry.terraform.io/providers/hashicorp/azurerm/3.101.0/docs/resources/role_assignment) | resource |
 | [azurerm_role_definition.orchestrator_role](https://registry.terraform.io/providers/hashicorp/azurerm/3.101.0/docs/resources/role_definition) | resource |
