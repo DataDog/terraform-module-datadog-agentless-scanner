@@ -28,6 +28,7 @@ No modules.
 | <a name="input_api_key"></a> [api\_key](#input\_api\_key) | Specifies the API key required by the Datadog Agent to submit vulnerabilities to Datadog | `string` | n/a | yes |
 | <a name="input_client_id"></a> [client\_id](#input\_client\_id) | Client ID of the managed identity used by the Datadog Agentless Scanner | `string` | n/a | yes |
 | <a name="input_location"></a> [location](#input\_location) | The location of the resource group where the Datadog Agentless Scanner resources will be created | `string` | n/a | yes |
+| <a name="input_scanner_channel"></a> [scanner\_channel](#input\_scanner\_channel) | Channel of the scanner to install from (stable or beta) | `string` | `"stable"` | no |
 | <a name="input_site"></a> [site](#input\_site) | By default the Agent sends its data to Datadog US site. If your organization is on another site, you must update it. See https://docs.datadoghq.com/getting_started/site/ | `string` | `"datadoghq.com"` | no |
 
 ## Outputs
