@@ -29,15 +29,19 @@ module "delegate_role" {
 module "agentless_scanner" {
   source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner"
 
-  api_key               = "YOUR API KEY"
+  api_key               = var.datadog-api-key
   instance_profile_name = module.scanner_role.instance_profile.name
+}
+
+variable "datadog-api-key" {
+
 }
 ```
 
 And run:
 ```sh
 terraform init
-terraform plan
+terraform apply -var="datadog-api-key=$DD_API_KEY"
 ```
 
 > [!IMPORTANT]
