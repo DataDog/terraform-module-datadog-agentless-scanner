@@ -86,14 +86,6 @@ resource "azurerm_role_assignment" "worker_role_assignments" {
   principal_type     = "ServicePrincipal"
 }
 
-resource "azurerm_role_assignment" "builtin_worker_role_assignments" {
-  for_each             = toset(var.scan_scopes)
-  scope                = each.key
-  role_definition_name = "VM Scanner Operator"
-  principal_id         = azurerm_user_assigned_identity.managed_identity.principal_id
-  principal_type       = "ServicePrincipal"
-}
-
 resource "azurerm_role_assignment" "api_key_role_assignment" {
   count                = var.api_key_secret_id != null ? 1 : 0
   scope                = var.api_key_secret_id
