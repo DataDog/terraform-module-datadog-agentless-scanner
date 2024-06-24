@@ -1,5 +1,5 @@
 locals {
-  scanner_version = "0.11"
+  scanner_version = "0"
 }
 
 resource "terraform_data" "template" {

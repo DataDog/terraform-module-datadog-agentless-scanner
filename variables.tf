@@ -12,12 +12,12 @@ variable "api_key_secret_arn" {
 }
 
 variable "scanner_version" {
-  description = "Version of the scanner to install"
+  description = "Major version of the scanner to install"
   type        = string
-  default     = "0.11"
+  default     = "0"
   validation {
-    condition     = can(regex("^[0-9]+\\.[0-9]+$", var.scanner_version))
-    error_message = "The scanner version must be in the format of X.Y"
+    condition     = can(regex("^[0-9]+(\\.[0-9]+)?$", var.scanner_version))
+    error_message = "The scanner version prefix must be in the format of X or X.Y"
   }
 }
 

@@ -129,9 +129,9 @@ Parameters:
 
   ScannerVersion:
     Type: String
-    Description: The version of the Agentless Scanner to install
-    Default: 0.11
-    AllowedPattern: "^[0-9]+\\.[0-9]+$"
+    Description: The major version of the Agentless Scanner to install
+    Default: "0"
+    AllowedPattern: "^[0-9]+(\\.[0-9]+){0,2}$"
 
   ScannerChannel:
     Type: String
@@ -311,7 +311,7 @@ Resources:
               # Install the agentless-scanner
               echo "deb [signed-by=/usr/share/keyrings/datadog-archive-keyring.gpg] https://apt.datadoghq.com/ $DD_AGENTLESS_CHANNEL agentless-scanner" >> /etc/apt/sources.list.d/datadog.list
               apt update
-              agentless_pkg_pattern="([[:digit:]]:)?$DD_AGENTLESS_VERSION(\.[[:digit:]]+){0,1}(~rc\.[[:digit:]]+)?(-[[:digit:]])?"
+              agentless_pkg_pattern="([[:digit:]]:)?$DD_AGENTLESS_VERSION(\.[[:digit:]]+){0,2}(~rc\.[[:digit:]]+)?(-[[:digit:]])?"
               agentless_version_custom="$(apt-cache madison datadog-agentless-scanner | grep -E "$agentless_pkg_pattern" -om1)" || true
               if [ -z "$agentless_version_custom" ]; then
                 printf "Could not find a version of datadog-agentless-scanner from %s" "$DD_AGENTLESS_VERSION"
