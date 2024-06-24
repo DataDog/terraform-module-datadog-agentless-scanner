@@ -25,6 +25,18 @@ variable "scanner_channel" {
   }
 }
 
+variable "scanner_configuration" {
+  description = "Specifies a custom configuration for the scanner. The specificed object will be passed directly as a configuration input for the scanner."
+  type        = any
+  default     = {}
+}
+
+variable "agent_configuration" {
+  description = "Specifies a custom configuration for the datadog-agent. The specified object will be passed directly as a configuration input for the datadog-agent."
+  type        = any
+  default     = {}
+}
+
 variable "api_key_secret_arn" {
   description = "ARN of the secret holding the Datadog API key. Takes precedence over api_key variable"
   type        = string

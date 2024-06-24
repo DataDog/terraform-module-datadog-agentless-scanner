@@ -59,3 +59,15 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "scanner_configuration" {
+  description = "Specifies a custom configuration for the scanner. The specificed object will be passed directly as a configuration input for the scanner."
+  type        = any
+  default     = {}
+}
+
+variable "agent_configuration" {
+  description = "Specifies a custom configuration for the datadog-agent. The specified object will be passed directly as a configuration input for the datadog-agent."
+  type        = any
+  default     = {}
+}
