@@ -26,7 +26,7 @@ variable "scanner_channel" {
 }
 
 variable "scanner_configuration" {
-  description = "Specifies a custom configuration for the scanner. The specificed object will be passed directly as a configuration input for the scanner."
+  description = "Specifies a custom configuration for the scanner. The specified object will be passed directly as a configuration input for the scanner."
   type        = any
   default     = {}
 }
