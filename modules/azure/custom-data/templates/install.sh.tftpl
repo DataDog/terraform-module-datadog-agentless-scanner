@@ -18,18 +18,13 @@ echo "options nbd nbds_max=128" > /etc/modprobe.d/nbd.conf
 
 # Install requirements
 apt update
-apt install -y nbd-client
+apt install -y nbd-client curl
 
 re='@Microsoft.KeyVault\(SecretUri=(https://.*)\)'
 if [[ "${api_key}" =~ $re ]]; then
-  echo "Datadog API key is a Key Vault reference"
-  API_KEY_URI=$${BASH_REMATCH[1]}
-  curl -sL https://aka.ms/InstallAzureCLIDeb | bash
-  echo "Retrieving Datadog API key from Azure Key Vault: $API_KEY_URI"
-  az login --identity --username "${azure_client_id}"
-  DD_API_KEY=$(az keyvault secret show --id "$API_KEY_URI" --query value --output tsv)
+  DD_API_KEY="ENC[${api_key}]"
 else
-  DD_API_KEY=$api_key
+  DD_API_KEY="${api_key}"
 fi
 
 # Append the last 6 bytes of the VM UUID to prevent hostname collisions
@@ -42,8 +37,7 @@ DD_AGENTLESS_CHANNEL="${scanner_channel}"
 hostnamectl hostname "$DD_HOSTNAME"
 
 # Install the agent
-DD_API_KEY="$DD_API_KEY" \
-  DD_SITE="$DD_SITE" \
+DD_SITE="$DD_SITE" \
   DD_HOSTNAME="$DD_HOSTNAME" \
   bash -c "$(curl -L https://s3.amazonaws.com/dd-agent/scripts/install_script_agent7.sh)"
 
@@ -85,10 +79,18 @@ site: $DD_SITE
 hostname: $DD_HOSTNAME
 logs_enabled: true
 ec2_prefer_imdsv2: true
+secret_backend_command: /opt/datadog-secrets
 %{if length(agent_configuration) > 0}
 ${yamlencode(agent_configuration)}
 %{endif}
 EOF
+
+cat <<EOF > /opt/datadog-secrets
+#!/bin/bash
+datadog-agentless-scanner secrets || exit 1
+EOF
+chown dd-agent: /opt/datadog-secrets
+chmod 700 /opt/datadog-secrets
 
 if [ "$DD_SITE" = "datad0g.com" ]; then
 cat <<EOF >> /etc/datadog-agent/datadog.yaml
@@ -110,6 +112,7 @@ ${yamlencode(scanner_configuration)}
 %{endif}
 EOF
 
+chown dd-agent: /etc/datadog-agent/agentless-scanner.yaml
 chmod 600 /etc/datadog-agent/agentless-scanner.yaml
 
 # Restart the agent
