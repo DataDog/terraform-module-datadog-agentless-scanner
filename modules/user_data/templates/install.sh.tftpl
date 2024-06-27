@@ -18,38 +18,24 @@ echo "options nbd nbds_max=128" > /etc/modprobe.d/nbd.conf
 
 # Install requirements
 apt update
-apt install -y nbd-client curl jq
+apt install -y nbd-client curl
 
 # Get IMDS metadata to fetch the API Key from SecretsManager (without having to install awscli)
-IMDS_TOKEN=$(        curl -sSL -XPUT "http://169.254.169.254/latest/api/token"                                              -H "X-AWS-EC2-Metadata-Token-TTL-Seconds: 30")
-IMDS_INSTANCE_ID=$(  curl -sSL -XGET "http://169.254.169.254/latest/meta-data/instance-id"                                  -H "X-AWS-EC2-Metadata-Token: $IMDS_TOKEN")
-IMDS_AWS_REGION=$(   curl -sSL -XGET "http://169.254.169.254/latest/meta-data/placement/region"                             -H "X-AWS-EC2-Metadata-Token: $IMDS_TOKEN")
-IMDS_INSTANCE_ROLE=$(curl -sSL -XGET "http://169.254.169.254/latest/meta-data/iam/security-credentials/"                    -H "X-AWS-EC2-Metadata-Token: $IMDS_TOKEN")
-IMDS_CREDS=$(        curl -sSL -XGET "http://169.254.169.254/latest/meta-data/iam/security-credentials/$IMDS_INSTANCE_ROLE" -H "X-AWS-EC2-Metadata-Token: $IMDS_TOKEN")
-
-AWS_ACCESS_KEY_ID=$(    jq -r '.AccessKeyId'     <<< "$IMDS_CREDS")
-AWS_SECRET_ACCESS_KEY=$(jq -r '.SecretAccessKey' <<< "$IMDS_CREDS")
-AWS_SECURITY_TOKEN=$(   jq -r '.Token'           <<< "$IMDS_CREDS")
-
-AWS_SECRET_JSON=$(curl --noproxy '*' -sSL -X POST "https://secretsmanager.$IMDS_AWS_REGION.amazonaws.com" \
-    --user "$AWS_ACCESS_KEY_ID:$AWS_SECRET_ACCESS_KEY" \
-    --aws-sigv4 "aws:amz:$IMDS_AWS_REGION:secretsmanager" \
-    --header "X-Amz-Security-Token: $AWS_SECURITY_TOKEN" \
-    --header "X-Amz-Target: secretsmanager.GetSecretValue" \
-    --header "Content-Type: application/x-amz-json-1.1" \
-    --data "{\"SecretId\":\"${api_key_secret_arn}\"}")
+IMDS_TOKEN=$(      curl -sSL -XPUT "http://169.254.169.254/latest/api/token"                  -H "X-AWS-EC2-Metadata-Token-TTL-Seconds: 30")
+IMDS_INSTANCE_ID=$(curl -sSL -XGET "http://169.254.169.254/latest/meta-data/instance-id"      -H "X-AWS-EC2-Metadata-Token: $IMDS_TOKEN")
+IMDS_AWS_REGION=$( curl -sSL -XGET "http://169.254.169.254/latest/meta-data/placement/region" -H "X-AWS-EC2-Metadata-Token: $IMDS_TOKEN")
+unset IMDS_TOKEN
 
 DD_HOSTNAME="agentless-scanning-$IMDS_AWS_REGION-$IMDS_INSTANCE_ID"
 DD_SITE="${site}"
-DD_API_KEY="$(jq -r '.SecretString' <<< "$AWS_SECRET_JSON")"
+DD_API_KEY="ENC[${api_key_secret_arn}]"
 DD_AGENTLESS_VERSION="${scanner_version}"
 DD_AGENTLESS_CHANNEL="${scanner_channel}"
 
 hostnamectl hostname "$DD_HOSTNAME"
 
 # Install the agent
-DD_API_KEY="$DD_API_KEY" \
-  DD_SITE="$DD_SITE" \
+DD_SITE="$DD_SITE" \
   DD_HOSTNAME="$DD_HOSTNAME" \
   bash -c "$(curl -L https://s3.amazonaws.com/dd-agent/scripts/install_script_agent7.sh)"
 
@@ -91,10 +77,18 @@ site: $DD_SITE
 hostname: $DD_HOSTNAME
 logs_enabled: true
 ec2_prefer_imdsv2: true
+secret_backend_command: /opt/datadog-secrets
 %{if length(agent_configuration) > 0}
 ${yamlencode(agent_configuration)}
 %{endif}
 EOF
+
+cat <<EOF > /opt/datadog-secrets
+#!/bin/bash
+datadog-agentless-scanner secrets || exit 1
+EOF
+chown dd-agent: /opt/datadog-secrets
+chmod 700 /opt/datadog-secrets
 
 if [ "$DD_SITE" = "datad0g.com" ]; then
 cat <<EOF >> /etc/datadog-agent/datadog.yaml
@@ -115,10 +109,11 @@ ${yamlencode(scanner_configuration)}
 %{endif}
 EOF
 
+chown dd-agent: /etc/datadog-agent/agentless-scanner.yaml
 chmod 600 /etc/datadog-agent/agentless-scanner.yaml
 
 # Restart the agent
-service datadog-agent restart
+systemctl restart datadog-agent
 
 # Give some room to the agent to start to not miss logs
 sleep 5
