@@ -91,7 +91,9 @@ site: $DD_SITE
 hostname: $DD_HOSTNAME
 logs_enabled: true
 ec2_prefer_imdsv2: true
+%{if length(agent_configuration) > 0}
 ${yamlencode(agent_configuration)}
+%{endif}
 EOF
 
 if [ "$DD_SITE" = "datad0g.com" ]; then
@@ -108,7 +110,9 @@ api_key: $DD_API_KEY
 site: $DD_SITE
 installation_mode: terraform
 installation_version: 0.11.2
+%{if length(scanner_configuration) > 0}
 ${yamlencode(scanner_configuration)}
+%{endif}
 EOF
 
 chmod 600 /etc/datadog-agent/agentless-scanner.yaml
