@@ -5,15 +5,14 @@ locals {
   }
 }
 
-resource "azurerm_orchestrated_virtual_machine_scale_set" "vmss" {
+resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   name                = var.name
   location            = var.location
   resource_group_name = var.resource_group_name
   tags                = merge(var.tags, local.dd_tags)
 
-  sku_name                    = var.instance_size
-  instances                   = var.instance_count
-  platform_fault_domain_count = 1
+  sku       = var.instance_size
+  instances = var.instance_count
 
   identity {
     type = "UserAssigned"
@@ -21,18 +20,15 @@ resource "azurerm_orchestrated_virtual_machine_scale_set" "vmss" {
       var.user_assigned_identity
     ]
   }
-  os_profile {
-    linux_configuration {
-      computer_name_prefix            = "agentless-scanning-"
-      admin_username                  = var.admin_username
-      disable_password_authentication = true
-      admin_ssh_key {
-        username   = var.admin_username
-        public_key = var.admin_ssh_key
-      }
-    }
-    custom_data = base64encode(var.custom_data)
+
+  computer_name_prefix = "agentless-scanning-"
+  custom_data          = base64encode(var.custom_data)
+  admin_username       = var.admin_username
+  admin_ssh_key {
+    username   = var.admin_username
+    public_key = var.admin_ssh_key
   }
+
   os_disk {
     caching              = "ReadWrite"
     storage_account_type = "StandardSSD_LRS"

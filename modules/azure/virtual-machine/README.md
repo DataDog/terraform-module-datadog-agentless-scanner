@@ -20,7 +20,7 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_orchestrated_virtual_machine_scale_set.vmss](https://registry.terraform.io/providers/hashicorp/azurerm/3.101.0/docs/resources/orchestrated_virtual_machine_scale_set) | resource |
+| [azurerm_linux_virtual_machine_scale_set.vmss](https://registry.terraform.io/providers/hashicorp/azurerm/3.101.0/docs/resources/linux_virtual_machine_scale_set) | resource |
 
 ## Inputs
 
