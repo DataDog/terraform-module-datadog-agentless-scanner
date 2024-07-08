@@ -28,6 +28,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
     username   = var.admin_username
     public_key = var.admin_ssh_key
   }
+  boot_diagnostics {}
 
   os_disk {
     caching              = "ReadWrite"
