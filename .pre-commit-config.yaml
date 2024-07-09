@@ -3,6 +3,9 @@ repos:
     rev: "v0.16.0"
     hooks:
       - id: terraform-docs-go
+        name: terraform docs for the root module
+        args: ["markdown", "table", "--output-file", "README.md", "./"]
+      - id: terraform-docs-go
         name: terraform docs for the 'instance' module
         args: ["markdown", "table", "--output-file", "README.md", "./modules/instance"]
       - id: terraform-docs-go
