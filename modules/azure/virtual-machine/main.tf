@@ -53,6 +53,10 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
     }
   }
 
+  automatic_instance_repair {
+    enabled      = true
+    grace_period = "PT10M"
+  }
   extension {
     name                 = "HealthExtension"
     publisher            = "Microsoft.ManagedServices"
