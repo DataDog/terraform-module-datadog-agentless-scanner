@@ -116,5 +116,9 @@ systemctl restart datadog-agent
 # Give some room to the agent to start to not miss logs
 sleep 5
 
+# Stop the scanner after 24 hours. This will cause the health
+# probe to fail and trigger an automatic instance replacement.
+systemd-run --on-boot=24h systemctl stop datadog-agentless-scanner
+
 # Enable and start datadog-agentless-scaner
 systemctl enable --now datadog-agentless-scanner
