@@ -2,6 +2,7 @@
 
 ## Version TBD
 
+- Upgrade scanner instances to Ubuntu Server 24.04
 - Replace scanner instances every 24 hours
 - Enable automatic instance repairs
 - Allow specifying custom configuration for the agent and scanner
