@@ -36,10 +36,27 @@ DD_AGENTLESS_CHANNEL="${scanner_channel}"
 
 hostnamectl hostname "$DD_HOSTNAME"
 
-# Install the agent
-DD_SITE="$DD_SITE" \
-  DD_HOSTNAME="$DD_HOSTNAME" \
-  bash -c "$(curl -L https://s3.amazonaws.com/dd-agent/scripts/install_script_agent7.sh)"
+# Custom configuration for agent
+mkdir /etc/datadog-agent
+cat <<EOF > /etc/datadog-agent/datadog.yaml
+api_key: $DD_API_KEY
+site: $DD_SITE
+hostname: $DD_HOSTNAME
+logs_enabled: true
+ec2_prefer_imdsv2: true
+secret_backend_command: /opt/datadog-secrets
+%{if length(agent_configuration) > 0}
+${yamlencode(agent_configuration)}
+%{endif}
+EOF
+
+# We temporarily mask datadog-agent to prevent it from being started
+# automatically by apt on install. This is needed because we need to
+# fix the config file permissions between installing it and starting
+# it. Simply setting the environment variable `DD_INSTALL_ONLY=true`
+# by itself does not prevent apt from starting the service.
+systemctl mask datadog-agent.service
+DD_INSTALL_ONLY=true bash -c "$(curl -L https://s3.amazonaws.com/dd-agent/scripts/install_script_agent7.sh)"
 
 # Install the agentless-scanner
 echo "deb [signed-by=/usr/share/keyrings/datadog-archive-keyring.gpg] https://apt.datadoghq.com/ $DD_AGENTLESS_CHANNEL agentless-scanner" >> /etc/apt/sources.list.d/datadog.list
@@ -72,19 +89,6 @@ EOF
 
 chown -R dd-agent: /etc/datadog-agent/conf.d/agentless-scanner.d
 
-# Custom configuration for agent
-cat <<EOF > /etc/datadog-agent/datadog.yaml
-api_key: $DD_API_KEY
-site: $DD_SITE
-hostname: $DD_HOSTNAME
-logs_enabled: true
-ec2_prefer_imdsv2: true
-secret_backend_command: /opt/datadog-secrets
-%{if length(agent_configuration) > 0}
-${yamlencode(agent_configuration)}
-%{endif}
-EOF
-
 cat <<EOF > /opt/datadog-secrets
 #!/bin/bash
 datadog-agentless-scanner secrets || exit 1
@@ -115,15 +119,16 @@ EOF
 chown dd-agent: /etc/datadog-agent/agentless-scanner.yaml
 chmod 600 /etc/datadog-agent/agentless-scanner.yaml
 
-# Restart the agent
-systemctl restart datadog-agent
+# Enable and start the agent
+systemctl unmask datadog-agent.service
+systemctl enable --now datadog-agent.service
 
 # Give some room to the agent to start to not miss logs
 sleep 5
 
 # Stop the scanner after 24 hours. This will cause the health
 # probe to fail and trigger an automatic instance replacement.
-systemd-run --on-boot=24h systemctl stop datadog-agentless-scanner
+systemd-run --on-boot=24h systemctl stop datadog-agentless-scanner.service
 
 # Enable and start datadog-agentless-scaner
-systemctl enable --now datadog-agentless-scanner
+systemctl enable --now datadog-agentless-scanner.service
