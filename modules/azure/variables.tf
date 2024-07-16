@@ -35,10 +35,19 @@ variable "location" {
 }
 
 variable "scan_scopes" {
-  description = "The set of scopes that the Agentless Scanner should be allowed to scan. Defaults to the scanner subscription."
+  description = "The set of scopes that the Agentless Scanner should be allowed to scan. Defaults to the scanner subscription. Ignored when scanner_identity is set."
   type        = list(string)
   nullable    = false
   default     = []
+}
+
+variable "scanner_identity" {
+  description = "A user assigned identity to assign to the Agentless Scanner VMs. It is recommended to leave this unset, in which case a new identity will be created with the required role assignments."
+  type = object({
+    client_id = string
+    id        = string
+  })
+  default = null
 }
 
 variable "bastion" {

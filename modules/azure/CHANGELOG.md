@@ -2,6 +2,7 @@
 
 ## Version TBD
 
+- Allow passing scanner identity as an input variable
 - Upgrade scanner instances to Ubuntu Server 24.04
 - Replace scanner instances every 24 hours
 - Enable automatic instance repairs

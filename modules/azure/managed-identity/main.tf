@@ -13,7 +13,7 @@ resource "azurerm_user_assigned_identity" "managed_identity" {
 }
 
 resource "azurerm_role_definition" "orchestrator_role" {
-  name        = "Datadog Agentless Scanner Orchestrator Role (${var.resource_group_name})"
+  name        = "Datadog Agentless Scanner Orchestrator Role"
   description = "Role used by the Datadog Agentless Scanner to manage resources in its resource group."
   scope       = var.resource_group_id
 
