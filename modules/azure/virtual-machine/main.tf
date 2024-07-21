@@ -71,3 +71,54 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
     })
   }
 }
+
+resource "azurerm_monitor_autoscale_setting" "autoscale_setting" {
+  name                = "${azurerm_linux_virtual_machine_scale_set.vmss.name}-Autoscale"
+  resource_group_name = azurerm_linux_virtual_machine_scale_set.vmss.resource_group_name
+  location            = azurerm_linux_virtual_machine_scale_set.vmss.location
+  target_resource_id  = azurerm_linux_virtual_machine_scale_set.vmss.id
+
+  profile {
+    name = "Terminate all instances"
+
+    capacity {
+      default = 0
+      minimum = 0
+      maximum = 0
+    }
+
+    recurrence {
+      days    = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+      hours   = [floor(random_integer.restart_minute.result / 60)]
+      minutes = [random_integer.restart_minute.result % 60]
+    }
+  }
+
+  profile {
+    name = jsonencode({
+      "for"  = "Terminate all instances"
+      "name" = "Auto created default scale condition"
+    })
+
+    capacity {
+      default = var.instance_count
+      minimum = var.instance_count
+      maximum = var.instance_count
+    }
+
+    recurrence {
+      days    = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+      hours   = [floor((random_integer.restart_minute.result + 1) / 60) % 24]
+      minutes = [(random_integer.restart_minute.result + 1) % 60]
+    }
+  }
+}
+
+resource "random_integer" "restart_minute" {
+  keepers = {
+    vmss_id = azurerm_linux_virtual_machine_scale_set.vmss.id
+  }
+
+  min = 0
+  max = (24 * 60) - 1
+}
