@@ -4,13 +4,13 @@
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
-| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | 3.101.0 |
+| <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 3.101.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | 3.101.0 |
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | >= 3.101.0 |
 
 ## Modules
 
@@ -20,11 +20,11 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [azurerm_role_assignment.api_key_role_assignment](https://registry.terraform.io/providers/hashicorp/azurerm/3.101.0/docs/resources/role_assignment) | resource |
-| [azurerm_role_assignment.orchestrator_role_assignment](https://registry.terraform.io/providers/hashicorp/azurerm/3.101.0/docs/resources/role_assignment) | resource |
-| [azurerm_role_assignment.worker_role_assignments](https://registry.terraform.io/providers/hashicorp/azurerm/3.101.0/docs/resources/role_assignment) | resource |
-| [azurerm_role_definition.orchestrator_role](https://registry.terraform.io/providers/hashicorp/azurerm/3.101.0/docs/resources/role_definition) | resource |
-| [azurerm_role_definition.worker_role](https://registry.terraform.io/providers/hashicorp/azurerm/3.101.0/docs/resources/role_definition) | resource |
+| [azurerm_role_assignment.api_key_role_assignment](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.orchestrator_role_assignment](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_assignment.worker_role_assignments](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) | resource |
+| [azurerm_role_definition.orchestrator_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_definition) | resource |
+| [azurerm_role_definition.worker_role](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_definition) | resource |
 
 ## Inputs
 
