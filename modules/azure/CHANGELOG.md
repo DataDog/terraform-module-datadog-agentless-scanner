@@ -2,6 +2,7 @@
 
 ## Version TBD
 
+- Fix constant Terraform drift when multiple scan scopes are specified
 - Split off role definition and assignment into a separate module
 - Upgrade scanner instances to Ubuntu Server 24.04
 - Replace scanner instances every 24 hours
