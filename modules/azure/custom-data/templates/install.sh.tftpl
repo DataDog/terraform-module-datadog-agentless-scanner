@@ -29,7 +29,7 @@ if [[ "${api_key}" =~ $re ]]; then
   az login --identity --username "${azure_client_id}"
   DD_API_KEY=$(az keyvault secret show --id "$API_KEY_URI" --query value --output tsv)
 else
-  DD_API_KEY=${api_key}
+  DD_API_KEY="${api_key}"
 fi
 
 # Append the last 6 bytes of the VM UUID to prevent hostname collisions
