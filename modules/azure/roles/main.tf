@@ -65,11 +65,16 @@ resource "azurerm_role_assignment" "orchestrator_role_assignment" {
 }
 
 resource "azurerm_role_assignment" "worker_role_assignments" {
-  for_each           = toset(var.scan_scopes)
-  scope              = each.key
-  role_definition_id = azurerm_role_definition.worker_role.role_definition_resource_id
-  principal_id       = var.principal_id
-  principal_type     = "ServicePrincipal"
+  for_each = toset(var.scan_scopes)
+  scope    = each.key
+  # This is a workaround for a bug in the azurerm provider: https://github.com/hashicorp/terraform-provider-azurerm/issues/4847
+  # We replace the subscription of the role definition ID by the subscription of the scope to avoid eternal TF drift.
+  role_definition_id = format("%s/%s",
+    substr(each.key, 0, 51),                                                        # scope subscription ID
+    substr(azurerm_role_definition.worker_role.role_definition_resource_id, 52, -1) # rest of the role definition ID
+  )
+  principal_id   = var.principal_id
+  principal_type = "ServicePrincipal"
 }
 
 resource "azurerm_role_assignment" "api_key_role_assignment" {

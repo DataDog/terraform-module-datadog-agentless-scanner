@@ -21,4 +21,10 @@ variable "scan_scopes" {
   description = "The set of scopes that the Datadog Agentless Scanner is allowed to scan."
   type        = list(string)
   nullable    = false
+  validation {
+    condition = alltrue([
+      for s in var.scan_scopes : can(regex("^(?i:/subscriptions/([a-f0-9-]{36}))/?$", s))
+    ])
+    error_message = "All scan scopes must be subscriptions."
+  }
 }
