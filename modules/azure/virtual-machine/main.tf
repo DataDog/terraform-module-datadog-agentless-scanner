@@ -78,6 +78,7 @@ resource "azurerm_monitor_autoscale_setting" "autoscale_setting" {
   resource_group_name = azurerm_linux_virtual_machine_scale_set.vmss.resource_group_name
   location            = azurerm_linux_virtual_machine_scale_set.vmss.location
   target_resource_id  = azurerm_linux_virtual_machine_scale_set.vmss.id
+  tags                = merge(var.tags, local.dd_tags)
 
   profile {
     name = "Terminate all instances"
