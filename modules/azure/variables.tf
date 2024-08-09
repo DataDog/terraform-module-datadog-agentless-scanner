@@ -72,7 +72,7 @@ variable "scanner_version" {
 }
 
 variable "scanner_channel" {
-  description = "Channel of the scanner to install from (stable or beta)"
+  description = "Channel of the scanner to install from (stable or beta)."
   type        = string
   default     = "stable"
   validation {
