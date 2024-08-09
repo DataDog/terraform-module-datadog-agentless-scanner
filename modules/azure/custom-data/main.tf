@@ -7,6 +7,5 @@ resource "terraform_data" "template" {
     scanner_channel       = var.scanner_channel,
     scanner_configuration = var.scanner_configuration,
     agent_configuration   = var.agent_configuration,
-    region                = var.location,
   })
 }

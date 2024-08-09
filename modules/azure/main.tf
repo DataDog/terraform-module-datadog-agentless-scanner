@@ -38,11 +38,14 @@ module "virtual_network" {
 }
 
 module "custom_data" {
-  source    = "./custom-data"
-  location  = var.location
-  api_key   = var.api_key != null ? var.api_key : "@Microsoft.KeyVault(SecretUri=${local.api_key_uri})"
-  site      = var.site
-  client_id = module.managed_identity.identity.client_id
+  source                = "./custom-data"
+  api_key               = var.api_key != null ? var.api_key : "@Microsoft.KeyVault(SecretUri=${local.api_key_uri})"
+  scanner_channel       = var.scanner_channel
+  scanner_version       = var.scanner_version
+  scanner_configuration = var.scanner_configuration
+  agent_configuration   = var.agent_configuration
+  site                  = var.site
+  client_id             = module.managed_identity.identity.client_id
 }
 
 module "managed_identity" {
