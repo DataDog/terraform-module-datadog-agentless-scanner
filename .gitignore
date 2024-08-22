@@ -32,3 +32,6 @@ example: *tfplan*
 terraform.rc
 
 .terraform.lock.hcl
+
+# Exclude .idea folder
+**/.idea
