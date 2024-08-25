@@ -21,12 +21,13 @@ data "aws_iam_policy_document" "scanning_orchestrator_policy_document" {
     resources = [
       "arn:${data.aws_partition.current.partition}:ec2:*:*:volume/*",
       "arn:${data.aws_partition.current.partition}:ec2:*:*:snapshot/*",
+      "arn:${data.aws_partition.current.partition}:ec2:*:*:image/*",
     ]
     // Allow specifying tags when creating snapshots or volumes
     condition {
       test     = "StringEquals"
       variable = "ec2:CreateAction"
-      values   = ["CreateSnapshot", "CreateVolume", "CopySnapshot"]
+      values   = ["CreateSnapshot", "CreateVolume", "CopySnapshot", "CopyImage"]
     }
   }
 
@@ -107,6 +108,49 @@ data "aws_iam_policy_document" "scanning_orchestrator_policy_document" {
 
     // Enforce that any of these actions can be performed on resources
     // (volumes and snapshots) that have the DatadogAgentlessScanner tag.
+    condition {
+      test     = "StringEquals"
+      variable = "aws:ResourceTag/DatadogAgentlessScanner"
+      values   = ["true"]
+    }
+  }
+
+  statement {
+    sid    = "DatadogAgentlessScannerCopyImage"
+    effect = "Allow"
+    actions = [
+      "ec2:CopyImage"
+    ]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:ec2:*:*:image/*",
+    ]
+    // Enforcing created image has DatadogAgentlessScanner tag
+    condition {
+      test     = "StringEquals"
+      variable = "aws:RequestTag/DatadogAgentlessScanner"
+      values   = ["true"]
+    }
+    // Enforcing created image has only tags with DatadogAgentlessScanner* prefix
+    condition {
+      test     = "ForAllValues:StringLike"
+      variable = "aws:TagKeys"
+      values   = ["DatadogAgentlessScanner*"]
+    }
+  }
+
+  statement {
+    sid    = "DatadogAgentlessScannerImageCleanup"
+    effect = "Allow"
+    actions = [
+      // Allow deleting created images
+      "ec2:DeregisterImage",
+    ]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:ec2:*:*:image/*",
+    ]
+
+    // Enforce that any of these actions can be performed on resources
+    // images that have the DatadogAgentlessScanner tag.
     condition {
       test     = "StringEquals"
       variable = "aws:ResourceTag/DatadogAgentlessScanner"
