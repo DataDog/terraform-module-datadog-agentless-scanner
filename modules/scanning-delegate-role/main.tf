@@ -149,8 +149,8 @@ data "aws_iam_policy_document" "scanning_orchestrator_policy_document" {
       "arn:${data.aws_partition.current.partition}:ec2:*:*:image/*",
     ]
 
-    // Enforce that any of these actions can be performed on resources
-    // images that have the DatadogAgentlessScanner tag.
+    // Enforce that any of these actions can be performed on images
+    // that have the DatadogAgentlessScanner tag.
     condition {
       test     = "StringEquals"
       variable = "aws:ResourceTag/DatadogAgentlessScanner"
