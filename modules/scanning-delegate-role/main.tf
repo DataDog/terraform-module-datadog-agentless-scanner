@@ -123,6 +123,7 @@ data "aws_iam_policy_document" "scanning_orchestrator_policy_document" {
     ]
     resources = [
       "arn:${data.aws_partition.current.partition}:ec2:*:*:image/*",
+      "arn:${data.aws_partition.current.partition}:ec2:*:*:snapshot/*",
     ]
     // Enforcing created image has DatadogAgentlessScanner tag
     condition {
@@ -178,6 +179,19 @@ data "aws_iam_policy_document" "scanning_orchestrator_policy_document" {
       // Required to be able to wait for volumes completion and cleanup. It
       // cannot be restricted.
       "ec2:DescribeVolumes",
+    ]
+    resources = [
+      "*",
+    ]
+  }
+
+  statement {
+    sid    = "DatadogAgentlessScannerDescribeImages"
+    effect = "Allow"
+    actions = [
+      // Required to be able to wait for image completion and cleanup. It
+      // cannot be restricted.
+      "ec2:DescribeImages",
     ]
     resources = [
       "*",
