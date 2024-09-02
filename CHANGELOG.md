@@ -1,16 +1,36 @@
 # Changelog
 
-## Version TBD
+## Version 0.11.3
 
-### agentless-scanner 2024032202
+- Add permissions to copy AMIs (ec2:CopyImage) to improve coverage of cross-account AMI scanning
+- Fix permissions to be able to scan for volumes encrypted with a customer-managed key
 
-- Bump Trivy to version 2024-02-28.
+## Version 0.11.2
+
+- Adds a scanner_channel variable at the root module level to allow specifying the channel to install the agentless scanner from
+- Upgrade datadog-agent to version 7.53
+- Add permissions to be able to scan for Lambda layers
+- Add sensitive_data_scanning_enabled parameter to opt-in to DSPM scanning
+- Add validation to api_key_secret_arns to be non-empty
+- Add parameters to allow specififying custom configuration for the agent and scanner
+
+## Version 0.11.1
+
+- Allow auto-update of the agentless scanner package
+
+## Version 0.11.0
+
+- Encrypted snapshots: allow granting KMS keys for AWS resources (#79) [Pierre Guilleminot]
+
+## Version 0.10.0
 
 ### Terraform
 
+- Add IAM permission to allow decrypting snapshots using CMK (#71)
 - Add missing CopySnapshot permissions to allow AMI scanning
 - Create a dedicated security-group for scanner instead of relying on the VPC default one.
 - Always rely on SecretsManager to store the Datadog API Key
+- Add subnets per Availability Zone to the scanner
 
 ### CloudFormation
 
