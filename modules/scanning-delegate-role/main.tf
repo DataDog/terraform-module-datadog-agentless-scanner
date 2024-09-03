@@ -214,12 +214,6 @@ data "aws_iam_policy_document" "scanning_orchestrator_policy_document" {
 
     condition {
       test     = "StringLike"
-      variable = "kms:EncryptionContext:aws:ebs:id"
-      values   = ["snap-*"]
-    }
-
-    condition {
-      test     = "StringLike"
       variable = "kms:ViaService"
       values   = ["ec2.*.amazonaws.com"]
     }
@@ -383,12 +377,6 @@ data "aws_iam_policy_document" "scanning_worker_policy_document" {
       test     = "ForAnyValue:StringEquals"
       variable = "kms:EncryptionContextKeys"
       values   = ["aws:ebs:id"]
-    }
-
-    condition {
-      test     = "StringLike"
-      variable = "kms:EncryptionContext:aws:ebs:id"
-      values   = ["snap-*"]
     }
 
     condition {
