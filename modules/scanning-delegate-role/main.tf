@@ -205,7 +205,7 @@ data "aws_iam_policy_document" "scanning_orchestrator_policy_document" {
     resources = ["arn:${data.aws_partition.current.partition}:kms:*:*:key/*"]
 
     // The following conditions enforce that decrypt action
-    // can only be performed on snapshots from calls by ebs API.
+    // can only be performed from calls by ebs API.
     condition {
       test     = "ForAnyValue:StringEquals"
       variable = "kms:EncryptionContextKeys"
@@ -372,7 +372,7 @@ data "aws_iam_policy_document" "scanning_worker_policy_document" {
     resources = ["arn:${data.aws_partition.current.partition}:kms:*:*:key/*"]
 
     // The following conditions enforce that decrypt action
-    // can only be performed on snapshots from calls by ebs API.
+    // can only be performed from calls by ebs API.
     condition {
       test     = "ForAnyValue:StringEquals"
       variable = "kms:EncryptionContextKeys"
