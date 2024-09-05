@@ -2,6 +2,7 @@
 
 ## Version TBD
 
+- Add instance_count variable to the main module
 - Install semgrep dependency
 - Fix constant Terraform drift when multiple scan scopes are specified
 - Split off role definition and assignment into a separate module

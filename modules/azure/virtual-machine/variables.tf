@@ -50,7 +50,7 @@ variable "admin_ssh_key" {
 }
 
 variable "instance_count" {
-  description = "Size of the autoscaling group the instance is in (i.e. number of instances to run)"
+  description = "Size of the scale set the scanner instance is in (i.e. number of instances to run)"
   type        = number
   default     = 1
 }

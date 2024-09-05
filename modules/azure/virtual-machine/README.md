@@ -33,7 +33,7 @@ No modules.
 | <a name="input_admin_ssh_key"></a> [admin\_ssh\_key](#input\_admin\_ssh\_key) | SSH public key for the admin user | `string` | n/a | yes |
 | <a name="input_admin_username"></a> [admin\_username](#input\_admin\_username) | Name of the admin user to use for the instance | `string` | `"azureuser"` | no |
 | <a name="input_custom_data"></a> [custom\_data](#input\_custom\_data) | The user data to provide when launching the instance | `string` | `null` | no |
-| <a name="input_instance_count"></a> [instance\_count](#input\_instance\_count) | Size of the autoscaling group the instance is in (i.e. number of instances to run) | `number` | `1` | no |
+| <a name="input_instance_count"></a> [instance\_count](#input\_instance\_count) | Size of the scale set the scanner instance is in (i.e. number of instances to run) | `number` | `1` | no |
 | <a name="input_instance_root_volume_size"></a> [instance\_root\_volume\_size](#input\_instance\_root\_volume\_size) | The instance root volume size in GiB | `number` | `30` | no |
 | <a name="input_instance_size"></a> [instance\_size](#input\_instance\_size) | The type of instance | `string` | `"Standard_B2ps_v2"` | no |
 | <a name="input_location"></a> [location](#input\_location) | The location of the resource group where the Datadog Agentless Scanner network resources will be created | `string` | n/a | yes |

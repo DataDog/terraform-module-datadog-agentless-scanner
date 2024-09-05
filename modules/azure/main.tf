@@ -70,6 +70,7 @@ module "virtual_machine" {
   location               = var.location
   resource_group_name    = module.resource_group.resource_group.name
   admin_ssh_key          = var.admin_ssh_key
+  instance_count         = var.instance_count
   custom_data            = module.custom_data.install_sh
   subnet_id              = module.virtual_network.subnet.id
   user_assigned_identity = module.managed_identity.identity.id

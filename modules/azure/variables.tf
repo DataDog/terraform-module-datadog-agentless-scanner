@@ -55,6 +55,12 @@ variable "bastion" {
   nullable    = false
 }
 
+variable "instance_count" {
+  description = "Size of the scale set the scanner instance is in (i.e. number of instances to run)"
+  type        = number
+  default     = 1
+}
+
 variable "tags" {
   description = "A map of additional tags to add to the resources created."
   type        = map(string)
