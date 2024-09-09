@@ -23,6 +23,8 @@ module "instance" {
   subnet_ids           = [for s in module.vpc.private_subnets : s.id]
   iam_instance_profile = var.instance_profile_name
   tags                 = var.tags
+  instance_type        = var.instance_type
+  asg_size             = var.instance_count
 
   depends_on = [module.vpc.routing_ready]
 }
