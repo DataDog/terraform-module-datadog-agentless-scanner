@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.11.4
+
+- Add parameters `instance_type` and `instance_count` to configure the auto-scaling group properties
+
 ## Version 0.11.3
 
 - Add permissions to copy AMIs (ec2:CopyImage) to improve coverage of cross-account AMI scanning

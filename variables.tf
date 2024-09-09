@@ -71,3 +71,15 @@ variable "agent_configuration" {
   type        = any
   default     = {}
 }
+
+variable "instance_type" {
+  description = "The type of instance running the scanner"
+  type        = string
+  default     = "t4g.large"
+}
+
+variable "instance_count" {
+  description = "Size of the autoscaling group the instance is in (i.e. number of instances with scanners to run)"
+  type        = number
+  default     = 1
+}
