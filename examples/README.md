@@ -20,3 +20,7 @@ To scan across accounts, see the [example](cross_account/README.md)
 # Custom VPC Example
 
 If you want to avoid creating a new VPC for the Agentless scanners, and you want to reuse one of your own, see the [example](custom_vpc/README.md)
+
+# Custom Agent Configurations Example
+
+If you want to add custom configurations for our Datadog Agent running alongside our scanners, see the [example](custom_agent_configurations/README.md)
