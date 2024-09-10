@@ -2,7 +2,7 @@
 
 The instance module can be used to spawn a dedicated instance specifically crafted for running the agentless scanner.
 
-It created an autoscaling group with a launch template that installs the agentless scanner on the instance.
+It creates an auto scaling group with a launch template that installs the agentless scanner on the instance.
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements

@@ -1,6 +1,6 @@
 ## Description
 
-The agentless-scanner-role module creates the proper role and policies for the agentless instance to be able to assume the scanning delegate roles.
+The agentless-scanner-role module creates the proper role and policies for the agentless scanner instance to be able to assume the scanning delegate roles.
 
 It exports the role and instance profile that should be attached to the agentless scanner instance.
 

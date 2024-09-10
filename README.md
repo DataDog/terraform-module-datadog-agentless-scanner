@@ -34,7 +34,7 @@ module "scanner_role" {
 }
 
 # As you can see there is a two way bindings between these two "role" modules.
-# - the scanner role requires the list of delegate roles ARN for the scanner to assume
+# - the scanner role requires the list of delegate role ARNs for the scanner to assume
 # - the delegate role(s) require the scanner role ARN as input in order to define the trust relationship between the EC2 scanner role and the delegate role to be assumed.
 
 # Finally we can create the agentless scanner instance. It requires the instance profile name that was created by the scanner_role.
@@ -70,10 +70,10 @@ To uninstall, remove the Agentless scanner module from your Terraform code. Remo
 
 ## Architecture
 
-Agentless deployment is split into different modules to allow for more flexibility and customization. The following modules are available:
+The Agentless Scanner deployment is split into different modules to allow for more flexibility and customization. The following modules are available:
 
-- [scanning-delegate-role](./modules/scanning-delegate-role/): Creates the necessary IAM roles and policies for the scanning delegate. It creates an IAM role in a specific account that the scanner can then assume to scan the account. This roles allow read accesses to many different resources (EBS snapshots, Lambdas etc.) in the account to be able to scan for them.
-- [agentless-scanner-role](./modules/agentless-scanner-role/): Creates the necessary IAM roles and policies for the agentless scanner instance. It creates an IAM role that allows the scanner to assume the role of the scanning delegate.
+- [scanning-delegate-role](./modules/scanning-delegate-role/): Creates the necessary IAM role and policies for the scanning delegate. It creates an IAM role in a specific account that the scanner can then assume to scan the account. This role allows read access to many different resources (EBS snapshots, Lambdas etc.) in the account to be able to scan them.
+- [agentless-scanner-role](./modules/agentless-scanner-role/): Creates the necessary IAM role and policies for the agentless scanner instance. It creates an IAM role that allows the scanner to assume the role of the scanning delegate.
 - [instance](./modules/instance/): Creates the EC2 instance that runs the agentless scanner. This instance is launched as part of an Auto Scaling group to ensure high availability.
 - [user_data](./modules/user_data/): Creates the user data script that installs and configures the agentless scanner on the EC2 instance.
 - [vpc](./modules/vpc/): Creates the VPC, subnets and all network resources required for the agentless scanner.
@@ -81,25 +81,29 @@ Agentless deployment is split into different modules to allow for more flexibili
 The main module provided at the root of this repository is a thin wrapper around the vpc, user_data and instance modules, with simplified inputs. The scanning-delegate-role and agentless-scanner-role modules are intended to be used in conjunction with this module, as they define the proper IAM permissions for the scanner.
 
 ```mermaid
-graph TD
-    A[Main module]
-    subgraph A[Main module - account X]
-        VPC[vpc]
-        UD[user_data]
-        I[instance]
+flowchart TD
+    subgraph "Account A"
+      subgraph "Main module"
+          UD[user_data]
+          VPC[vpc]
+          I[instance]
+          UD-->I
+          VPC-->I
+        end
+
+        SR[agentless-scanner-role]
+        SR-->I
+
+        DRA[scanning-delegate-role A]
+        DRA-- trusts -->SR
+        SR-- assumes -->DRA
     end
 
-    DRA[scanning-delegate-role A]
-    DRB[scanning-delegate-role B]
-    SR[agentless-scanner-role]
-
-    DRA-->|trust relationship|SR
-    DRB-->|trust relationship|SR
-    SR-->DRA
-    SR-->DRB
-    SR-->I
-    UD-->I
-    VPC-->I
+    subgraph "Account B"
+      DRB[scanning-delegate-role B]
+      DRB-- trusts -->SR
+      SR-- assumes -->DRB
+    end
 ```
 
 ## Examples
