@@ -71,3 +71,16 @@ variable "agent_configuration" {
   type        = any
   default     = {}
 }
+
+variable "security_agent_configuration" {
+  description = "Specifies a custom configuration for the Datadog Security Agent. The specified object is passed directly as a configuration input for the Datadog Security Agent."
+  type        = any
+  default     = {}
+}
+
+variable "system_probe_configuration" {
+  description = "Specifies a custom configuration for the Datadog System Probe. The specified object is passed directly as a configuration input for the Datadog System Probe."
+  type        = any
+  default     = {}
+}
+

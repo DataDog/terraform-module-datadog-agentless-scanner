@@ -97,6 +97,26 @@ ${yamlencode(agent_configuration)}
 %{endif}
 EOF
 
+# Custom configuration for security-agent
+%{if length(security_agent_configuration) > 0}
+cat <<EOF > /etc/datadog-agent/security-agent.yaml
+${yamlencode(security_agent_configuration)}
+EOF
+
+chmod 600 /etc/datadog-agent/security-agent.yaml
+chown dd-agent: /etc/datadog-agent/security-agent.yaml
+%{endif}
+
+# Custom configuration for system-probe
+%{if length(system_probe_configuration) > 0}
+cat <<EOF > /etc/datadog-agent/system-probe.yaml
+${yamlencode(system_probe_configuration)}
+EOF
+
+chmod 600 /etc/datadog-agent/system-probe.yaml
+chown root:root /etc/datadog-agent/system-probe.yaml
+%{endif}
+
 cat <<EOF > /etc/datadog-agent/agentless-scanner.yaml
 hostname: $DD_HOSTNAME
 api_key: $DD_API_KEY

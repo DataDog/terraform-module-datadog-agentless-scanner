@@ -37,6 +37,18 @@ variable "agent_configuration" {
   default     = {}
 }
 
+variable "security_agent_configuration" {
+  description = "Specifies a custom configuration for the Datadog Security Agent. The specified object is passed directly as a configuration input for the Datadog Security Agent."
+  type        = any
+  default     = {}
+}
+
+variable "system_probe_configuration" {
+  description = "Specifies a custom configuration for the Datadog System Probe. The specified object is passed directly as a configuration input for the Datadog System Probe."
+  type        = any
+  default     = {}
+}
+
 variable "api_key_secret_arn" {
   description = "ARN of the secret holding the Datadog API key. Takes precedence over api_key variable"
   type        = string

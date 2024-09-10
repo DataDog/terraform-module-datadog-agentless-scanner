@@ -5,15 +5,17 @@ module "vpc" {
 }
 
 module "user_data" {
-  source                = "./modules/user_data"
-  api_key               = var.api_key
-  api_key_secret_arn    = var.api_key_secret_arn
-  scanner_channel       = var.scanner_channel
-  scanner_version       = var.scanner_version
-  scanner_configuration = var.scanner_configuration
-  agent_configuration   = var.agent_configuration
-  site                  = var.site
-  tags                  = var.tags
+  source                       = "./modules/user_data"
+  api_key                      = var.api_key
+  api_key_secret_arn           = var.api_key_secret_arn
+  scanner_channel              = var.scanner_channel
+  scanner_version              = var.scanner_version
+  scanner_configuration        = var.scanner_configuration
+  agent_configuration          = var.agent_configuration
+  security_agent_configuration = var.security_agent_configuration
+  system_probe_configuration   = var.system_probe_configuration
+  site                         = var.site
+  tags                         = var.tags
 }
 
 module "instance" {
