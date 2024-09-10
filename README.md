@@ -33,8 +33,8 @@ module "scanner_role" {
   api_key_secret_arns = [module.agentless_scanner.api_key_secret_arn]
 }
 
-# As you can see there is a two way bindings between these two "role" modules.
-# - the scanner role requires the list of delegate role ARNs for the scanner to assume
+# As you can see there is a two way binding between these two "role" modules.
+# - the scanner role requires the list of delegate role ARNs for the scanner to assume.
 # - the delegate role(s) require the scanner role ARN as input in order to define the trust relationship between the EC2 scanner role and the delegate role to be assumed.
 
 # Finally we can create the agentless scanner instance. It requires the instance profile name that was created by the scanner_role.
