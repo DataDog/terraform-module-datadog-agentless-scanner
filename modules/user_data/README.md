@@ -1,3 +1,9 @@
+## Description
+
+The user_data module exports a script that can be used to install the Datadog agentless scanner on a target instance. This script can be configured to install the scanner.
+
+It is then used to create the launch template for the agentless scanner instance.
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 

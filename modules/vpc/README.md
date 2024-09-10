@@ -1,3 +1,9 @@
+## Description
+
+The vpc module can be used to spawn a dedicated VPC specifically crafted for running the agentless scanner instance.
+
+It provides dedicated private subnet, associated with the proper private endpoints to AWS services in order to reduce the network cost induced by scanning resources.
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 

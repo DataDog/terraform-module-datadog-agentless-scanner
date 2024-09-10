@@ -12,7 +12,20 @@ Before using this module, make sure you have the following:
 ## Usage
 
 To use this module in your Terraform configuration, add the following code in your existing Terraform code:
+
 ```hcl
+# First we need to define the proper roles for our scanners. It consists of two different modules that have a two way bindings between them.
+
+# 1. The "scanning delegate role" defines all the policies and IAM roles necessary for the scanner to interact and scan some specific account resources.
+# It shall be created for every account that the agentless scanner will be able scan. These roles are meant to be assumed by the "agentless scanner role".
+module "delegate_role" {
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/scanning-delegate-role"
+
+  scanner_roles = [module.scanner_role.role.arn]
+}
+
+# 2. The "agentless scanner role" creates an EC2 instance profile along with an IAM role allowing the EC2 instance scanner to assume the scanning delegate role(s).
+# It shall be created in the same account as the agentless scanner instance.
 module "scanner_role" {
   source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanner-role"
 
@@ -20,12 +33,13 @@ module "scanner_role" {
   api_key_secret_arns = [module.agentless_scanner.api_key_secret_arn]
 }
 
-module "delegate_role" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/scanning-delegate-role"
+# As you can see there is a two way bindings between these two "role" modules.
+# - the scanner role requires the list of delegate roles ARN for the scanner to assume
+# - the delegate role(s) require the scanner role ARN as input in order to define the trust relationship between the EC2 scanner role and the delegate role to be assumed.
 
-  scanner_roles = [module.scanner_role.role.arn]
-}
-
+# Finally we can create the agentless scanner instance. It requires the instance profile name that was created by the scanner_role.
+# This module will define the VPC, subnets, network and compute resources required for the agentless scanner.
+# See the documentation of each module for more information or our examples for a complete setup.
 module "agentless_scanner" {
   source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner"
 
@@ -53,6 +67,40 @@ To uninstall, remove the Agentless scanner module from your Terraform code. Remo
 
 > [!WARNING]
 > Exercise caution when deleting Terraform resources. Review the plan carefully to ensure everything is in order.
+
+## Architecture
+
+Agentless deployment is split into different modules to allow for more flexibility and customization. The following modules are available:
+
+- [scanning-delegate-role](./modules/scanning-delegate-role/): Creates the necessary IAM roles and policies for the scanning delegate. It creates an IAM role in a specific account that the scanner can then assume to scan the account. This roles allow read accesses to many different resources (EBS snapshots, Lambdas etc.) in the account to be able to scan for them.
+- [agentless-scanner-role](./modules/agentless-scanner-role/): Creates the necessary IAM roles and policies for the agentless scanner instance. It creates an IAM role that allows the scanner to assume the role of the scanning delegate.
+- [instance](./modules/instance/): Creates the EC2 instance that runs the agentless scanner. This instance is launched as part of an Auto Scaling group to ensure high availability.
+- [user_data](./modules/user_data/): Creates the user data script that installs and configures the agentless scanner on the EC2 instance.
+- [vpc](./modules/vpc/): Creates the VPC, subnets and all network resources required for the agentless scanner.
+
+The main module provided at the root of this repository is a thin wrapper around the vpc, user_data and instance modules, with simplified inputs. The scanning-delegate-role and agentless-scanner-role modules are intended to be used in conjunction with this module, as they define the proper IAM permissions for the scanner.
+
+```mermaid
+graph TD
+    A[Main module]
+    subgraph A[Main module - account X]
+        VPC[vpc]
+        UD[user_data]
+        I[instance]
+    end
+
+    DRA[scanning-delegate-role A]
+    DRB[scanning-delegate-role B]
+    SR[agentless-scanner-role]
+
+    DRA-->|trust relationship|SR
+    DRB-->|trust relationship|SR
+    SR-->DRA
+    SR-->DRB
+    SR-->I
+    UD-->I
+    VPC-->I
+```
 
 ## Examples
 
