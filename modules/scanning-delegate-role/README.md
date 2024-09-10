@@ -1,6 +1,6 @@
 ## Description
 
-The scanning-delegate-role module create the proper role and policies to allow the agentless scanner to interact with AWS services of a specific account.
+The scanning-delegate-role module creates the proper role and policies to allow the agentless scanner to interact with AWS services of a specific account.
 
 It should be installed in every account that the agentless scanner will scan.
 
