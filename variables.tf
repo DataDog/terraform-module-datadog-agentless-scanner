@@ -61,13 +61,13 @@ variable "tags" {
 }
 
 variable "scanner_configuration" {
-  description = "Specifies a custom configuration for the scanner. The specified object is passed directly as a configuration input for the scanner."
+  description = "Specifies a custom configuration for the scanner. The specified object is passed directly as a configuration input for the scanner. Warning: this is an advanced feature and can break the scanner if not used correctly."
   type        = any
   default     = {}
 }
 
 variable "agent_configuration" {
-  description = "Specifies a custom configuration for the Datadog Agent. The specified object is passed directly as a configuration input for the Datadog Agent."
+  description = "Specifies a custom configuration for the Datadog Agent. The specified object is passed directly as a configuration input for the Datadog Agent. For more details: https://docs.datadoghq.com/agent/configuration/agent-configuration-files/. Warning: this is an advanced feature and can break the Datadog Agent if not used correctly."
   type        = any
   default     = {}
 }
