@@ -20,7 +20,7 @@ provider "aws" {
 }
 
 module "agentless_scanner_role" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanner-role?ref=0.11.3"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanner-role?ref=0.11.4"
 
   account_roles = [module.delegate_role.role.arn]
   api_key_secret_arns = [
@@ -30,13 +30,13 @@ module "agentless_scanner_role" {
 }
 
 module "delegate_role" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/scanning-delegate-role?ref=0.11.3"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/scanning-delegate-role?ref=0.11.4"
 
   scanner_roles = [module.agentless_scanner_role.role.arn]
 }
 
 module "agentless_scanner_us" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner?ref=0.11.3"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner?ref=0.11.4"
 
   providers = {
     aws = aws.us
@@ -47,7 +47,7 @@ module "agentless_scanner_us" {
 }
 
 module "agentless_scanner_eu" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner?ref=0.11.3"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner?ref=0.11.4"
 
   providers = {
     aws = aws.eu

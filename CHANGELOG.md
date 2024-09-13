@@ -3,6 +3,7 @@
 ## Version 0.11.4
 
 - Add parameters `instance_type` and `instance_count` to configure the auto-scaling group properties
+- Fix allowing overriding conflicting parameters (hostname, api_key, site) from agent_configuration variable
 
 ## Version 0.11.3
 
