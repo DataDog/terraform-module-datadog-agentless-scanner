@@ -71,12 +71,12 @@ terraform apply -var="datadog-api-key=$DD_API_KEY"
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_custom_data"></a> [custom\_data](#module\_custom\_data) | ./custom-data | n/a |
-| <a name="module_managed_identity"></a> [managed\_identity](#module\_managed\_identity) | ./managed-identity | n/a |
-| <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | ./resource-group | n/a |
-| <a name="module_roles"></a> [roles](#module\_roles) | ./roles | n/a |
-| <a name="module_virtual_machine"></a> [virtual\_machine](#module\_virtual\_machine) | ./virtual-machine | n/a |
-| <a name="module_virtual_network"></a> [virtual\_network](#module\_virtual\_network) | ./virtual-network | n/a |
+| <a name="module_custom_data"></a> [custom\_data](#module\_custom\_data) | ./modules/custom-data | n/a |
+| <a name="module_managed_identity"></a> [managed\_identity](#module\_managed\_identity) | ./modules/managed-identity | n/a |
+| <a name="module_resource_group"></a> [resource\_group](#module\_resource\_group) | ./modules/resource-group | n/a |
+| <a name="module_roles"></a> [roles](#module\_roles) | ./modules/roles | n/a |
+| <a name="module_virtual_machine"></a> [virtual\_machine](#module\_virtual\_machine) | ./modules/virtual-machine | n/a |
+| <a name="module_virtual_network"></a> [virtual\_network](#module\_virtual\_network) | ./modules/virtual-network | n/a |
 
 ## Resources
 

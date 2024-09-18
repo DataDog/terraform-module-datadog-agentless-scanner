@@ -23,14 +23,14 @@ locals {
 }
 
 module "resource_group" {
-  source   = "./resource-group"
+  source   = "./modules/resource-group"
   name     = var.resource_group_name
   location = var.location
   tags     = var.tags
 }
 
 module "virtual_network" {
-  source              = "./virtual-network"
+  source              = "./modules/virtual-network"
   resource_group_name = module.resource_group.resource_group.name
   location            = var.location
   bastion             = var.bastion
@@ -38,7 +38,7 @@ module "virtual_network" {
 }
 
 module "custom_data" {
-  source                = "./custom-data"
+  source                = "./modules/custom-data"
   api_key               = var.api_key != null ? var.api_key : "@Microsoft.KeyVault(SecretUri=${local.api_key_uri})"
   scanner_channel       = var.scanner_channel
   scanner_version       = var.scanner_version
@@ -49,7 +49,7 @@ module "custom_data" {
 }
 
 module "managed_identity" {
-  source              = "./managed-identity"
+  source              = "./modules/managed-identity"
   resource_group_name = module.resource_group.resource_group.name
   location            = var.location
   tags                = var.tags
@@ -57,7 +57,7 @@ module "managed_identity" {
 
 module "roles" {
   count             = var.create_roles ? 1 : 0
-  source            = "./roles"
+  source            = "./modules/roles"
   resource_group_id = module.resource_group.resource_group.id
   principal_id      = module.managed_identity.identity.principal_id
   api_key_secret_id = one(data.azapi_resource_id.api_key_id[*].resource_id)
@@ -65,7 +65,7 @@ module "roles" {
 }
 
 module "virtual_machine" {
-  source                 = "./virtual-machine"
+  source                 = "./modules/virtual-machine"
   depends_on             = [module.virtual_network]
   location               = var.location
   resource_group_name    = module.resource_group.resource_group.name
