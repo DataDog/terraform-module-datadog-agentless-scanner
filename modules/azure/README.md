@@ -1,6 +1,6 @@
 # Terraform Module Datadog Agentless Scanner Module
 
-This Terraform module provides a simple and reusable configuration for installing a Datadog agentless scanner on Azure.
+This Terraform module provides a simple and reusable configuration for installing a Datadog Agentless Scanner on Azure.
 
 ## Prerequisites
 
@@ -43,12 +43,12 @@ terraform apply -var="datadog-api-key=$DD_API_KEY"
 - `site` must match the Datadog site parameter of your account (see [this table](https://docs.datadoghq.com/getting_started/site/#access-the-datadog-site)).
 - `location` must be an Azure region. To avoid inter-region bandwidth charges,
   the scanner should be deployed in the same region as the resources to be scanned.
-- `resource_group_name` is the name of the resource group where the agentless scanner
-  will be created. For security reasons, this resource group should be reserved for
+- `resource_group_name` is the name of the resource group where the Agentless scanner
+  is created. For security reasons, this resource group should be reserved for
   the exclusive use of the scanner.
 - `scan_scopes` is a list of [scopes](https://learn.microsoft.com/azure/role-based-access-control/scope-overview)
-  that the agentless scanner should scan. The scanner will be given read access to managed
-  disks in these scopes. Note that currently only subscription scopes are supported.
+  that the Agentless scanner should scan. The scanner is given read access to managed
+  disks in these scopes. Only subscription scopes are supported.
 
 
 <!-- BEGIN_TF_DOCS -->
