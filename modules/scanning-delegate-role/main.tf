@@ -6,6 +6,8 @@ locals {
 }
 
 data "aws_partition" "current" {}
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
 
 // The IAM policy for the scanning orchestrator allows to create resources
 // such as snapshots and volumes. It is also able to cleanup these resources
@@ -469,6 +471,7 @@ data "aws_iam_policy_document" "scanning_worker_dspm_policy_document" {
   }
 }
 
+
 resource "aws_iam_policy" "scanning_orchestrator_policy" {
   name_prefix = "${var.iam_role_name}OrchestratorPolicy"
   path        = var.iam_role_path
@@ -482,7 +485,7 @@ resource "aws_iam_policy" "scanning_worker_policy" {
 }
 
 resource "aws_iam_policy" "scanning_worker_dspm_policy" {
-  count       = var.sensitive_data_scanning_enabled ? 1 : 0
+  count       = var.sensitive_data_scanning_enabled || var.sensitive_data_scanning_rds_enabled ? 1 : 0
   name_prefix = "${var.iam_role_name}WorkerDSPMPolicy"
   path        = var.iam_role_path
   policy      = data.aws_iam_policy_document.scanning_worker_dspm_policy_document.json
@@ -539,7 +542,145 @@ resource "aws_iam_role_policy_attachment" "worker_attachment" {
 }
 
 resource "aws_iam_role_policy_attachment" "workers_dspm_attachment" {
-  count      = var.sensitive_data_scanning_enabled ? 1 : 0
+  count      = length(aws_iam_policy.scanning_worker_dspm_policy)
   policy_arn = aws_iam_policy.scanning_worker_dspm_policy[0].arn
+  role       = aws_iam_role.role.name
+}
+
+// RDS Specific resources
+
+// RDS Service Role for S3 Exports
+data "aws_iam_policy_document" "rds_service_role_assume_policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    effect  = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["export.rds.amazonaws.com"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "rds_service_role_policy_document" {
+  statement {
+    actions = [
+      "s3:PutObject*",
+      "s3:ListBucket",
+      "s3:GetObject*",
+      "s3:DeleteObject*",
+      "s3:GetBucketLocation"
+    ]
+    resources = [
+      "arn:aws:s3:::datadog-agentless-scanning-*",
+      "arn:aws:s3:::datadog-agentless-scanning-*/*",
+    ]
+  }
+}
+
+resource "aws_iam_role" "rds_service_role" {
+  count       = var.sensitive_data_scanning_rds_enabled ? 1 : 0
+  name        = "DatadogAgentlessScannerRDSS3ExportRole"
+  path        = var.iam_role_path
+  description = "Role assumed by the RDS service to write to the S3 bucket"
+
+  assume_role_policy = data.aws_iam_policy_document.rds_service_role_assume_policy.json
+  tags               = merge(var.tags, local.dd_tags)
+}
+
+resource "aws_iam_policy" "rds_service_role_policy" {
+  count       = length(aws_iam_role.rds_service_role)
+  name_prefix = "DatadogAgentlessWorkerRDSS3ExportPolicy"
+  path        = var.iam_role_path
+  policy      = data.aws_iam_policy_document.rds_service_role_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "rds_service_role_attachment" {
+  count      = length(aws_iam_policy.rds_service_role_policy)
+  policy_arn = aws_iam_policy.rds_service_role_policy[0].arn
+  role       = aws_iam_role.rds_service_role[0].name
+}
+
+// KMS Key for RDS S3 Exports
+resource "aws_kms_key" "agentless_kms_key" {
+  count        = var.sensitive_data_scanning_rds_enabled ? 1 : 0
+  description  = "This key is used to encrypt bucket objects"
+  multi_region = true
+  tags         = merge(var.tags, local.dd_tags)
+}
+
+data "aws_iam_policy_document" "kms_key_policy_document" {
+  statement {
+    sid    = "DatadogAgentlessKMSKeyPolicy"
+    effect = "Allow"
+    actions = [
+      "kms:CreateGrant",
+      "kms:DescribeKey",
+    ]
+    resources = [
+      "arn:${data.aws_partition.current.id}:kms:*:${data.aws_caller_identity.current.account_id}:key/${aws_kms_key.agentless_kms_key[0].key_id}",
+    ]
+  }
+}
+
+resource "aws_iam_policy" "kms_key_policy" {
+  count       = length(aws_kms_key.agentless_kms_key)
+  name_prefix = "DatadogAgentlessWorkerKMSKeyPolicy"
+  path        = var.iam_role_path
+  policy      = data.aws_iam_policy_document.kms_key_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "kms_key_policy_attachment" {
+  count      = length(aws_iam_policy.kms_key_policy)
+  policy_arn = aws_iam_policy.kms_key_policy[0].arn
+  role       = aws_iam_role.role.name
+}
+
+// RDS Scanning Policy
+data "aws_iam_policy_document" "scanning_rds_policy_document" {
+  statement {
+    sid    = "DatadogAgentlessScannerRDSStartExportTask"
+    effect = "Allow"
+    actions = [
+      "rds:StartExportTask"
+    ]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:rds:*:*:cluster:*",
+      "arn:${data.aws_partition.current.partition}:rds:*:*:cluster-snapshot:*",
+      "arn:${data.aws_partition.current.partition}:rds:*:*:snapshot:*",
+    ]
+    condition {
+      test     = "StringNotEquals"
+      variable = "aws:ResourceTag/DatadogAgentlessScanner"
+      values   = ["false"]
+    }
+  }
+
+  statement {
+    sid    = "DatadogAgentlessScannerPassRoleToRDS"
+    effect = "Allow"
+    actions = [
+      "iam:PassRole"
+    ]
+    resources = [
+      aws_iam_role.rds_service_role[0].arn,
+    ]
+    condition {
+      test     = "StringEquals"
+      variable = "iam:PassedToService"
+      values   = ["rds.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_policy" "scanning_rds_policy" {
+  count       = var.sensitive_data_scanning_rds_enabled ? 1 : 0
+  name_prefix = "${var.iam_role_name}WorkerRDSPolicy"
+  path        = var.iam_role_path
+  policy      = data.aws_iam_policy_document.scanning_rds_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "delegate_role_rds_policy_attachment" {
+  count      = length(aws_iam_policy.scanning_rds_policy)
+  policy_arn = aws_iam_policy.scanning_rds_policy[0].arn
   role       = aws_iam_role.role.name
 }

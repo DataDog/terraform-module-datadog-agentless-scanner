@@ -15,6 +15,9 @@ repos:
         name: terraform docs for the 'agentless-scanner-role' module
         args: ["markdown", "table", "--output-file", "README.md", "./modules/agentless-scanner-role"]
       - id: terraform-docs-go
+        name: terraform docs for the 'agentless-s3-bucket' module
+        args: ["markdown", "table", "--output-file", "README.md", "./modules/agentless-s3-bucket"]
+      - id: terraform-docs-go
         name: terraform docs for the 'user_data' module
         args: ["markdown", "table", "--output-file", "README.md", "./modules/user_data"]
       - id: terraform-docs-go
