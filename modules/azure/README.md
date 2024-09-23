@@ -1,3 +1,56 @@
+# Terraform Module Datadog Agentless Scanner Module
+
+This Terraform module provides a simple and reusable configuration for installing a Datadog Agentless Scanner on Azure.
+
+## Prerequisites
+
+Before using this module, make sure you have the following:
+
+1. [Terraform](https://www.terraform.io/) installed on your local machine.
+2. The [Azure CLI](https://learn.microsoft.com/cli/azure/) installed on your local machine.
+3. Azure credentials configured (`az login`) with the necessary permissions.
+
+## Usage
+
+To use this module in your Terraform configuration, add the following code in your existing Terraform code:
+
+```hcl
+variable "datadog-api-key" {}
+
+module "datadog-agentless-scanner" {
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/azure"
+
+  site                = "datadoghq.com"
+  location            = "East US"
+  resource_group_name = "datadog-agentless-scanner"
+  admin_ssh_key       = "ssh-rsa ..." # SSH public key of the admin user
+  api_key             = var.datadog-api-key
+
+  # A list of subscriptions to be scanned. If not specified, defaults to the current subscription.
+  scan_scopes = ["/subscriptions/00000000-xxxx-xxxx-xxxx-xxxxxxxxxxxx"]
+}
+```
+
+And run:
+```sh
+terraform init
+export ARM_SUBSCRIPTION_ID="00000000-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+terraform apply -var="datadog-api-key=$DD_API_KEY"
+```
+
+### Notes
+
+- `site` must match the Datadog site parameter of your account (see [this table](https://docs.datadoghq.com/getting_started/site/#access-the-datadog-site)).
+- `location` must be an Azure region. To avoid inter-region bandwidth charges,
+  the scanner should be deployed in the same region as the resources to be scanned.
+- `resource_group_name` is the name of the resource group where the Agentless scanner
+  is created. For security reasons, this resource group should be reserved for
+  the exclusive use of the scanner.
+- `scan_scopes` is a list of [scopes](https://learn.microsoft.com/azure/role-based-access-control/scope-overview)
+  that the Agentless scanner should scan. The scanner is given read access to managed
+  disks in these scopes. Only subscription scopes are supported.
+
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
