@@ -16,7 +16,7 @@ It exports the role and instance profile that should be attached to the agentles
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.67.0 |
 
 ## Modules
 

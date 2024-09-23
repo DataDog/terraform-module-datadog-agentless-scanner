@@ -467,6 +467,77 @@ data "aws_iam_policy_document" "scanning_worker_dspm_policy_document" {
       values   = ["s3.*.amazonaws.com"]
     }
   }
+
+  statement {
+    sid    = "DatadogAgentlessScannerRDSStartExportTask"
+    effect = "Allow"
+    actions = [
+      "rds:StartExportTask"
+    ]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:rds:*:*:cluster:*",
+      "arn:${data.aws_partition.current.partition}:rds:*:*:cluster-snapshot:*",
+      "arn:${data.aws_partition.current.partition}:rds:*:*:snapshot:*",
+    ]
+    condition {
+      test     = "StringNotEquals"
+      variable = "aws:ResourceTag/DatadogAgentlessScanner"
+      values   = ["false"]
+    }
+  }
+
+  statement {
+    sid    = "DatadogAgentlessScannerPassRoleToRDS"
+    effect = "Allow"
+    actions = [
+      "iam:PassRole"
+    ]
+    resources = [
+      aws_iam_role.rds_s3_export_role.arn,
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "rds_s3_export_worker_policy_document" {
+  statement {
+    sid = "DatadogAgentlessScannerExportPolicy"
+    actions = [
+      "s3:PutObject*",
+      "s3:ListBucket",
+      "s3:GetObject*",
+      "s3:DeleteObject*",
+      "s3:GetBucketLocation"
+    ]
+    resources = [
+      "arn:aws:s3:::dd-agentless-*",
+      "arn:aws:s3:::dd-agentless-*/*",
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "kms_key_policy_document" {
+  statement {
+    sid    = "DatadogAgentlessServiceRoleKMSKeyPolicy"
+    effect = "Allow"
+    actions = [
+      "kms:CreateGrant",
+      "kms:DescribeKey",
+    ]
+    resources = [
+      aws_kms_key.agentless_kms_key.arn
+    ]
+    principals {
+      type = "AWS"
+      identifiers = [
+        aws_iam_role.role.arn,
+        aws_iam_role.rds_s3_export_role.arn
+      ]
+    }
+  }
+
+  statement {
+    sid = "DatadogAgentlessAllowUsageKMSKeyPolicy"
+  }
 }
 
 resource "aws_iam_policy" "scanning_orchestrator_policy" {
@@ -488,6 +559,12 @@ resource "aws_iam_policy" "scanning_worker_dspm_policy" {
   policy      = data.aws_iam_policy_document.scanning_worker_dspm_policy_document.json
 }
 
+resource "aws_iam_policy" "rds_s3_export_policy" {
+  name_prefix = "DatadogAgentlessWorkerRDSS3ExportPolicy"
+  path        = var.iam_role_path
+  policy      = data.aws_iam_policy_document.rds_s3_export_worker_policy_document.json
+}
+
 data "aws_iam_policy_document" "assume_role_policy" {
   statement {
     sid     = "EC2AssumeRole"
@@ -506,6 +583,18 @@ data "aws_iam_policy_document" "assume_role_policy" {
   }
 }
 
+data "aws_iam_policy_document" "assume_rds_export_role_policy" {
+  statement {
+    sid     = "EC2AssumeRole"
+    actions = ["sts:AssumeRole"]
+
+    principals {
+      type        = "Service"
+      identifiers = ["export.rds.amazonaws.com"]
+    }
+  }
+}
+
 resource "aws_iam_role" "role" {
   name        = var.iam_role_name
   path        = var.iam_role_path
@@ -514,6 +603,15 @@ resource "aws_iam_role" "role" {
   assume_role_policy = data.aws_iam_policy_document.assume_role_policy.json
 
   tags = merge(var.tags, local.dd_tags)
+}
+
+resource "aws_iam_role" "rds_s3_export_role" {
+  name        = "DatadogAgentlessScannerRDSS3ExportRole"
+  path        = var.iam_role_path
+  description = "Role assumed by the RDS Snapshots to execute the S3 export"
+
+  assume_role_policy = data.aws_iam_policy_document.assume_rds_export_role_policy.json
+  tags               = merge(var.tags, local.dd_tags)
 }
 
 resource "aws_iam_role_policy_attachment" "orchestrator_attachment" {
@@ -529,5 +627,22 @@ resource "aws_iam_role_policy_attachment" "worker_attachment" {
 resource "aws_iam_role_policy_attachment" "workers_dspm_attachment" {
   count      = var.sensitive_data_scanning_enabled ? 1 : 0
   policy_arn = aws_iam_policy.scanning_worker_dspm_policy[0].arn
+  role       = aws_iam_role.role.name
+}
+
+resource "aws_iam_role_policy_attachment" "rds_s3_export_attachment" {
+  policy_arn = aws_iam_policy.rds_s3_export_policy.arn
+  role       = aws_iam_role.role.name
+}
+
+resource "aws_kms_key" "agentless_kms_key" {
+  description  = "This key is used to encrypt bucket objects"
+  multi_region = true
+  #   policy       = data.aws_iam_policy_document.kms_key_policy_document.json
+  tags = merge(var.tags, local.dd_tags)
+}
+
+resource "aws_iam_role_policy_attachment" "kms_key_policy_attachment" {
+  policy_arn = data.aws_iam_policy_document.kms_key_policy_document.json
   role       = aws_iam_role.role.name
 }
