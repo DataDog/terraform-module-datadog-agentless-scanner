@@ -4,6 +4,12 @@ variable "iam_role_name" {
   default     = "DatadogAgentlessScannerAgentRole"
 }
 
+variable "organization_unit_ids" {
+  description = "List of AWS Organization Unit IDs that are allowed to assume the Datadog agentless scanner role"
+  type        = list(string)
+  default     = ["*"]
+}
+
 variable "iam_policy_name" {
   description = "Name to use on IAM policy created"
   type        = string
@@ -23,9 +29,9 @@ variable "iam_policy_path" {
 }
 
 variable "account_roles" {
-  description = "List of cross accounts roles ARN that the Datadog agentless scanner can assume"
+  description = "List of cross accounts roles ARN that the Datadog agentless scanner can assume - make sure to respect the same naming convention as the agentless scanner role."
   type        = list(string)
-  default     = []
+  default     = ["arn:*:iam::*:role/DatadogAgentlessScannerDelegateRole"]
 }
 
 variable "api_key_secret_arns" {

@@ -499,9 +499,21 @@ data "aws_iam_policy_document" "assume_role_policy" {
     }
 
     condition {
+      test     = "StringEquals"
+      variable = "iam:ResourceTag/DatadogAgentlessScanner"
+      values   = ["true"]
+    }
+
+    condition {
       test     = "ArnLike"
       variable = "aws:PrincipalArn"
       values   = var.scanner_roles
+    }
+
+    condition {
+      test     = "ForAnyValue:StringLike"
+      variable = "aws:PrincipalOrgID"
+      values   = var.scanner_organization_unit_ids
     }
   }
 }
