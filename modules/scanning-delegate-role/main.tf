@@ -513,7 +513,7 @@ data "aws_iam_policy_document" "assume_role_policy" {
     condition {
       test     = "ForAnyValue:StringLike"
       variable = "aws:PrincipalOrgID"
-      values   = var.scanner_organization_unit_ids
+      values   = var.scanner_organizational_unit_ids
     }
   }
 }

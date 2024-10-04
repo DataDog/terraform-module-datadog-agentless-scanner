@@ -53,15 +53,9 @@ data "aws_iam_policy_document" "scanner_policy_document" {
     resources = var.account_roles
 
     condition {
-      test     = "StringEquals"
-      variable = "iam:ResourceTag/DatadogAgentlessScanner"
-      values   = ["true"]
-    }
-
-    condition {
       test     = "ForAnyValue:StringLike"
       variable = "aws:PrincipalOrgID"
-      values   = var.organization_unit_ids
+      values   = var.allowed_organizational_unit_ids
     }
   }
 
