@@ -5,7 +5,7 @@ variable "iam_role_name" {
 }
 
 variable "organization_unit_ids" {
-  description = "List of AWS Organization Unit IDs that are allowed to assume the Datadog agentless scanner role"
+  description = "List of AWS Organizations organizational units (OUs) that are allowed to assume the Datadog agentless scanner role"
   type        = list(string)
   default     = ["*"]
 }

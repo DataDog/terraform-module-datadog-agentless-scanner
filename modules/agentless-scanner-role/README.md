@@ -47,7 +47,7 @@ No modules.
 | <a name="input_iam_policy_path"></a> [iam\_policy\_path](#input\_iam\_policy\_path) | IAM policy path | `string` | `null` | no |
 | <a name="input_iam_role_name"></a> [iam\_role\_name](#input\_iam\_role\_name) | Name to use on IAM role created | `string` | `"DatadogAgentlessScannerAgentRole"` | no |
 | <a name="input_iam_role_path"></a> [iam\_role\_path](#input\_iam\_role\_path) | IAM role path | `string` | `"/"` | no |
-| <a name="input_organization_unit_ids"></a> [organization\_unit\_ids](#input\_organization\_unit\_ids) | List of AWS Organization Unit IDs that are allowed to assume the Datadog agentless scanner role | `list(string)` | <pre>[<br>  "*"<br>]</pre> | no |
+| <a name="input_organization_unit_ids"></a> [organization\_unit\_ids](#input\_organization\_unit\_ids) | List of AWS Organizations organizational units (OUs) that are allowed to assume the Datadog agentless scanner role | `list(string)` | <pre>[<br>  "*"<br>]</pre> | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of additional tags to add to the IAM role/profile created | `map(string)` | `{}` | no |
 
 ## Outputs

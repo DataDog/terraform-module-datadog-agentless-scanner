@@ -22,7 +22,7 @@ variable "scanner_roles" {
 }
 
 variable "scanner_organization_unit_ids" {
-  description = "List of organization unit IDs allowed to assume this role"
+  description = "List of AWS Organizations organizational units (OUs) allowed to assume this role"
   type        = list(string)
   default     = ["*"]
 }
