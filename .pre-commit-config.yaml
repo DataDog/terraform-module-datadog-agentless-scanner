@@ -22,25 +22,25 @@ repos:
         args: ["markdown", "table", "--output-file", "README.md", "./modules/vpc"]
       - id: terraform-docs-go
         name: terraform docs for the Azure root module
-        args: ["markdown", "table", "--lockfile=false", "--output-file", "README.md", "./modules/azure"]
+        args: ["markdown", "table", "--lockfile=false", "--output-file", "README.md", "./azure"]
       - id: terraform-docs-go
         name: terraform docs for the 'azure/custom-data' module
-        args: ["markdown", "table", "--output-file", "README.md", "./modules/azure/custom-data"]
+        args: ["markdown", "table", "--output-file", "README.md", "./azure/modules/custom-data"]
       - id: terraform-docs-go
         name: terraform docs for the 'azure/managed-identity' module
-        args: ["markdown", "table", "--output-file", "README.md", "./modules/azure/managed-identity"]
+        args: ["markdown", "table", "--output-file", "README.md", "./azure/modules/managed-identity"]
       - id: terraform-docs-go
         name: terraform docs for the 'azure/resource-group' module
-        args: ["markdown", "table", "--output-file", "README.md", "./modules/azure/resource-group"]
+        args: ["markdown", "table", "--output-file", "README.md", "./azure/modules/resource-group"]
       - id: terraform-docs-go
         name: terraform docs for the 'azure/roles' module
-        args: ["markdown", "table", "--output-file", "README.md", "./modules/azure/roles"]
+        args: ["markdown", "table", "--output-file", "README.md", "./azure/modules/roles"]
       - id: terraform-docs-go
         name: terraform docs for the 'azure/virtual-machine' module
-        args: ["markdown", "table", "--output-file", "README.md", "./modules/azure/virtual-machine"]
+        args: ["markdown", "table", "--output-file", "README.md", "./azure/modules/virtual-machine"]
       - id: terraform-docs-go
         name: terraform docs for the 'azure/virtual-network' module
-        args: ["markdown", "table", "--output-file", "README.md", "./modules/azure/virtual-network"]
+        args: ["markdown", "table", "--output-file", "README.md", "./azure/modules/virtual-network"]
   
   - repo: https://github.com/antonbabenko/pre-commit-terraform
     rev: "v1.83.6"
