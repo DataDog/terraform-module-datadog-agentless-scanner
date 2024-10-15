@@ -4,12 +4,6 @@ variable "iam_role_name" {
   default     = "DatadogAgentlessScannerAgentRole"
 }
 
-variable "allowed_organizational_unit_ids" {
-  description = "List of AWS Organizations organizational units (OUs) that are allowed to assume the Datadog agentless scanner role"
-  type        = list(string)
-  default     = ["*"]
-}
-
 variable "iam_policy_name" {
   description = "Name to use on IAM policy created"
   type        = string
