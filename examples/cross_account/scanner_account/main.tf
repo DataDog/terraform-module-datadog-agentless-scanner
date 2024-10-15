@@ -16,11 +16,6 @@ provider "aws" {
 module "scanner_role" {
   source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanner-role?ref=0.11.4"
 
-  # compact remove empty value for cross_account_delegate_arn during the first run
-  account_roles = compact([
-    module.self_delegate_role.role.arn,
-    var.cross_account_delegate_arn
-  ])
   api_key_secret_arns = [module.agentless_scanner.api_key_secret_arn]
 }
 

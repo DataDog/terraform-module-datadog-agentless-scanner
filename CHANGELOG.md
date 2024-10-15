@@ -1,5 +1,9 @@
 # Changelog
 
+## Version TBD
+
+- Scanner role delegations based on a account_id wildcard by default
+
 ## Version 0.11.4
 
 - Add parameters `instance_type` and `instance_count` to configure the auto-scaling group properties

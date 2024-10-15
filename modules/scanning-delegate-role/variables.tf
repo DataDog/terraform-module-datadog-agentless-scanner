@@ -21,6 +21,12 @@ variable "scanner_roles" {
   type        = list(string)
 }
 
+variable "scanner_organizational_unit_ids" {
+  description = "List of AWS Organizations organizational units (OUs) allowed to assume this role"
+  type        = list(string)
+  default     = ["*"]
+}
+
 variable "tags" {
   description = "A map of additional tags to add to the IAM role/profile created"
   type        = map(string)

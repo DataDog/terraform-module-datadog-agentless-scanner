@@ -14,7 +14,7 @@ Before using this module, make sure you have the following:
 To use this module in your Terraform configuration, add the following code in your existing Terraform code:
 
 ```hcl
-# First we need to define the proper roles for our scanners. It consists of two different modules that have a two way bindings between them.
+# First we need to define the proper roles for our scanners. It consists of two different modules.
 
 # 1. The "scanning delegate role" defines all the policies and IAM roles necessary for the scanner to interact and scan some specific account resources.
 # It shall be created for every account that the agentless scanner will be able scan. These roles are meant to be assumed by the "agentless scanner role".
@@ -29,13 +29,8 @@ module "delegate_role" {
 module "scanner_role" {
   source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanner-role"
 
-  account_roles       = [module.delegate_role.role.arn]
   api_key_secret_arns = [module.agentless_scanner.api_key_secret_arn]
 }
-
-# As you can see there is a two way binding between these two "role" modules.
-# - the scanner role requires the list of delegate role ARNs for the scanner to assume.
-# - the delegate role(s) require the scanner role ARN as input in order to define the trust relationship between the EC2 scanner role and the delegate role to be assumed.
 
 # Finally we can create the agentless scanner instance. It requires the instance profile name that was created by the scanner_role.
 # This module will define the VPC, subnets, network and compute resources required for the agentless scanner.

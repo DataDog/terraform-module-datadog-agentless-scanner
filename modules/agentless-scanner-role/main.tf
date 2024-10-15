@@ -51,6 +51,12 @@ data "aws_iam_policy_document" "scanner_policy_document" {
     effect    = "Allow"
     actions   = ["sts:AssumeRole"]
     resources = var.account_roles
+
+    condition {
+      test     = "ForAnyValue:StringLike"
+      variable = "aws:PrincipalOrgID"
+      values   = var.allowed_organizational_unit_ids
+    }
   }
 
   statement {
