@@ -39,6 +39,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
+| <a name="input_account_org_paths"></a> [account\_org\_paths](#input\_account\_org\_paths) | List of AWS Organizations organizational unit (OU) paths in which the agentless scanner is allowed to assume role (default allows all) | `list(string)` | <pre>[<br>  "*"<br>]</pre> | no |
 | <a name="input_account_roles"></a> [account\_roles](#input\_account\_roles) | List of cross accounts roles ARN that the Datadog agentless scanner can assume - make sure to respect the same naming convention as the agentless scanner role. | `list(string)` | <pre>[<br>  "arn:*:iam::*:role/DatadogAgentlessScannerDelegateRole"<br>]</pre> | no |
 | <a name="input_api_key_secret_arns"></a> [api\_key\_secret\_arns](#input\_api\_key\_secret\_arns) | List of ARNs of the secrets holding the Datadog API keys | `list(string)` | n/a | yes |
 | <a name="input_api_key_secret_kms_key_arns"></a> [api\_key\_secret\_kms\_key\_arns](#input\_api\_key\_secret\_kms\_key\_arns) | List of ARNs of the KMS keys encrypting the secrets | `list(string)` | `[]` | no |
