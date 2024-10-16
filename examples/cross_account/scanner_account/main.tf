@@ -21,7 +21,7 @@ module "scanner_role" {
   #
   # account_roles = ["arn:*:iam::*:role/DatadogAgentlessScannerDelegateRole"]
 
-  ## Is is also possible explicitly lists the roles the scanner can assume if
+  ## It is also possible to explicitly list the roles the scanner can assume if
   ## you changed the name of the delegate role:
   #
   # account_roles = ["arn:*:iam::111111111111:role/MyDatadogAgentlessScannerDelegateRole"]
