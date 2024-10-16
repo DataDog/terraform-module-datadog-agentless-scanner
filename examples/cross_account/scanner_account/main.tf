@@ -16,6 +16,26 @@ provider "aws" {
 module "scanner_role" {
   source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanner-role?ref=0.11.4"
 
+  ## By default the scanner can assume any role with the default naming
+  ## convention from any account.
+  #
+  # account_roles = ["arn:*:iam::*:role/DatadogAgentlessScannerDelegateRole"]
+
+  ## It is also possible to explicitly list the roles the scanner can assume if
+  ## you changed the name of the delegate role:
+  #
+  # account_roles = ["arn:*:iam::111111111111:role/MyDatadogAgentlessScannerDelegateRole"]
+
+  ## The account_org_paths variable can restrict the scanner to only be
+  ## allowed to assume roles from specific AWS Organizations organizational
+  ## unit (OU) paths.
+  ## reference: https://aws.amazon.com/blogs/security/how-to-control-access-to-aws-resources-based-on-aws-account-ou-or-organization/
+  #
+  # account_org_paths = [
+  #  "o-acorg/r-acroot/ou-acroot-mediaou/",
+  #  "o-acorg/r-acroot/ou-acroot-sportsou/*",
+  # ]
+
   api_key_secret_arns = [module.agentless_scanner.api_key_secret_arn]
 }
 
