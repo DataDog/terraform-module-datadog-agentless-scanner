@@ -2,8 +2,8 @@
 
 ## Version 0.11.5 - 2024-10-16
 
-- Scanner role delegations based on a account_id wildcard by default: `account_roles` variable is now optional and defaults to allowing all accounts
-- Scanner role delegations can be limited to a specific list of organizational unit paths via the `account_org_paths` variable
+- Scanner role delegations based on a account_id wildcard by default: variable `account_roles` is now optional and defaults to allowing all accounts. This was done to simplify the cross-account setups.
+- Scanner role delegations can be limited to a specific list of organizational unit paths via the `account_org_paths` variable. This can be used to restrict the scanner to only scan resources in specific organizational units.
 
 ## Version 0.11.4
 
