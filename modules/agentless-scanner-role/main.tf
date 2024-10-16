@@ -53,6 +53,21 @@ data "aws_iam_policy_document" "scanner_policy_document" {
     resources = var.account_roles
   }
 
+  # Denying the ability to assume roles outside of the specified OU paths.
+  # Variable account_org_paths defaults to ["*"] which allows the role to be
+  # assumed from any OU
+  statement {
+    sid       = "EC2DenyAssumeRoleOutsideOUs"
+    actions   = ["sts:AssumeRole"]
+    effect    = "Deny"
+    resources = ["arn:aws:iam::*:*"]
+    condition {
+      test     = "ForAllValues:StringNotLike"
+      variable = "aws:ResourceOrgPaths"
+      values   = var.account_org_paths
+    }
+  }
+
   statement {
     sid       = "ReadSecret"
     actions   = ["secretsmanager:GetSecretValue"]

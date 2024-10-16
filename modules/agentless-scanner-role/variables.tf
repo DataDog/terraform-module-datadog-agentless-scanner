@@ -28,6 +28,12 @@ variable "account_roles" {
   default     = ["arn:*:iam::*:role/DatadogAgentlessScannerDelegateRole"]
 }
 
+variable "account_org_paths" {
+  description = "List of AWS Organizations organizational unit (OU) paths in which the agentless scanner is allowed to assume role (default allows all)"
+  type        = list(string)
+  default     = ["*"]
+}
+
 variable "api_key_secret_arns" {
   description = "List of ARNs of the secrets holding the Datadog API keys"
   type        = list(string)
