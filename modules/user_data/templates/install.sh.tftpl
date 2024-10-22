@@ -49,7 +49,8 @@ DD_AGENTLESS_CHANNEL="${scanner_channel}"
 hostnamectl hostname "$DD_HOSTNAME"
 
 # Install the agent
-DD_API_KEY="$DD_API_KEY" \
+DD_INSTALL_ONLY=true \
+  DD_API_KEY="$DD_API_KEY" \
   DD_SITE="$DD_SITE" \
   DD_HOSTNAME="$DD_HOSTNAME" \
   bash -c "$(curl -L https://s3.amazonaws.com/dd-agent/scripts/install_script_agent7.sh)"
@@ -111,7 +112,7 @@ EOF
 chmod 600 /etc/datadog-agent/agentless-scanner.yaml
 
 # Restart the agent
-service datadog-agent restart
+systemctl restart datadog-agent
 
 # Give some room to the agent to start to not miss logs
 sleep 5
