@@ -58,7 +58,11 @@ if [ -z "$agentless_version_custom" ]; then
   printf "Could not find a version of datadog-agentless-scanner from %s" "$DD_AGENTLESS_VERSION"
   exit 1
 fi
+# We mask/unmask because apt auto-starts the service, and we do
+# not want to start it before the configuration is in place.
+systemctl mask datadog-agentless-scanner.service
 apt install -y "datadog-agentless-scanner=$agentless_version_custom"
+systemctl unmask datadog-agentless-scanner.service
 
 # Adding automatic reboot on kernel updates
 cat << EOF >> /etc/apt/apt.conf.d/50unattended-upgrades
