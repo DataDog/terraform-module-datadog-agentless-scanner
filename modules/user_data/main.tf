@@ -3,12 +3,23 @@ locals {
     Datadog                 = "true"
     DatadogAgentlessScanner = "true"
   }
+  dd_tags_list = [for k, v in local.dd_tags : "${k}:${v}"]
 }
 
 data "aws_region" "current" {}
 
 locals {
   api_key_secret_arn = var.api_key_secret_arn != null ? var.api_key_secret_arn : aws_secretsmanager_secret.api_key[0].arn
+  # Add custom tags to the agent configuration.
+  custom_agent_configuration = merge(
+    var.agent_configuration,
+    {
+      tags = concat(
+        lookup(var.agent_configuration, "tags", []), # Safely get existing tags or default to an empty list
+        local.dd_tags_list
+      )
+    }
+  )
 }
 
 resource "aws_secretsmanager_secret" "api_key" {
@@ -37,7 +48,7 @@ resource "terraform_data" "template" {
     scanner_version       = var.scanner_version,
     scanner_channel       = var.scanner_channel,
     scanner_configuration = var.scanner_configuration,
-    agent_configuration   = var.agent_configuration,
+    agent_configuration   = local.custom_agent_configuration,
     region                = data.aws_region.current.name,
   })
 }
