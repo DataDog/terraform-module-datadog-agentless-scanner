@@ -49,7 +49,8 @@ DD_AGENTLESS_CHANNEL="${scanner_channel}"
 hostnamectl hostname "$DD_HOSTNAME"
 
 # Install the agent
-DD_API_KEY="$DD_API_KEY" \
+DD_INSTALL_ONLY=true \
+  DD_API_KEY="$DD_API_KEY" \
   DD_SITE="$DD_SITE" \
   DD_HOSTNAME="$DD_HOSTNAME" \
   bash -c "$(curl -L https://s3.amazonaws.com/dd-agent/scripts/install_script_agent7.sh)"
@@ -63,7 +64,11 @@ if [ -z "$agentless_version_custom" ]; then
   printf "Could not find a version of datadog-agentless-scanner from %s" "$DD_AGENTLESS_VERSION"
   exit 1
 fi
+# We mask/unmask because apt auto-starts the service, and we do
+# not want to start it before the configuration is in place.
+systemctl mask datadog-agentless-scanner.service
 apt install -y "datadog-agentless-scanner=$agentless_version_custom"
+systemctl unmask datadog-agentless-scanner.service
 
 # Adding automatic reboot on kernel updates
 cat << EOF >> /etc/apt/apt.conf.d/50unattended-upgrades
@@ -111,11 +116,10 @@ EOF
 chmod 600 /etc/datadog-agent/agentless-scanner.yaml
 
 # Restart the agent
-service datadog-agent restart
+systemctl restart datadog-agent
 
 # Give some room to the agent to start to not miss logs
 sleep 5
 
 # Enable and start datadog-agentless-scaner
-systemctl enable datadog-agentless-scanner
-systemctl start datadog-agentless-scanner
+systemctl enable --now datadog-agentless-scanner
