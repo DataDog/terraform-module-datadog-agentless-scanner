@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.11.6 - 2024-10-28
+
+- Prevent Datadog Agent from starting before its configuration has been changed
+
 ## Version 0.11.5 - 2024-10-16
 
 - Scanner role delegations based on a account_id wildcard by default: variable `account_roles` is now optional and defaults to allowing all accounts. This was done to simplify the cross-account setups.
