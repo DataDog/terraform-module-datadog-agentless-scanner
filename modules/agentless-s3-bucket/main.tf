@@ -5,8 +5,6 @@ locals {
   }
 }
 
-data "aws_region" "current" {}
-
 resource "aws_s3_bucket" "bucket" {
   bucket_prefix = "datadog-agentless-scanning-"
   tags          = merge(var.tags, local.dd_tags)
@@ -38,15 +36,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "bucket_lifecycle" {
 data "aws_iam_policy_document" "bucket_access_policy_document" {
   # TODO: add statement to deny access to everyone except the scanner roles
   statement {
-    sid = "DatadogAgentlessScannerBucketPolicy"
-
-    principals {
-      type = "AWS"
-      identifiers = [
-        var.rds_service_role_arn,
-      ]
-    }
-
+    sid    = "DatadogAgentlessScannerBucketPolicy"
+    effect = "Allow"
     actions = [
       "s3:PutObject*",
       "s3:ListBucket",
@@ -54,49 +45,50 @@ data "aws_iam_policy_document" "bucket_access_policy_document" {
       "s3:DeleteObject*",
       "s3:GetBucketLocation"
     ]
-
     resources = [
       aws_s3_bucket.bucket.arn,
       "${aws_s3_bucket.bucket.arn}/*",
     ]
-  }
-
-  statement {
-    sid = "DatadogAgentlessScannerAccessS3Objects"
-
     principals {
       type = "AWS"
       identifiers = [
-        var.iam_delegate_role_arn,
+        var.rds_service_role_arn,
       ]
     }
+  }
 
+  statement {
+    sid    = "DatadogAgentlessScannerAccessS3Objects"
+    effect = "Allow"
     actions = [
       "s3:GetObject",
     ]
-
     resources = [
       "${aws_s3_bucket.bucket.arn}/*",
     ]
-  }
-
-  statement {
-    sid = "DatadogAgentlessScannerListS3Buckets"
-
     principals {
       type = "AWS"
       identifiers = [
         var.iam_delegate_role_arn,
       ]
     }
+  }
 
+  statement {
+    sid    = "DatadogAgentlessScannerListS3Buckets"
+    effect = "Allow"
     actions = [
       "s3:ListBucket",
     ]
-
     resources = [
       aws_s3_bucket.bucket.arn,
     ]
+    principals {
+      type = "AWS"
+      identifiers = [
+        var.iam_delegate_role_arn,
+      ]
+    }
   }
 }
 
@@ -105,9 +97,32 @@ resource "aws_s3_bucket_policy" "bucket_access_policy" {
   policy = data.aws_iam_policy_document.bucket_access_policy_document.json
 }
 
-resource "aws_kms_replica_key" "replica" {
-  count           = var.primary_kms_key_region == data.aws_region.current.name ? 0 : 1
-  description     = "Multi-Region replica key"
-  primary_key_arn = var.primary_kms_key_arn
-  tags            = merge(var.tags, local.dd_tags)
+// KMS Key for RDS S3 Exports
+resource "aws_kms_key" "agentless_kms_key" {
+  description = "This key is used to encrypt bucket objects"
+  tags        = merge(var.tags, local.dd_tags)
+}
+
+data "aws_iam_policy_document" "kms_key_policy_document" {
+  statement {
+    effect = "Allow"
+    sid    = "DatadogAgentlessKMSKeyPolicy"
+    actions = [
+      "kms:CreateGrant",
+      "kms:DescribeKey",
+    ]
+    resources = [
+      aws_kms_key.agentless_kms_key.arn,
+    ]
+  }
+}
+
+resource "aws_iam_policy" "kms_key_policy" {
+  name_prefix = "DatadogAgentlessWorkerKMSKeyPolicy"
+  policy      = data.aws_iam_policy_document.kms_key_policy_document.json
+}
+
+resource "aws_iam_role_policy_attachment" "kms_key_policy_attachment" {
+  policy_arn = aws_iam_policy.kms_key_policy.arn
+  role       = var.iam_delegate_role_name
 }
