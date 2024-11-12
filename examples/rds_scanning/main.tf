@@ -62,10 +62,8 @@ module "agentless_scanner_eu" {
 module "agentless_s3_bucket_us" {
   source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-s3-bucket?ref=0.11.7"
 
-  iam_delegate_role_arn   = module.delegate_role.role.arn
+  iam_delegate_role_name  = module.delegate_role.role.name
   iam_rds_assume_role_arn = module.agentless_scanner_us.role.arn
-  primary_kms_key_arn     = module.delegate_role.primary_kms_key.arn
-  primary_kms_key_region  = module.delegate_role.primary_kms_key_region
 
   providers = {
     aws = aws.us
@@ -75,10 +73,8 @@ module "agentless_s3_bucket_us" {
 module "agentless_s3_bucket_eu" {
   source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-s3-bucket?ref=0.11.7"
 
-  iam_delegate_role_arn   = module.delegate_role.role.arn
+  iam_delegate_role_name  = module.delegate_role.role.name
   iam_rds_assume_role_arn = module.agentless_scanner_eu.role.arn
-  primary_kms_key_arn     = module.delegate_role.primary_kms_key.arn
-  primary_kms_key_region  = module.delegate_role.primary_kms_key_region
 
   providers = {
     aws = aws.eu

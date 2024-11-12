@@ -6,8 +6,6 @@ locals {
 }
 
 data "aws_partition" "current" {}
-data "aws_caller_identity" "current" {}
-data "aws_region" "current" {}
 
 // The IAM policy for the scanning orchestrator allows to create resources
 // such as snapshots and volumes. It is also able to cleanup these resources
@@ -598,41 +596,6 @@ resource "aws_iam_role_policy_attachment" "rds_service_role_attachment" {
   count      = length(aws_iam_policy.rds_service_role_policy)
   policy_arn = aws_iam_policy.rds_service_role_policy[0].arn
   role       = aws_iam_role.rds_service_role[0].name
-}
-
-// KMS Key for RDS S3 Exports
-resource "aws_kms_key" "agentless_kms_key" {
-  count        = var.sensitive_data_scanning_rds_enabled ? 1 : 0
-  description  = "This key is used to encrypt bucket objects"
-  multi_region = true
-  tags         = merge(var.tags, local.dd_tags)
-}
-
-data "aws_iam_policy_document" "kms_key_policy_document" {
-  statement {
-    sid    = "DatadogAgentlessKMSKeyPolicy"
-    effect = "Allow"
-    actions = [
-      "kms:CreateGrant",
-      "kms:DescribeKey",
-    ]
-    resources = [
-      "arn:${data.aws_partition.current.id}:kms:*:${data.aws_caller_identity.current.account_id}:key/${aws_kms_key.agentless_kms_key[0].key_id}",
-    ]
-  }
-}
-
-resource "aws_iam_policy" "kms_key_policy" {
-  count       = length(aws_kms_key.agentless_kms_key)
-  name_prefix = "DatadogAgentlessWorkerKMSKeyPolicy"
-  path        = var.iam_role_path
-  policy      = data.aws_iam_policy_document.kms_key_policy_document.json
-}
-
-resource "aws_iam_role_policy_attachment" "kms_key_policy_attachment" {
-  count      = length(aws_iam_policy.kms_key_policy)
-  policy_arn = aws_iam_policy.kms_key_policy[0].arn
-  role       = aws_iam_role.role.name
 }
 
 // RDS Scanning Policy
