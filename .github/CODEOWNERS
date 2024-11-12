@@ -13,6 +13,6 @@
 
 ## Docs
 
-/docs/     @DataDog/documentation  @DataDog/k9-cloud-security-posture-management
-/examples/ @DataDog/documentation  @DataDog/k9-cloud-security-posture-management 
-*README.md @DataDog/documentation  @DataDog/k9-cloud-security-posture-management
+/docs/     @DataDog/documentation @DataDog/k9-agentless
+/examples/ @DataDog/documentation @DataDog/k9-agentless
+*README.md @DataDog/documentation @DataDog/k9-agentless
