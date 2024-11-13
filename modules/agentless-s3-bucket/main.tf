@@ -5,6 +5,8 @@ locals {
   }
 }
 
+data "aws_caller_identity" "current" {}
+
 resource "aws_s3_bucket" "bucket" {
   bucket_prefix = "datadog-agentless-scanning-"
   tags          = merge(var.tags, local.dd_tags)
@@ -101,28 +103,33 @@ resource "aws_s3_bucket_policy" "bucket_access_policy" {
 resource "aws_kms_key" "agentless_kms_key" {
   description = "This key is used to encrypt bucket objects"
   tags        = merge(var.tags, local.dd_tags)
+  policy      = data.aws_iam_policy_document.kms_key_policy_document.json
 }
 
 data "aws_iam_policy_document" "kms_key_policy_document" {
   statement {
+    sid    = "Enable IAM User Permissions"
     effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
+    }
+    actions = [
+      "kms:*",
+    ]
+    resources = ["*"]
+  }
+  statement {
     sid    = "DatadogAgentlessKMSKeyPolicy"
+    effect = "Allow"
+    principals {
+      type        = "AWS"
+      identifiers = [var.iam_delegate_role_arn]
+    }
     actions = [
       "kms:CreateGrant",
       "kms:DescribeKey",
     ]
-    resources = [
-      aws_kms_key.agentless_kms_key.arn,
-    ]
+    resources = ["*"]
   }
-}
-
-resource "aws_iam_policy" "kms_key_policy" {
-  name_prefix = "DatadogAgentlessWorkerKMSKeyPolicy"
-  policy      = data.aws_iam_policy_document.kms_key_policy_document.json
-}
-
-resource "aws_iam_role_policy_attachment" "kms_key_policy_attachment" {
-  policy_arn = aws_iam_policy.kms_key_policy.arn
-  role       = var.iam_delegate_role_name
 }
