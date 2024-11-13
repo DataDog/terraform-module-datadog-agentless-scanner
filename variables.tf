@@ -31,6 +31,16 @@ variable "scanner_channel" {
   }
 }
 
+variable "scanner_repository" {
+  description = "Repository URL to install the scanner from."
+  type        = string
+  default     = "https://apt.datadoghq.com/"
+  validation {
+    condition     = can(regex("^https://", var.scanner_repository))
+    error_message = "The scanner repository must be a valid HTTPs URL"
+  }
+}
+
 variable "site" {
   description = "By default the Agent sends its data to Datadog US site. If your organization is on another site, you must update it. See https://docs.datadoghq.com/getting_started/site/"
   type        = string

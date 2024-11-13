@@ -47,6 +47,7 @@ resource "terraform_data" "template" {
     site                  = var.site,
     scanner_version       = var.scanner_version,
     scanner_channel       = var.scanner_channel,
+    scanner_repository    = var.scanner_repository,
     scanner_configuration = var.scanner_configuration,
     agent_configuration   = local.custom_agent_configuration,
     region                = data.aws_region.current.name,
