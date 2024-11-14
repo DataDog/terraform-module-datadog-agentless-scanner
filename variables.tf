@@ -26,8 +26,8 @@ variable "scanner_channel" {
   type        = string
   default     = "stable"
   validation {
-    condition     = contains(["stable", "beta"], var.scanner_channel)
-    error_message = "The scanner channel must be either 'stable' or 'beta'"
+    condition     = contains(["stable", "beta", "nightly"], var.scanner_channel)
+    error_message = "The scanner channel must be either 'stable', 'beta' or 'nightly'"
   }
 }
 
