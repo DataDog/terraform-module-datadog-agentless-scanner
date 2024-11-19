@@ -467,6 +467,34 @@ data "aws_iam_policy_document" "scanning_worker_dspm_policy_document" {
       values   = ["s3.*.amazonaws.com"]
     }
   }
+
+  statement {
+    sid    = "DatadogAgentlessScannerECRAuthorizationToken"
+    effect = "Allow"
+    actions = [
+      "ecr:GetAuthorizationToken",
+    ]
+    resources = [
+      "*"
+    ]
+  }
+
+  statement {
+    sid    = "DatadogAgentlessScannerECRImages"
+    effect = "Allow"
+    actions = [
+      "ecr:GetDownloadUrlForLayer",
+      "ecr:BatchGetImage",
+    ]
+    resources = [
+      "arn:aws:ecr:*:*:repository/*"
+    ]
+    condition {
+      test     = "StringNotEquals"
+      variable = "ecr:ResourceTag/DatadogAgentlessScanner"
+      values   = ["false"]
+    }
+  }
 }
 
 
