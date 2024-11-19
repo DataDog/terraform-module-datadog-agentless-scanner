@@ -42,6 +42,7 @@ module "custom_data" {
   api_key               = var.api_key != null ? var.api_key : "@Microsoft.KeyVault(SecretUri=${local.api_key_uri})"
   scanner_channel       = var.scanner_channel
   scanner_version       = var.scanner_version
+  scanner_repository    = var.scanner_repository
   scanner_configuration = var.scanner_configuration
   agent_configuration   = var.agent_configuration
   site                  = var.site

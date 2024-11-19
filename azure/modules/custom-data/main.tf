@@ -5,6 +5,7 @@ resource "terraform_data" "template" {
     azure_client_id       = var.client_id,
     scanner_version       = var.scanner_version,
     scanner_channel       = var.scanner_channel,
+    scanner_repository    = var.scanner_repository,
     scanner_configuration = var.scanner_configuration,
     agent_configuration   = var.agent_configuration,
   })

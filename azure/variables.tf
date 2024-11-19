@@ -87,6 +87,16 @@ variable "scanner_channel" {
   }
 }
 
+variable "scanner_repository" {
+  description = "Repository URL to install the scanner from."
+  type        = string
+  default     = "https://apt.datadoghq.com/"
+  validation {
+    condition     = can(regex("^https://", var.scanner_repository))
+    error_message = "The scanner repository must be a valid HTTPs URL"
+  }
+}
+
 variable "scanner_configuration" {
   description = "Specifies a custom configuration for the scanner. The specified object is passed directly as a configuration input for the scanner."
   type        = any
