@@ -469,15 +469,25 @@ data "aws_iam_policy_document" "scanning_worker_dspm_policy_document" {
   }
 
   statement {
-    sid    = "DatadogAgentlessScannerECRImages"
+    sid    = "DatadogAgentlessScannerECRAuthorizationToken"
     effect = "Allow"
     actions = [
       "ecr:GetAuthorizationToken",
+    ]
+    resources = [
+      "*"
+    ]
+  }
+
+  statement {
+    sid    = "DatadogAgentlessScannerECRImages"
+    effect = "Allow"
+    actions = [
       "ecr:GetDownloadUrlForLayer",
       "ecr:BatchGetImage",
     ]
     resources = [
-      "*"
+      "arn:aws:ecr:*:*:repository/*"
     ]
     condition {
       test     = "StringNotEquals"
