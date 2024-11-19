@@ -21,10 +21,6 @@ variable "scanner_version" {
   description = "Specifies the version of the scanner to install"
   type        = string
   default     = "0.11"
-  validation {
-    condition     = can(regex("^[0-9]+\\.[0-9]+$", var.scanner_version))
-    error_message = "The scanner version must be in the format of X.Y"
-  }
 }
 
 variable "scanner_channel" {
