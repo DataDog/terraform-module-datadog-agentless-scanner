@@ -628,6 +628,7 @@ resource "aws_iam_role_policy_attachment" "rds_service_role_attachment" {
 
 // RDS Scanning Policy
 data "aws_iam_policy_document" "scanning_rds_policy_document" {
+  count = length(aws_iam_role.rds_service_role)
   statement {
     sid    = "DatadogAgentlessScannerRDSStartExportTask"
     effect = "Allow"
@@ -664,10 +665,10 @@ data "aws_iam_policy_document" "scanning_rds_policy_document" {
 }
 
 resource "aws_iam_policy" "scanning_rds_policy" {
-  count       = var.sensitive_data_scanning_rds_enabled ? 1 : 0
+  count       = length(data.aws_iam_policy_document.scanning_rds_policy_document)
   name_prefix = "${var.iam_role_name}WorkerRDSPolicy"
   path        = var.iam_role_path
-  policy      = data.aws_iam_policy_document.scanning_rds_policy_document.json
+  policy      = data.aws_iam_policy_document.scanning_rds_policy_document[0].json
 }
 
 resource "aws_iam_role_policy_attachment" "delegate_role_rds_policy_attachment" {
