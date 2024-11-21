@@ -10,6 +10,14 @@
                     "label": "Basics",
                     "elements": [
                         {
+                            "name": "resourceGroupWarning",
+                            "type": "Microsoft.Common.InfoBox",
+                            "options": {
+                                "style": "Warning",
+                                "text": "It is <strong>strongly</strong> recommended to deploy the Datadog Agentless Scanner in a <strong>dedicated resource group</strong>."
+                            }
+                        },
+                        {
                             "name": "resourceScope",
                             "type": "Microsoft.Common.ResourceScope",
                             "location": {
