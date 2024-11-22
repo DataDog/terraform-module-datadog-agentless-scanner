@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.31.92.45157",
-      "templateHash": "8204999556699575493"
+      "templateHash": "13352737458824158975"
     }
   },
   "functions": [
@@ -145,7 +145,7 @@
     "sshAuthorizedKeysFile": "[format('/home/{0}/.ssh/authorized_keys', parameters('adminUsername'))]",
     "tags": "[union(parameters('resourceTags'), createObject('Datadog', 'true', 'DatadogAgentlessScanner', 'true'))]",
     "name": "DatatogAgentlessScanner",
-    "restartMinute": "[mod(int(substring(join(split(guid(resourceId('Microsoft.Compute/virtualMachineScaleSets', variables('name'))), createArray('a', 'b', 'c', 'd', 'e', 'f', '-')), ''), 9)), mul(24, 60))]"
+    "restartMinute": "[mod(int(substring(join(split(guid(resourceId('Microsoft.Compute/virtualMachineScaleSets', variables('name'))), createArray('a', 'b', 'c', 'd', 'e', 'f', '-')), ''), 0, 9)), mul(24, 60))]"
   },
   "resources": {
     "vmss": {

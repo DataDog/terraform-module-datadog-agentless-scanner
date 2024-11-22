@@ -174,7 +174,8 @@ resource vmss 'Microsoft.Compute/virtualMachineScaleSets@2024-07-01' = {
   }
 }
 
-var restartMinute = int(substring(join(split(guid(vmss.id), ['a', 'b', 'c', 'd', 'e', 'f', '-']), ''), 9)) % (24 * 60)
+// Generate a random number from a GUID by removing the letters/hyphens and taking the first 9 digits (to avoid overflow)
+var restartMinute = int(substring(join(split(guid(vmss.id), ['a', 'b', 'c', 'd', 'e', 'f', '-']), ''), 0, 9)) % (24 * 60)
 resource autoscaleSetting 'Microsoft.Insights/autoscalesettings@2022-10-01' = {
   name: '${vmss.name}-Autoscale'
   location: resourceGroup().location
