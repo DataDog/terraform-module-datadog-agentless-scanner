@@ -1,0 +1,526 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "languageVersion": "2.0",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.31.92.45157",
+      "templateHash": "816638341113202344"
+    }
+  },
+  "functions": [
+    {
+      "namespace": "__bicep",
+      "members": {
+        "replaceMultiple": {
+          "parameters": [
+            {
+              "type": "string",
+              "name": "input"
+            },
+            {
+              "type": "object",
+              "properties": {},
+              "additionalProperties": {
+                "type": "string"
+              },
+              "name": "replacements"
+            }
+          ],
+          "output": {
+            "type": "string",
+            "value": "[reduce(items(parameters('replacements')), parameters('input'), lambda('cur', 'next', replace(string(lambdaVariables('cur')), lambdaVariables('next').key, lambdaVariables('next').value)))]"
+          }
+        }
+      }
+    }
+  ],
+  "parameters": {
+    "datadogAPIKey": {
+      "type": "securestring",
+      "metadata": {
+        "description": "A Remote Configuration-enabled API key for the Datadog account\n(see https://app.datadoghq.com/organization-settings/api-keys).\n"
+      }
+    },
+    "datadogSite": {
+      "type": "string",
+      "defaultValue": "datadoghq.com",
+      "allowedValues": [
+        "datadoghq.com",
+        "datadoghq.eu",
+        "us3.datadoghq.com",
+        "us5.datadoghq.com",
+        "ap1.datadoghq.com",
+        "datad0g.com"
+      ],
+      "metadata": {
+        "description": "The Datadog site to use for the Datadog Agentless Scanner"
+      }
+    },
+    "instanceCount": {
+      "type": "int",
+      "defaultValue": 1,
+      "metadata": {
+        "description": "Number of Agentless Scanner instances to launch"
+      }
+    },
+    "instanceSize": {
+      "type": "string",
+      "defaultValue": "Standard_B2ps_v2",
+      "metadata": {
+        "description": "Virtual Machine instance size"
+      }
+    },
+    "identityName": {
+      "type": "string",
+      "defaultValue": "DatatogAgentlessScannerIdentity",
+      "metadata": {
+        "description": "The name of the user-assigned managed identity to be used by the Datadog Agentless Scanner virtual machine instances."
+      }
+    },
+    "scanScopes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "defaultValue": [
+        "[subscription().id]"
+      ],
+      "metadata": {
+        "description": "The set of scopes that the Datadog Agentless Scanner is allowed to scan"
+      }
+    },
+    "scannerVersion": {
+      "type": "string",
+      "defaultValue": "0.11",
+      "metadata": {
+        "description": "Specifies the version of the scanner to install"
+      }
+    },
+    "scannerChannel": {
+      "type": "string",
+      "defaultValue": "stable",
+      "allowedValues": [
+        "stable",
+        "beta",
+        "nightly"
+      ],
+      "metadata": {
+        "description": "Specifies the channel to use for installing the scanner"
+      }
+    },
+    "scannerRepository": {
+      "type": "string",
+      "defaultValue": "https://apt.datadoghq.com/",
+      "metadata": {
+        "description": "Repository URL to install the scanner from."
+      }
+    },
+    "adminUsername": {
+      "type": "string",
+      "defaultValue": "azureuser",
+      "metadata": {
+        "description": "The administrator username for the VM"
+      }
+    },
+    "sshPublicKey": {
+      "type": "string",
+      "nullable": true,
+      "metadata": {
+        "description": "SSH public key of the administrator user"
+      }
+    },
+    "resourceTags": {
+      "type": "object",
+      "defaultValue": {},
+      "metadata": {
+        "description": "Tags to apply to all resources."
+      }
+    }
+  },
+  "variables": {
+    "$fxv#0": "#!/bin/bash\nset +x\nset -u\nset -e\nset -o pipefail\n\nfatal_error () {\n  printf \"FATAL ERROR: shutting down\\n\"\n  shutdown -h now\n}\n\ntrap 'fatal_error' ERR\n\n# Remove SSH mock public key\nsed -i '/.*${ssh_mock_public_key}.*/d' '${ssh_authorized_keys_file}'\n\n# Enable the nbd module\nmodprobe nbd nbds_max=128\necho \"nbd\" > /etc/modules-load.d/nbd.conf\necho \"options nbd nbds_max=128\" > /etc/modprobe.d/nbd.conf\n\n# Install requirements\nsnap install --no-wait semgrep\napt update\napt install -y nbd-client curl\n\nre='@Microsoft.KeyVault\\(SecretUri=(https://.*)\\)'\nif [[ \"${api_key}\" =~ $re ]]; then\n  echo \"Datadog API key is a Key Vault reference\"\n  DD_API_KEY=\"ENC[${api_key}]\"\nelse\n  DD_API_KEY=\"${api_key}\"\nfi\n\n# Append the last 6 bytes of the VM UUID to prevent hostname collisions\nVM_ID=$(cat /sys/devices/virtual/dmi/id/product_uuid)\nDD_HOSTNAME=\"$(hostname)-$${VM_ID:(-12)}\"\nDD_SITE=\"${site}\"\nDD_AGENTLESS_VERSION=\"${scanner_version}\"\nDD_AGENTLESS_CHANNEL=\"${scanner_channel}\"\n\nhostnamectl hostname \"$DD_HOSTNAME\"\n\n# Install the agent\nDD_INSTALL_ONLY=true \\\n  DD_API_KEY=\"TBD\" \\\n  DD_SITE=\"$DD_SITE\" \\\n  DD_HOSTNAME=\"$DD_HOSTNAME\" \\\n  bash -c \"$(curl -L https://s3.amazonaws.com/dd-agent/scripts/install_script_agent7.sh)\"\n\n# Install the agentless-scanner\necho \"deb [signed-by=/usr/share/keyrings/datadog-archive-keyring.gpg] https://apt.datadoghq.com/ $DD_AGENTLESS_CHANNEL agentless-scanner\" >> /etc/apt/sources.list.d/datadog.list\napt update\nagentless_pkg_pattern=\"([[:digit:]]:)?$DD_AGENTLESS_VERSION(\\.[[:digit:]]+){0,1}(~rc\\.[[:digit:]]+)?(-[[:digit:]])?\"\nagentless_version_custom=\"$(apt-cache madison datadog-agentless-scanner | grep -E \"$agentless_pkg_pattern\" -om1)\" || true\nif [ -z \"$agentless_version_custom\" ]; then\n  printf \"Could not find a version of datadog-agentless-scanner from %s\" \"$DD_AGENTLESS_VERSION\"\n  exit 1\nfi\n# We mask/unmask because apt auto-starts the service, and we do\n# not want to start it before the configuration is in place.\nsystemctl mask datadog-agentless-scanner.service\napt install -y \"datadog-agentless-scanner=$agentless_version_custom\"\nsystemctl unmask datadog-agentless-scanner.service\n\n# Adding automatic reboot on kernel updates\ncat << EOF >> /etc/apt/apt.conf.d/50unattended-upgrades\nUnattended-Upgrade::Automatic-Reboot \"true\";\nUnattended-Upgrade::Automatic-Reboot-WithUsers \"true\";\nUnattended-Upgrade::Automatic-Reboot-Time \"now\";\nEOF\n\n# Activate agentless scanner logging\nmkdir -p /etc/datadog-agent/conf.d/agentless-scanner.d\ncat <<EOF > /etc/datadog-agent/conf.d/agentless-scanner.d/conf.yaml\nlogs:\n  - type: file\n    path: \"/var/log/datadog/agentless-scanner.log\"\n    service: \"agentless-scanner\"\n    source: go\n    sourcecategory: sourcecode\nEOF\n\nchown -R dd-agent: /etc/datadog-agent/conf.d/agentless-scanner.d\n\n# Custom configuration for agent\ncat <<EOF > /etc/datadog-agent/datadog.yaml\napi_key: $DD_API_KEY\nsite: $DD_SITE\nhostname: $DD_HOSTNAME\nlogs_enabled: true\nec2_prefer_imdsv2: true\nsecret_backend_command: /usr/local/bin/dd-secret-backend\nEOF\n\ncat <<EOF > /usr/local/bin/dd-secret-backend\n#!/bin/bash\ndatadog-agentless-scanner secrets || exit 1\nEOF\nchown dd-agent: /usr/local/bin/dd-secret-backend\nchmod 700 /usr/local/bin/dd-secret-backend\n\ncat <<EOF > /etc/datadog-agent/agentless-scanner.yaml\nhostname: $DD_HOSTNAME\napi_key: $DD_API_KEY\nsite: $DD_SITE\nazure_client_id: ${azure_client_id}\ninstallation_mode: terraform\ninstallation_version: 0.11.6\nEOF\n\nchown dd-agent: /etc/datadog-agent/agentless-scanner.yaml\nchmod 600 /etc/datadog-agent/agentless-scanner.yaml\n\n# Restart the agent\nsystemctl restart datadog-agent\n\n# Stop the scanner after 24 hours. This will cause the health\n# probe to fail and trigger an automatic instance replacement.\nsystemd-run --on-boot=24h systemctl stop datadog-agentless-scanner\n\n# Enable and start datadog-agentless-scaner\nsystemctl enable --now datadog-agentless-scanner\n",
+    "sshMockPublicKey": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJWFDAB+VRKsHvHjIyiEN9izvhaosXAUMG1jPMo9hcnE",
+    "sshAuthorizedKeysFile": "[format('/home/{0}/.ssh/authorized_keys', parameters('adminUsername'))]",
+    "tags": "[union(parameters('resourceTags'), createObject('Datadog', 'true', 'DatadogAgentlessScanner', 'true'))]",
+    "name": "DatatogAgentlessScanner",
+    "restartMinute": "[mod(int(substring(join(split(guid(resourceId('Microsoft.Compute/virtualMachineScaleSets', variables('name'))), createArray('a', 'b', 'c', 'd', 'e', 'f', '-')), ''), 0, 9)), mul(24, 60))]"
+  },
+  "resources": {
+    "vmss": {
+      "type": "Microsoft.Compute/virtualMachineScaleSets",
+      "apiVersion": "2024-07-01",
+      "name": "[variables('name')]",
+      "location": "[resourceGroup().location]",
+      "tags": "[variables('tags')]",
+      "identity": {
+        "type": "UserAssigned",
+        "userAssignedIdentities": {
+          "[format('{0}', resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('identityName')))]": {}
+        }
+      },
+      "sku": {
+        "name": "[parameters('instanceSize')]",
+        "capacity": "[parameters('instanceCount')]"
+      },
+      "properties": {
+        "orchestrationMode": "Uniform",
+        "upgradePolicy": {
+          "mode": "Automatic"
+        },
+        "virtualMachineProfile": {
+          "osProfile": {
+            "computerNamePrefix": "agentless-scanning-",
+            "adminUsername": "[parameters('adminUsername')]",
+            "customData": "[base64(__bicep.replaceMultiple(variables('$fxv#0'), createObject('${api_key}', parameters('datadogAPIKey'), '${site}', parameters('datadogSite'), '${scanner_version}', parameters('scannerVersion'), '${scanner_channel}', parameters('scannerChannel'), '${scanner_repository}', parameters('scannerRepository'), '${azure_client_id}', reference('managedIdentity').clientId, '${ssh_mock_public_key}', variables('sshMockPublicKey'), '${ssh_authorized_keys_file}', variables('sshAuthorizedKeysFile'))))]",
+            "linuxConfiguration": {
+              "disablePasswordAuthentication": true,
+              "ssh": {
+                "publicKeys": [
+                  {
+                    "path": "[variables('sshAuthorizedKeysFile')]",
+                    "keyData": "[coalesce(parameters('sshPublicKey'), variables('sshMockPublicKey'))]"
+                  }
+                ]
+              }
+            }
+          },
+          "storageProfile": {
+            "osDisk": {
+              "osType": "Linux",
+              "createOption": "FromImage",
+              "caching": "ReadWrite",
+              "managedDisk": {
+                "storageAccountType": "StandardSSD_LRS"
+              },
+              "diskSizeGB": 30
+            },
+            "imageReference": {
+              "publisher": "canonical",
+              "offer": "ubuntu-24_04-lts",
+              "sku": "server-arm64",
+              "version": "latest"
+            }
+          },
+          "networkProfile": {
+            "networkInterfaceConfigurations": [
+              {
+                "name": "nic",
+                "properties": {
+                  "primary": true,
+                  "enableAcceleratedNetworking": false,
+                  "ipConfigurations": [
+                    {
+                      "name": "ipconfig",
+                      "properties": {
+                        "privateIPAddressVersion": "IPv4",
+                        "subnet": {
+                          "id": "[format('{0}/subnets/default', resourceId('Microsoft.Network/virtualNetworks', 'vnet'))]"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          "diagnosticsProfile": {
+            "bootDiagnostics": {
+              "enabled": true
+            }
+          },
+          "extensionProfile": {
+            "extensions": [
+              {
+                "name": "HealthExtension",
+                "properties": {
+                  "publisher": "Microsoft.ManagedServices",
+                  "type": "ApplicationHealthLinux",
+                  "typeHandlerVersion": "2.0",
+                  "settings": {
+                    "protocol": "http",
+                    "port": 6253,
+                    "requestPath": "/health",
+                    "intervalInSeconds": 10,
+                    "numberOfProbes": 3,
+                    "gracePeriod": 1200
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "automaticRepairsPolicy": {
+          "enabled": true,
+          "gracePeriod": "PT10M"
+        }
+      },
+      "dependsOn": [
+        "managedIdentity",
+        "virtualNetwork"
+      ]
+    },
+    "autoscaleSetting": {
+      "type": "Microsoft.Insights/autoscalesettings",
+      "apiVersion": "2022-10-01",
+      "name": "[format('{0}-Autoscale', variables('name'))]",
+      "location": "[resourceGroup().location]",
+      "tags": "[variables('tags')]",
+      "properties": {
+        "name": "[format('{0}-Autoscale', variables('name'))]",
+        "enabled": true,
+        "targetResourceUri": "[resourceId('Microsoft.Compute/virtualMachineScaleSets', variables('name'))]",
+        "targetResourceLocation": "[reference('vmss', '2024-07-01', 'full').location]",
+        "profiles": [
+          {
+            "name": "Terminate all instances",
+            "capacity": {
+              "default": "0",
+              "maximum": "0",
+              "minimum": "0"
+            },
+            "rules": [],
+            "recurrence": {
+              "frequency": "Week",
+              "schedule": {
+                "days": [
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                  "Saturday",
+                  "Sunday"
+                ],
+                "hours": [
+                  "[div(variables('restartMinute'), 60)]"
+                ],
+                "minutes": [
+                  "[mod(variables('restartMinute'), 60)]"
+                ],
+                "timeZone": "UTC"
+              }
+            }
+          },
+          {
+            "name": "{\"name\":\"Auto created default scale condition\",\"for\":\"Terminate all instances\"}",
+            "capacity": {
+              "default": "[format('{0}', parameters('instanceCount'))]",
+              "maximum": "[format('{0}', parameters('instanceCount'))]",
+              "minimum": "[format('{0}', parameters('instanceCount'))]"
+            },
+            "rules": [],
+            "recurrence": {
+              "frequency": "Week",
+              "schedule": {
+                "days": [
+                  "Monday",
+                  "Tuesday",
+                  "Wednesday",
+                  "Thursday",
+                  "Friday",
+                  "Saturday",
+                  "Sunday"
+                ],
+                "hours": [
+                  "[mod(div(add(variables('restartMinute'), 1), 60), 24)]"
+                ],
+                "minutes": [
+                  "[mod(add(variables('restartMinute'), 1), 60)]"
+                ],
+                "timeZone": "UTC"
+              }
+            }
+          }
+        ]
+      },
+      "dependsOn": [
+        "vmss"
+      ]
+    },
+    "managedIdentity": {
+      "type": "Microsoft.ManagedIdentity/userAssignedIdentities",
+      "apiVersion": "2023-01-31",
+      "name": "[parameters('identityName')]",
+      "location": "[resourceGroup().location]",
+      "tags": "[variables('tags')]"
+    },
+    "scannerRole": {
+      "type": "Microsoft.Authorization/roleDefinitions",
+      "apiVersion": "2022-04-01",
+      "name": "[guid(variables('name'), 'scannerRole', resourceGroup().id, subscription().id)]",
+      "properties": {
+        "roleName": "Datadog Agentless Scanner Role",
+        "description": "Role used by the Datadog Agentless Scanner to manage resources in its own resource group.",
+        "type": "customRole",
+        "permissions": [
+          {
+            "actions": [
+              "Microsoft.Authorization/*/read",
+              "Microsoft.Resources/subscriptions/resourceGroups/read",
+              "Microsoft.Compute/availabilitySets/*",
+              "Microsoft.Compute/locations/*",
+              "Microsoft.Compute/virtualMachines/*",
+              "Microsoft.Compute/virtualMachineScaleSets/*",
+              "Microsoft.Compute/disks/read",
+              "Microsoft.Compute/disks/write",
+              "Microsoft.Compute/disks/delete",
+              "Microsoft.Compute/disks/beginGetAccess/action",
+              "Microsoft.Compute/disks/endGetAccess/action",
+              "Microsoft.Compute/snapshots/read",
+              "Microsoft.Compute/snapshots/write",
+              "Microsoft.Compute/snapshots/delete",
+              "Microsoft.Compute/snapshots/beginGetAccess/action",
+              "Microsoft.Compute/snapshots/endGetAccess/action",
+              "Microsoft.Storage/storageAccounts/listkeys/action",
+              "Microsoft.Storage/storageAccounts/read",
+              "Microsoft.Storage/storageAccounts/write",
+              "Microsoft.Storage/storageAccounts/delete"
+            ],
+            "notActions": []
+          }
+        ],
+        "assignableScopes": [
+          "[resourceGroup().id]"
+        ]
+      }
+    },
+    "delegateRole": {
+      "type": "Microsoft.Authorization/roleDefinitions",
+      "apiVersion": "2022-04-01",
+      "name": "[guid(variables('name'), 'delegateRole', resourceGroup().id, subscription().id)]",
+      "properties": {
+        "roleName": "Datadog Agentless Scanner Delegate Role",
+        "description": "Role used by the Datadog Agentless Scanner to scan resources.",
+        "type": "customRole",
+        "permissions": [
+          {
+            "actions": [
+              "Microsoft.Compute/virtualMachines/read",
+              "Microsoft.Compute/virtualMachines/instanceView/read",
+              "Microsoft.Compute/virtualMachineScaleSets/read",
+              "Microsoft.Compute/virtualMachineScaleSets/instanceView/read",
+              "Microsoft.Compute/virtualMachineScaleSets/virtualMachines/read",
+              "Microsoft.Compute/virtualMachineScaleSets/virtualMachines/instanceView/read",
+              "Microsoft.Compute/disks/read",
+              "Microsoft.Compute/disks/beginGetAccess/action",
+              "Microsoft.Compute/disks/endGetAccess/action"
+            ],
+            "notActions": []
+          }
+        ],
+        "assignableScopes": "[union(createArray(resourceGroup().id), parameters('scanScopes'))]"
+      }
+    },
+    "scannerRoleAssignment": {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "name": "[guid(resourceId('Microsoft.Authorization/roleDefinitions', guid(variables('name'), 'scannerRole', resourceGroup().id, subscription().id)), resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('identityName')))]",
+      "properties": {
+        "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', guid(variables('name'), 'scannerRole', resourceGroup().id, subscription().id))]",
+        "principalId": "[reference('managedIdentity').principalId]",
+        "principalType": "ServicePrincipal"
+      },
+      "dependsOn": [
+        "managedIdentity",
+        "scannerRole"
+      ]
+    },
+    "delegateRoleAssignment": {
+      "type": "Microsoft.Authorization/roleAssignments",
+      "apiVersion": "2022-04-01",
+      "name": "[guid(resourceId('Microsoft.Authorization/roleDefinitions', guid(variables('name'), 'delegateRole', resourceGroup().id, subscription().id)), resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('identityName')))]",
+      "properties": {
+        "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', guid(variables('name'), 'delegateRole', resourceGroup().id, subscription().id))]",
+        "principalId": "[reference('managedIdentity').principalId]",
+        "principalType": "ServicePrincipal"
+      },
+      "dependsOn": [
+        "delegateRole",
+        "managedIdentity"
+      ]
+    },
+    "virtualNetwork": {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2024-03-01",
+      "name": "vnet",
+      "location": "[resourceGroup().location]",
+      "tags": "[variables('tags')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "10.0.0.0/16"
+          ]
+        },
+        "encryption": {
+          "enabled": false,
+          "enforcement": "AllowUnencrypted"
+        },
+        "subnets": [
+          {
+            "name": "default",
+            "properties": {
+              "addressPrefixes": [
+                "10.0.128.0/19"
+              ],
+              "natGateway": {
+                "id": "[resourceId('Microsoft.Network/natGateways', 'natgw')]"
+              },
+              "serviceEndpoints": [
+                {
+                  "service": "Microsoft.Storage",
+                  "locations": [
+                    "[resourceGroup().location]"
+                  ]
+                }
+              ],
+              "privateEndpointNetworkPolicies": "Disabled",
+              "privateLinkServiceNetworkPolicies": "Enabled",
+              "defaultOutboundAccess": false
+            },
+            "type": "Microsoft.Network/virtualNetworks/subnets"
+          }
+        ]
+      },
+      "dependsOn": [
+        "natGateway"
+      ]
+    },
+    "natGateway": {
+      "type": "Microsoft.Network/natGateways",
+      "apiVersion": "2024-03-01",
+      "name": "natgw",
+      "location": "[resourceGroup().location]",
+      "tags": "[variables('tags')]",
+      "sku": {
+        "name": "Standard"
+      },
+      "properties": {
+        "publicIpAddresses": [
+          {
+            "id": "[resourceId('Microsoft.Network/publicIPAddresses', 'natgw-ip')]"
+          }
+        ]
+      },
+      "dependsOn": [
+        "publicIpAddress"
+      ]
+    },
+    "publicIpAddress": {
+      "type": "Microsoft.Network/publicIPAddresses",
+      "apiVersion": "2024-03-01",
+      "name": "natgw-ip",
+      "location": "[resourceGroup().location]",
+      "tags": "[variables('tags')]",
+      "sku": {
+        "name": "Standard",
+        "tier": "Regional"
+      },
+      "properties": {
+        "publicIPAddressVersion": "IPv4",
+        "publicIPAllocationMethod": "Static"
+      }
+    }
+  }
+}
