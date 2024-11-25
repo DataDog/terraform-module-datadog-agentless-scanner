@@ -215,9 +215,9 @@ resource autoscaleSetting 'Microsoft.Insights/autoscalesettings@2022-10-01' = {
       {
         name: '{"name":"Auto created default scale condition","for":"Terminate all instances"}'
         capacity: {
-          default: '1'
-          maximum: '1'
-          minimum: '1'
+          default: '${instanceCount}'
+          maximum: '${instanceCount}'
+          minimum: '${instanceCount}'
         }
         rules: []
         recurrence: {

@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.31.92.45157",
-      "templateHash": "13352737458824158975"
+      "templateHash": "816638341113202344"
     }
   },
   "functions": [
@@ -306,9 +306,9 @@
           {
             "name": "{\"name\":\"Auto created default scale condition\",\"for\":\"Terminate all instances\"}",
             "capacity": {
-              "default": "1",
-              "maximum": "1",
-              "minimum": "1"
+              "default": "[format('{0}', parameters('instanceCount'))]",
+              "maximum": "[format('{0}', parameters('instanceCount'))]",
+              "minimum": "[format('{0}', parameters('instanceCount'))]"
             },
             "rules": [],
             "recurrence": {
