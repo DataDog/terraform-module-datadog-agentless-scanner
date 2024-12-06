@@ -36,7 +36,6 @@ resource "aws_s3_bucket_lifecycle_configuration" "bucket_lifecycle" {
 }
 
 data "aws_iam_policy_document" "bucket_access_policy_document" {
-  # TODO: add statement to deny access to everyone except the scanner roles
   statement {
     sid    = "DatadogAgentlessScannerBucketPolicy"
     effect = "Allow"
@@ -89,6 +88,32 @@ data "aws_iam_policy_document" "bucket_access_policy_document" {
       type = "AWS"
       identifiers = [
         var.iam_delegate_role_arn,
+      ]
+    }
+  }
+
+  statement {
+    sid    = "DenyAllOtherAccess"
+    effect = "Deny"
+    actions = [
+      "s3:GetObject*",
+      "s3:ListBucket",
+      "s3:PutObject*",
+    ]
+    resources = [
+      aws_s3_bucket.bucket.arn,
+      "${aws_s3_bucket.bucket.arn}/*",
+    ]
+    principals {
+      type        = "AWS"
+      identifiers = ["*"]
+    }
+    condition {
+      test     = "ArnNotEquals"
+      variable = "aws:PrincipalArn"
+      values = [
+        var.iam_delegate_role_arn,
+        var.rds_service_role_arn,
       ]
     }
   }
