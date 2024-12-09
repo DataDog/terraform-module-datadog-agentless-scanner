@@ -54,3 +54,11 @@ repos:
       - id: terraform_tflint
         name: terraform lint
         args: [--args=--disable-rule=terraform_module_pinned_source]
+
+  - repo: local
+    hooks:
+    - id: bicep-build
+      name: Build Azure ARM template
+      language: system
+      entry: az bicep build --file
+      files: ^azure/arm/main.bicep$
