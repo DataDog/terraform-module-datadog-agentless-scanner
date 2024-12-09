@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 0.11.7 - 2024-12-10
+
+- Add support for AWS ECR registry scanning
+- Add support for scanning AWS RDS databases
+- Add sensitive_data_scanning_rds_enabled parameter to opt-in to AWS RDS databases scanning
+- Add S3 module to create a bucket used by the scanner to store temporary files (example: RDS exports)
+
 ## Version 0.11.6 - 2024-10-28
 
 - Prevent Datadog Agent from starting before its configuration has been changed
