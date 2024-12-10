@@ -1,0 +1,268 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2021-09-09/uiFormDefinition.schema.json",
+    "view": {
+        "kind": "Form",
+        "properties": {
+            "title": "Datadog Agentless Scanner",
+            "steps": [
+                {
+                    "name": "basics",
+                    "label": "Basics",
+                    "elements": [
+                        {
+                            "name": "resourceGroupWarning",
+                            "type": "Microsoft.Common.InfoBox",
+                            "options": {
+                                "style": "Warning",
+                                "text": "It is <strong>strongly</strong> recommended to deploy the Datadog Agentless Scanner in a <strong>dedicated resource group</strong>."
+                            }
+                        },
+                        {
+                            "name": "resourceScope",
+                            "type": "Microsoft.Common.ResourceScope",
+                            "location": {
+                                "resourceTypes": [
+                                    "microsoft.compute/virtualmachinescalesets",
+                                    "microsoft.insights/autoscalesettings",
+                                    "microsoft.managedidentity/userassignedidentities",
+                                    "microsoft.network/virtualnetworks",
+                                    "microsoft.network/natgateways",
+                                    "microsoft.network/publicipaddresses",
+                                    "microsoft.resources/resourcegroups"
+                                ]
+                            }
+                        },
+                        {
+                            "name": "subscriptions",
+                            "type": "Microsoft.Solutions.ArmApiControl",
+                            "request": {
+                                "method": "GET",
+                                "path": "/subscriptions?api-version=2022-12-01"
+                            },
+                            "visible": false
+                        },
+                        {
+                            "name": "scanScopes",
+                            "type": "Microsoft.Common.DropDown",
+                            "label": "Subscriptions to scan",
+                            "defaultValue": [
+                                {
+                                    "value": "[steps('basics').resourceScope.subscription.id]"
+                                }
+                            ],
+                            "toolTip": "The set of subscriptions that the Datadog Agentless Scanner is allowed to scan",
+                            "multiselect": true,
+                            "selectAll": true,
+                            "filter": true,
+                            "filterPlaceholder": "Filter subscriptions...",
+                            "constraints": {
+                                "required": true,
+                                "allowedValues": "[map(steps('basics').subscriptions.value, (item) => parse(concat('{\"label\":\"', item.displayName, '\",\"value\":\"', item.id, '\"}')))]"
+                            },
+                            "visible": true
+                        },
+                        {
+                            "name": "datadogAPIKey",
+                            "type": "Microsoft.Common.PasswordBox",
+                            "label": {
+                                "password": "Datadog API Key"
+                            },
+                            "toolTip": "A Remote Configuration-enabled API key for the Datadog account\n(see https://app.datadoghq.com/organization-settings/api-keys).\n",
+                            "constraints": {
+                                "required": true,
+                                "regex": "^[0-9a-f]{32}$",
+                                "validationMessage": "The value must be a 32-character lowercase hexadecimal string."
+                            },
+                            "options": {
+                                "hideConfirmation": true
+                            },
+                            "visible": true
+                        },
+                        {
+                            "name": "datadogSite",
+                            "type": "Microsoft.Common.DropDown",
+                            "label": "Datadog Site",
+                            "toolTip": "The Datadog site to use for the Datadog Agentless Scanner",
+                            "constraints": {
+                                "required": true,
+                                "allowedValues": [
+                                    {
+                                        "label": "datadoghq.com",
+                                        "value": "datadoghq.com"
+                                    },
+                                    {
+                                        "label": "datadoghq.eu",
+                                        "value": "datadoghq.eu"
+                                    },
+                                    {
+                                        "label": "us3.datadoghq.com",
+                                        "value": "us3.datadoghq.com"
+                                    },
+                                    {
+                                        "label": "us5.datadoghq.com",
+                                        "value": "us5.datadoghq.com"
+                                    },
+                                    {
+                                        "label": "ap1.datadoghq.com",
+                                        "value": "ap1.datadoghq.com"
+                                    }
+                                ]
+                            },
+                            "visible": true
+                        },
+                        {
+                            "name": "instanceCount",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Instance Count",
+                            "defaultValue": "1",
+                            "toolTip": "Number of Agentless Scanner instances to launch",
+                            "constraints": {
+                                "required": true,
+                                "regex": "^0*[1-9][0-9]*$",
+                                "validationMessage": "The value must be a positive integer."
+                            },
+                            "visible": true
+                        },
+                        {
+                            "name": "instanceSize",
+                            "type": "Microsoft.Compute.SizeSelector",
+                            "label": "Instance Size",
+                            "toolTip": "Virtual Machine instance size",
+                            "recommendedSizes": [
+                                "Standard_B2ps_v2"
+                            ],
+                            "osPlatform": "Linux",
+                            "imageReference": {
+                                "publisher": "canonical",
+                                "offer": "ubuntu-24_04-lts",
+                                "sku": "server-arm64"
+                            },
+                            "count": "[steps('basics').instanceCount]",
+                            "visible": true
+                        },
+                        {
+                            "name": "identityName",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Identity Name",
+                            "subLabel": "",
+                            "defaultValue": "DatatogAgentlessScannerIdentity",
+                            "toolTip": "The name of the user-assigned managed identity to be used by the Datadog Agentless Scanner virtual machine instances.",
+                            "constraints": {
+                                "required": false,
+                                "regex": "",
+                                "validationMessage": ""
+                            },
+                            "visible": false
+                        },
+                        {
+                            "name": "scannerVersion",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Scanner Version",
+                            "defaultValue": "0.11",
+                            "toolTip": "Specifies the version of the scanner to install",
+                            "constraints": {
+                                "required": true,
+                                "regex": "",
+                                "validationMessage": "",
+                                "validations": []
+                            },
+                            "visible": false
+                        },
+                        {
+                            "name": "scannerChannel",
+                            "type": "Microsoft.Common.DropDown",
+                            "label": "Scanner Channel",
+                            "toolTip": "Specifies the channel to use for installing the scanner",
+                            "constraints": {
+                                "required": true,
+                                "allowedValues": [
+                                    {
+                                        "label": "stable",
+                                        "value": "stable"
+                                    },
+                                    {
+                                        "label": "beta",
+                                        "value": "beta"
+                                    },
+                                    {
+                                        "label": "nightly",
+                                        "value": "nightly"
+                                    }
+                                ]
+                            },
+                            "visible": false
+                        },
+                        {
+                            "name": "scannerRepository",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Scanner Repository",
+                            "defaultValue": "https://apt.datadoghq.com/",
+                            "toolTip": "Repository URL to install the scanner from.",
+                            "constraints": {
+                                "required": true,
+                                "regex": "^https://.+",
+                                "validationMessage": "Must be an HTTPS URL"
+                            },
+                            "visible": false
+                        },
+                        {
+                            "name": "adminUsername",
+                            "type": "Microsoft.Compute.UserNameTextBox",
+                            "label": "Username",
+                            "defaultValue": "azureuser",
+                            "toolTip": "The administrator username for the VM",
+                            "osPlatform": "Linux",
+                            "visible": false
+                        },
+                        {
+                            "name": "sshPublicKey",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "SSH Public Key",
+                            "subLabel": "",
+                            "defaultValue": "",
+                            "toolTip": "SSH public key of the administrator user",
+                            "constraints": {
+                                "required": false,
+                                "regex": "^($|ssh-rsa |ssh-ed25519 )",
+                                "validationMessage": "Check your key and try again. Your key may begin with \"ssh-rsa\" or \"ssh-ed25519\"."
+                            },
+                            "visible": false
+                        },
+                        {
+                            "name": "resourceTags",
+                            "type": "Microsoft.Common.TextBox",
+                            "label": "Resource Tags",
+                            "defaultValue": "{}",
+                            "toolTip": "Tags to apply to all resources.",
+                            "constraints": {
+                                "required": false,
+                                "regex": "",
+                                "validationMessage": ""
+                            },
+                            "visible": false
+                        }
+                    ]
+                }
+            ]
+        },
+        "outputs": {
+            "kind": "ResourceGroup",
+            "location": "[steps('basics').resourceScope.location.name]",
+            "resourceGroupId": "[steps('basics').resourceScope.resourceGroup.id]",
+            "parameters": {
+                "datadogAPIKey": "[steps('basics').datadogAPIKey]",
+                "datadogSite": "[steps('basics').datadogSite]",
+                "instanceCount": "[steps('basics').instanceCount]",
+                "instanceSize": "[steps('basics').instanceSize]",
+                "identityName": "[steps('basics').identityName]",
+                "scanScopes": "[steps('basics').scanScopes]",
+                "scannerVersion": "[steps('basics').scannerVersion]",
+                "scannerChannel": "[steps('basics').scannerChannel]",
+                "scannerRepository": "[steps('basics').scannerRepository]",
+                "adminUsername": "[steps('basics').adminUsername]",
+                "sshPublicKey": "[steps('basics').sshPublicKey]",
+                "resourceTags": "[steps('basics').resourceTags]"
+            }
+        }
+    }
+}
