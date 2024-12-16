@@ -105,6 +105,10 @@
                                     {
                                         "label": "ap1.datadoghq.com",
                                         "value": "ap1.datadoghq.com"
+                                    },
+                                    {
+                                        "label": "datad0g.com",
+                                        "value": "datad0g.com"
                                     }
                                 ]
                             },
