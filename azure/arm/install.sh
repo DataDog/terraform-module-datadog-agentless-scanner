@@ -34,7 +34,7 @@ fi
 
 # Append the last 6 bytes of the VM UUID to prevent hostname collisions
 VM_ID=$(cat /sys/devices/virtual/dmi/id/product_uuid)
-DD_HOSTNAME="$(hostname)-$${VM_ID:(-12)}"
+DD_HOSTNAME="$(hostname)-${VM_ID:(-12)}"
 DD_SITE="${site}"
 DD_AGENTLESS_VERSION="${scanner_version}"
 DD_AGENTLESS_CHANNEL="${scanner_channel}"
