@@ -326,14 +326,20 @@ resource scannerRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-
   }
 }
 
-resource delegateRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(delegateRole.id, managedIdentity.id)
-  properties: {
-    roleDefinitionId: delegateRole.id
-    principalId: managedIdentity.properties.principalId
-    principalType: 'ServicePrincipal'
+module delegateRoleAssignments './delegateRoleAssignment.bicep' = [
+  for subscriptionId in map(
+    filter(scanScopes, s => startsWith(s, '/subscriptions/')),
+    s => skip(s, length('/subscriptions/'))
+  ): {
+    name: 'delegateRoleAssignment-${guid(delegateRole.id, managedIdentity.id, subscriptionId)}'
+    scope: subscription(subscriptionId)
+    params: {
+      name: guid(delegateRole.id, managedIdentity.id, subscriptionId)
+      roleDefinitionId: delegateRole.id
+      principalId: managedIdentity.properties.principalId
+    }
   }
-}
+]
 
 // Network resources
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2024-03-01' = {
