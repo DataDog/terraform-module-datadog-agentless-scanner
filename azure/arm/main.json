@@ -5,8 +5,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.31.92.45157",
-      "templateHash": "15994061350563052951"
+      "version": "0.32.4.45862",
+      "templateHash": "15332090303257789948"
     }
   },
   "functions": [
@@ -427,20 +427,6 @@
         "scannerRole"
       ]
     },
-    "delegateRoleAssignment": {
-      "type": "Microsoft.Authorization/roleAssignments",
-      "apiVersion": "2022-04-01",
-      "name": "[guid(resourceId('Microsoft.Authorization/roleDefinitions', guid(variables('name'), 'delegateRole', resourceGroup().id, subscription().id)), resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('identityName')))]",
-      "properties": {
-        "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', guid(variables('name'), 'delegateRole', resourceGroup().id, subscription().id))]",
-        "principalId": "[reference('managedIdentity').principalId]",
-        "principalType": "ServicePrincipal"
-      },
-      "dependsOn": [
-        "delegateRole",
-        "managedIdentity"
-      ]
-    },
     "virtualNetwork": {
       "type": "Microsoft.Network/virtualNetworks",
       "apiVersion": "2024-03-01",
@@ -521,6 +507,72 @@
         "publicIPAddressVersion": "IPv4",
         "publicIPAllocationMethod": "Static"
       }
+    },
+    "delegateRoleAssignments": {
+      "copy": {
+        "name": "delegateRoleAssignments",
+        "count": "[length(map(filter(parameters('scanScopes'), lambda('s', startsWith(lambdaVariables('s'), '/subscriptions/'))), lambda('s', skip(lambdaVariables('s'), length('/subscriptions/')))))]"
+      },
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2022-09-01",
+      "name": "[format('delegateRoleAssignment-{0}', guid(resourceId('Microsoft.Authorization/roleDefinitions', guid(variables('name'), 'delegateRole', resourceGroup().id, subscription().id)), resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('identityName')), map(filter(parameters('scanScopes'), lambda('s', startsWith(lambdaVariables('s'), '/subscriptions/'))), lambda('s', skip(lambdaVariables('s'), length('/subscriptions/'))))[copyIndex()]))]",
+      "subscriptionId": "[map(filter(parameters('scanScopes'), lambda('s', startsWith(lambdaVariables('s'), '/subscriptions/'))), lambda('s', skip(lambdaVariables('s'), length('/subscriptions/'))))[copyIndex()]]",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "name": {
+            "value": "[guid(resourceId('Microsoft.Authorization/roleDefinitions', guid(variables('name'), 'delegateRole', resourceGroup().id, subscription().id)), resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('identityName')), map(filter(parameters('scanScopes'), lambda('s', startsWith(lambdaVariables('s'), '/subscriptions/'))), lambda('s', skip(lambdaVariables('s'), length('/subscriptions/'))))[copyIndex()])]"
+          },
+          "roleDefinitionId": {
+            "value": "[resourceId('Microsoft.Authorization/roleDefinitions', guid(variables('name'), 'delegateRole', resourceGroup().id, subscription().id))]"
+          },
+          "principalId": {
+            "value": "[reference('managedIdentity').principalId]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.32.4.45862",
+              "templateHash": "8910985709788751382"
+            }
+          },
+          "parameters": {
+            "name": {
+              "type": "string"
+            },
+            "roleDefinitionId": {
+              "type": "string"
+            },
+            "principalId": {
+              "type": "string"
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Authorization/roleAssignments",
+              "apiVersion": "2022-04-01",
+              "name": "[parameters('name')]",
+              "properties": {
+                "roleDefinitionId": "[parameters('roleDefinitionId')]",
+                "principalId": "[parameters('principalId')]",
+                "principalType": "ServicePrincipal"
+              }
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "delegateRole",
+        "managedIdentity"
+      ]
     }
   }
 }
