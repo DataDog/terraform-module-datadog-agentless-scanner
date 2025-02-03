@@ -14,6 +14,10 @@ variable "api_key" {
   type        = string
   sensitive   = true
   default     = null
+  validation {
+    condition     = can(var.api_key == null ? {} : regex(" ^[0-9a-f]{32}$", var.api_key))
+    error_message = "api_key must be a Datadog API key (32 hexadecimal characters)"
+  }
 }
 
 variable "api_key_secret_id" {
