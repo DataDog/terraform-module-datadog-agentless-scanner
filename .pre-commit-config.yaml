@@ -57,8 +57,14 @@ repos:
 
   - repo: local
     hooks:
+    - id: bicep-install
+      name: Install Azure Bicep CLI
+      description: This hook installs the same version of the Azure Bicep CLI that was used to build the ARM template.
+      language: system
+      entry: sh -c 'az bicep install --version $(jq -r '\''.metadata._generator.version | split(".")[:3] | ("v" + join("."))'\'' "${0%.bicep}.json")'
+      files: ^azure/arm/main.bicep$
     - id: bicep-build
-      name: Build Azure ARM template
+      name: Build Azure ARM template with Bicep
       language: system
       entry: az bicep build --file
       files: ^azure/arm/main.bicep$
