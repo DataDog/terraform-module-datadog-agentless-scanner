@@ -135,7 +135,7 @@
                             "imageReference": {
                                 "publisher": "canonical",
                                 "offer": "ubuntu-24_04-lts",
-                                "sku": "server-arm64"
+                                "sku": "minimal-arm64"
                             },
                             "count": "[steps('basics').instanceCount]",
                             "visible": true

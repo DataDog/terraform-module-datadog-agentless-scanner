@@ -113,7 +113,7 @@ resource vmss 'Microsoft.Compute/virtualMachineScaleSets@2024-07-01' = {
         imageReference: {
           publisher: 'canonical'
           offer: 'ubuntu-24_04-lts'
-          sku: 'server-arm64'
+          sku: 'minimal-arm64'
           version: 'latest'
         }
       }
