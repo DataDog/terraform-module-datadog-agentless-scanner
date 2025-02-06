@@ -21,7 +21,14 @@ echo "options nbd nbds_max=128" > /etc/modprobe.d/nbd.conf
 
 # Install requirements
 apt update
-apt install -y nbd-client curl
+apt install -y curl
+
+# Remove uneeded packages
+apt remove -y libx11-6
+apt autoremove -y
+
+# Perform unattended upgrades
+unattended-upgrade -v
 
 re='@Microsoft.KeyVault\(SecretUri=(https://.*)\)'
 if [[ "${api_key}" =~ $re ]]; then
@@ -68,6 +75,24 @@ Unattended-Upgrade::Automatic-Reboot "true";
 Unattended-Upgrade::Automatic-Reboot-WithUsers "true";
 Unattended-Upgrade::Automatic-Reboot-Time "now";
 EOF
+
+# Perform unattended upgrades 10 min after boot, then every 3 hours
+cat << EOF > /etc/systemd/system/apt-daily-upgrade.timer
+[Unit]
+Description=Daily apt upgrade and clean activities
+After=apt-daily.timer
+
+[Timer]
+OnActiveSec=10min
+OnCalendar=0/3:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+EOF
+
+systemctl daemon-reload
+systemctl restart apt-daily-upgrade.timer
 
 # Activate agentless scanner logging
 mkdir -p /etc/datadog-agent/conf.d/agentless-scanner.d
