@@ -1,5 +1,13 @@
 # Changelog
 
+## Version 0.11.8 - 2025-02-12
+
+- Use Ubuntu 24.04 Minimal Server image on AWS and Azure
+- Run unattended upgrade on deployment on AWS and Azure
+- Remove semgrep dependency
+- Fix delegate role assignment on Azure Resource Manager
+- Fix hostname on Azure Resource Manager
+
 ## Version 0.11.7 - 2024-12-10
 
 - Add support for AWS ECR registry scanning
