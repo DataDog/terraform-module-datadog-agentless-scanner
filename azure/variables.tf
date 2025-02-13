@@ -48,6 +48,12 @@ variable "scan_scopes" {
   default     = []
 }
 
+variable "vnet_cidr" {
+  description = "The CIDR block for the Virtual Network"
+  type        = string
+  default     = "10.0.0.0/16"
+}
+
 variable "bastion" {
   description = "Create a bastion in the subnet."
   type        = bool
