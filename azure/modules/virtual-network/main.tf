@@ -51,15 +51,15 @@ resource "azurerm_subnet_nat_gateway_association" "subnet_natgw_assoc" {
 
 # Bastion (optional)
 resource "azurerm_bastion_host" "bastion" {
-  count = var.bastion == true ? 1 : 0
+  count = var.bastion ? 1 : 0
 
   name                = "bastion"
   location            = azurerm_virtual_network.vnet.location
   resource_group_name = azurerm_virtual_network.vnet.resource_group_name
   ip_configuration {
     name                 = "ipconfig"
-    subnet_id            = azurerm_subnet.bastion_subnet.id
-    public_ip_address_id = azurerm_public_ip.bastion_ip[count.index].id
+    subnet_id            = one(azurerm_subnet.bastion_subnet).id
+    public_ip_address_id = one(azurerm_public_ip.bastion_ip).id
   }
   sku               = "Standard"
   tunneling_enabled = true
@@ -67,6 +67,8 @@ resource "azurerm_bastion_host" "bastion" {
 }
 
 resource "azurerm_subnet" "bastion_subnet" {
+  count = var.bastion ? 1 : 0
+
   name                 = "AzureBastionSubnet"
   resource_group_name  = azurerm_virtual_network.vnet.resource_group_name
   virtual_network_name = azurerm_virtual_network.vnet.name
@@ -74,7 +76,7 @@ resource "azurerm_subnet" "bastion_subnet" {
 }
 
 resource "azurerm_public_ip" "bastion_ip" {
-  count = var.bastion == true ? 1 : 0
+  count = var.bastion ? 1 : 0
 
   name                = "bastion-ip"
   location            = azurerm_virtual_network.vnet.location

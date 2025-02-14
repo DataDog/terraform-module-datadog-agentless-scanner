@@ -33,6 +33,7 @@ module "virtual_network" {
   source              = "./modules/virtual-network"
   resource_group_name = module.resource_group.resource_group.name
   location            = var.location
+  cidr                = var.vnet_cidr
   bastion             = var.bastion
   tags                = var.tags
 }
