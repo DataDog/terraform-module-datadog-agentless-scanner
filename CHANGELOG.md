@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.11.9 - 2025-02-14
+
+- Azure: expose vnet_cidr parameter in main module
+
 ## Version 0.11.8 - 2025-02-12
 
 - Use Ubuntu 24.04 Minimal Server image on AWS and Azure
