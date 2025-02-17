@@ -4,6 +4,26 @@ The scanning-delegate-role module creates the proper role and policies to allow 
 
 It should be installed in every account that the agentless scanner will scan.
 
+### Note on AWS Service control policies (SCPs)
+
+Some permissions required by the Datadog Agentless Scanner may conflict with
+organizational policies enforced by SCPs. For instance, a scanner will require
+`ec2:DescribeSnapshots`, `ec2:DescribeVolumes`, `ec2:CreateSnapshot` and
+`ec2:DeleteSnapshot`. If any of these permissions is globally restricted by an
+SCP at the organization level, the scanner will not be able to perform its scans
+properly.
+
+In such case you should see error or warning logs in the Datadog logs from the
+`service:agentless-scanner`, of the form:
+
+```
+... User: arn:aws:sts::<account>:assumed-role/DatadogAgentlessScannerDelegateRole/DatadogAgentlessScanner is not authorized to perform: ec2:DescribeSnapshots with an explicit deny in a service control policy.
+```
+
+For more details on how to adjust you SCPs, please refer to the AWS
+documentation on [Service Control
+Policies](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html).
+
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
