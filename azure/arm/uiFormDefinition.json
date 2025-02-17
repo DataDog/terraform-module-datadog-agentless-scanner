@@ -79,6 +79,23 @@
                             "visible": true
                         },
                         {
+                            "name": "datadogAppKey",
+                            "type": "Microsoft.Common.PasswordBox",
+                            "label": {
+                                "password": "Datadog Application Key"
+                            },
+                            "toolTip": "TODO",
+                            "constraints": {
+                                "required": true,
+                                "regex": "^[0-9a-f]{40}$",
+                                "validationMessage": "The value must be a 40-character lowercase hexadecimal string."
+                            },
+                            "options": {
+                                "hideConfirmation": true
+                            },
+                            "visible": true
+                        },
+                        {
                             "name": "datadogSite",
                             "type": "Microsoft.Common.DropDown",
                             "label": "Datadog Site",
@@ -255,6 +272,7 @@
             "resourceGroupId": "[steps('basics').resourceScope.resourceGroup.id]",
             "parameters": {
                 "datadogAPIKey": "[steps('basics').datadogAPIKey]",
+                "datadogAppKey": "[steps('basics').datadogAppKey]",
                 "datadogSite": "[steps('basics').datadogSite]",
                 "instanceCount": "[steps('basics').instanceCount]",
                 "instanceSize": "[steps('basics').instanceSize]",

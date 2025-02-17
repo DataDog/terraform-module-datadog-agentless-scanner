@@ -5,6 +5,9 @@ A Remote Configuration-enabled API key for the Datadog account
 @secure()
 param datadogAPIKey string
 
+@secure()
+param datadogAppKey string = ''
+
 @description('The Datadog site to use for the Datadog Agentless Scanner')
 @allowed([
   'datadoghq.com'
@@ -415,3 +418,23 @@ var customData = replaceMultiple(loadTextContent('./install.sh'), {
 
 func replaceMultiple(input string, replacements { *: string }) string =>
   reduce(items(replacements), input, (cur, next) => replace(string(cur), next.key, next.value))
+
+resource ddApiCall 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
+  name: guid(name, 'ddApiCall', resourceGroup().id, subscription().id)
+  location: resourceGroup().location
+  tags: tags
+  kind: 'AzurePowerShell'
+  properties: {
+    azPowerShellVersion: '12.3'
+    environmentVariables: [
+      { name: 'DD_API_KEY', secureValue: datadogAPIKey }
+      { name: 'DD_APP_KEY', secureValue: datadogAppKey }
+      { name: 'DD_SITE', value: datadogSite }
+      { name: 'SCAN_SCOPES', value: string(scanScopes) }
+    ]
+    scriptContent: loadTextContent('./agentless-api-call.ps1')
+    retentionInterval: 'P1D'
+    timeout: 'PT10M'
+    cleanupPreference: 'OnExpiration'
+  }
+}
