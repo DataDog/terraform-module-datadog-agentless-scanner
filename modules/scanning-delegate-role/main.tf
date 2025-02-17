@@ -10,6 +10,7 @@ data "aws_partition" "current" {}
 // The IAM policy for the scanning orchestrator allows to create resources
 // such as snapshots and volumes. It is also able to cleanup these resources
 // after creation. It does not allow reading the created resources.
+//
 // reference: https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonec2.html
 data "aws_iam_policy_document" "scanning_orchestrator_policy_document" {
   statement {
@@ -231,87 +232,6 @@ data "aws_iam_policy_document" "scanning_orchestrator_policy_document" {
     actions   = ["kms:DescribeKey"]
     resources = ["arn:${data.aws_partition.current.partition}:kms:*:*:key/*"]
   }
-
-  # Uncomment this block to allow volume-attach mode of the scanner:
-  #
-  #   statement {
-  #     sid   = "DatadogAgentlessScannerSnapshotSharing"
-  #     effet = "allow"
-  #     actions = [
-  #       // Allow sharing created snapshots for cross-account scanning
-  #       "ec2:ModifySnapshotAttribute"
-  #     ]
-  #     resources = [
-  #       "arn:${data.aws_partition.current.partition}:ec2:*:*:snapshot/*",
-  #     ]
-  #     condition {
-  #       test     = "StringEquals"
-  #       variable = "aws:ResourceTag/DatadogAgentlessScanner"
-  #       values   = ["true"]
-  #     }
-  #   }
-  #
-  #   statement {
-  #     sid    = "DatadogAgentlessScannerVolumeCreation"
-  #     effect = "Allow"
-  #     actions = [
-  #       "ec2:CreateVolume",
-  #     ]
-  #     resources = [
-  #       "arn:${data.aws_partition.current.partition}:ec2:*:*:volume/*",
-  #     ]
-  #     // Enforcing created volume has DatadogAgentlessScanner tag
-  #     condition {
-  #       test     = "StringEquals"
-  #       variable = "aws:RequestTag/DatadogAgentlessScanner"
-  #       values   = ["true"]
-  #     }
-  #     // Enforcing created volume has only tags with DatadogAgentlessScanner* prefix
-  #     condition {
-  #       test     = "ForAllValues:StringLike"
-  #       variable = "aws:TagKeys"
-  #       values   = ["DatadogAgentlessScanner*"]
-  #     }
-  #   }
-  #
-  #   statement {
-  #     sid    = "DatadogAgentlessScannerVolumeAttachToInstance"
-  #     effect = "Allow"
-  #     actions = [
-  #       "ec2:AttachVolume",
-  #       "ec2:DetachVolume",
-  #     ]
-  #     resources = [
-  #       "arn:${data.aws_partition.current.partition}:ec2:*:*:instance/*",
-  #     ]
-  #     // Enforce that any of these actions can be performed on resources
-  #     // (volumes and snapshots) that have the DatadogAgentlessScanner tag.
-  #     condition {
-  #       test     = "StringEquals"
-  #       variable = "aws:ResourceTag/DatadogAgentlessScanner"
-  #       values   = ["true"]
-  #     }
-  #   }
-  #
-  #   statement {
-  #     sid    = "DatadogAgentlessScannerVolumeAttachAndDelete"
-  #     effect = "Allow"
-  #     actions = [
-  #       "ec2:AttachVolume",
-  #       "ec2:DetachVolume",
-  #       "ec2:DeleteVolume",
-  #     ]
-  #     resources = [
-  #       "arn:${data.aws_partition.current.partition}:ec2:*:*:volume/*",
-  #     ]
-  #     // Enforce that any of these actions can be performed on resources
-  #     // (volumes and snapshots) that have the DatadogAgentlessScanner tag.
-  #     condition {
-  #       test     = "StringEquals"
-  #       variable = "aws:ResourceTag/DatadogAgentlessScanner"
-  #       values   = ["true"]
-  #     }
-  #   }
 }
 
 // The IAM policy for the scanning worker allows to read created resources, as
