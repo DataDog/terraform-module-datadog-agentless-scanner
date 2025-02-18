@@ -5,12 +5,14 @@ function ConvertTo-AzureSubscriptionId {
         [string[]]$Scopes
     )
     process {
-        # try {
-        #     return [Azure.Core.ResourceIdentifier]::Parse($_).SubscriptionId
-        # }
-        # catch {}
-
         $scope = $_.Trim()
+        Write-Debug "Scope: ${scope}"
+
+        try {
+            Write-Debug [Azure.Core.ResourceIdentifier]::Parse($_).SubscriptionId
+        }
+        catch {}
+
         if ($scope -notmatch '^/subscriptions/([a-f0-9-]{36})(/|$)') {
             Write-Warning "Ignoring scope: $scope"
             return
@@ -22,7 +24,7 @@ function ConvertTo-AzureSubscriptionId {
             return
         }
 
-        return $subscription_id
+        return $subscription_id.ToString("D")
     }
 }
 
@@ -30,7 +32,7 @@ function Set-AzureAgentlessOptions {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory, ValueFromPipeline)]
-        [System.Guid[]]$Subscriptions,
+        [string[]]$Subscriptions,
         [Parameter(Mandatory)]
         [string]$DatadogSite,
         [Parameter(Mandatory, HelpMessage = "Datadog API Key")]
@@ -42,14 +44,14 @@ function Set-AzureAgentlessOptions {
     )
     begin {
         $headers = @{
-            'DD-API-KEY'         = $DD_API_KEY
-            'DD-APPLICATION-KEY' = $DD_APP_KEY
+            'DD-API-KEY'         = $APIKey
+            'DD-APPLICATION-KEY' = $ApplicationKey
             'Dd-Call-Source'     = "arm-agentless"
         }
     }
     process {
-        $subscription_id = $_.ToString("D")
-        $url = "https://api.${DD_SITE}/api/v2/agentless_scanning/accounts/azure"
+        $subscription_id = $_
+        $url = "https://api.${DatadogSite}/api/v2/agentless_scanning/accounts/azure"
         $body = @{
             "data" = @{
                 "id"         = $subscription_id
@@ -61,14 +63,26 @@ function Set-AzureAgentlessOptions {
             }
         } | ConvertTo-Json
 
-        Write-Host "POST ${url}`n$(ConvertTo-Json $headers)"
+        Write-Debug "POST ${url}`n${body}"
 
-        Invoke-RestMethod -Method POST -uri $url -Headers $headers -Body $body
+        $result = Invoke-RestMethod -Method POST -Uri $url -Headers $headers -Body $body -SkipHttpErrorCheck -StatusCodeVariable status
+        if ($status -eq 409) {
+            $result = Invoke-RestMethod -Method PATCH -Uri "${url}/${subscription_id}" -Headers $headers -Body $body -SkipHttpErrorCheck -StatusCodeVariable status
+        }
+        if ($status -ge 200 -and $status -lt 300) {
+            Write-Information "Successfully enabled Agentless Scanning for subscription ${subscription_id}"
+        }
+        else {
+            Write-Error "Failed to enable Agentless Scanning for subscription ${subscription_id}: $(ConvertTo-Json -Compress $result)"
+        }
     }
 }
 
+$InformationPreference = 'Continue'
+$DebugPreference = 'Continue'
+
 ${env:SCAN_SCOPES} |
-ConvertFrom-Json -NoEnumerate |
+ConvertFrom-Json |
 ConvertTo-AzureSubscriptionId |
 Sort-Object |
 Get-Unique |
