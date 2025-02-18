@@ -8,10 +8,10 @@ function ConvertTo-AzureSubscriptionId {
         $scope = $_.Trim()
         Write-Debug "Scope: ${scope}"
 
-        try {
-            Write-Debug [Azure.Core.ResourceIdentifier]::Parse($_).SubscriptionId
-        }
-        catch {}
+        # try {
+        #     Write-Debug [Azure.Core.ResourceIdentifier]::Parse($_).SubscriptionId
+        # }
+        # catch {}
 
         if ($scope -notmatch '^/subscriptions/([a-f0-9-]{36})(/|$)') {
             Write-Warning "Ignoring scope: $scope"
