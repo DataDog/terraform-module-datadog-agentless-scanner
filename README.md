@@ -8,6 +8,7 @@ Before using this module, make sure you have the following:
 
 1. [Terraform](https://www.terraform.io/) installed on your local machine.
 2. AWS credentials configured with the necessary permissions.
+3. A Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/) with Remote Configuration enabled.
 
 ## Usage
 
