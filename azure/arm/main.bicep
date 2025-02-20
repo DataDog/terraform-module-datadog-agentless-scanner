@@ -10,7 +10,7 @@ param datadogAPIKey string
 [Optional] A Datadog application key. If provided, it will be used to
 automatically enable Agentless Scanning on the selected subscriptions.
 ''')
-param datadogAppKey string?
+param datadogAppKey string = ''
 
 @description('The Datadog site to use for the Datadog Agentless Scanner')
 @allowed([
@@ -411,7 +411,7 @@ resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2024-03-01' = {
 // Call the Datadog API to enable Agentless Scanning on the selected subscription
 @description('[Internal: do not change] Tag to force an update to the Datadog Agentless Scanning options.')
 param _forceUpdateTag string = utcNow()
-resource ddApiCall 'Microsoft.Resources/deploymentScripts@2023-08-01' = if (datadogAppKey != null) {
+resource ddApiCall 'Microsoft.Resources/deploymentScripts@2023-08-01' = if (datadogAppKey != '') {
   name: '${name}-ApiCall'
   location: resourceGroup().location
   tags: tags

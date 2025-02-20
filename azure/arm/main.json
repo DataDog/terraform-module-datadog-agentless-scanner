@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.33.93.31351",
-      "templateHash": "15528264312030941247"
+      "templateHash": "7878072835611628906"
     }
   },
   "functions": [
@@ -45,7 +45,7 @@
     },
     "datadogAppKey": {
       "type": "securestring",
-      "nullable": true,
+      "defaultValue": "",
       "metadata": {
         "description": "[Optional] A Datadog application key. If provided, it will be used to\nautomatically enable Agentless Scanning on the selected subscriptions.\n"
       }
@@ -524,7 +524,7 @@
       }
     },
     "ddApiCall": {
-      "condition": "[not(equals(parameters('datadogAppKey'), null()))]",
+      "condition": "[not(equals(parameters('datadogAppKey'), ''))]",
       "type": "Microsoft.Resources/deploymentScripts",
       "apiVersion": "2023-08-01",
       "name": "[format('{0}-ApiCall', variables('name'))]",
