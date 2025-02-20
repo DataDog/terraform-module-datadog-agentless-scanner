@@ -5,6 +5,13 @@ A Remote Configuration-enabled API key for the Datadog account
 @secure()
 param datadogAPIKey string
 
+@secure()
+@description('''
+[Optional] A Datadog application key. If provided, it will be used to
+automatically enable Agentless Scanning on the selected subscriptions.
+''')
+param datadogAppKey string?
+
 @description('The Datadog site to use for the Datadog Agentless Scanner')
 @allowed([
   'datadoghq.com'
@@ -398,6 +405,31 @@ resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2024-03-01' = {
   properties: {
     publicIPAddressVersion: 'IPv4'
     publicIPAllocationMethod: 'Static'
+  }
+}
+
+// Call the Datadog API to enable Agentless Scanning on the selected subscription
+@description('[Internal: do not change] Tag to force an update to the Datadog Agentless Scanning options.')
+param _forceUpdateTag string = utcNow()
+resource ddApiCall 'Microsoft.Resources/deploymentScripts@2023-08-01' = if (datadogAppKey != null) {
+  name: '${name}-ApiCall'
+  location: resourceGroup().location
+  tags: tags
+  kind: 'AzurePowerShell'
+  properties: {
+    azPowerShellVersion: '12.3'
+    environmentVariables: [
+      { name: 'DD_API_KEY', secureValue: datadogAPIKey }
+      { name: 'DD_APP_KEY', secureValue: datadogAppKey }
+      { name: 'DD_SITE', value: datadogSite }
+      { name: 'SCAN_SCOPES', value: string(scanScopes) }
+      { name: 'NO_COLOR', value: 'true' }
+    ]
+    forceUpdateTag: _forceUpdateTag
+    scriptContent: loadTextContent('./agentless-api-call.ps1')
+    retentionInterval: 'P1D'
+    timeout: 'PT10M'
+    cleanupPreference: 'OnExpiration'
   }
 }
 
