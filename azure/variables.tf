@@ -10,14 +10,14 @@ variable "admin_ssh_key" {
 }
 
 variable "api_key" {
-  description = "Specifies the API key required by the Agentless Scanner to submit vulnerabilities to Datadog."
+  description = "Specifies the API key required by the Agentless Scanner to submit vulnerabilities to Datadog - Make sure the API key is Remote Configuration enabled."
   type        = string
   sensitive   = true
   default     = null
 }
 
 variable "api_key_secret_id" {
-  description = "The versionless resource ID of the Azure Key Vault secret holding the Datadog API key. Ignored if api_key is specified."
+  description = "The versionless resource ID of the Azure Key Vault secret holding the Datadog API key. Ignored if api_key is specified - Make sure the API key is Remote Configuration enabled."
   type        = string
   default     = null
 }
