@@ -1,5 +1,5 @@
 variable "api_key" {
-  description = "Specifies the API key required by the Datadog Agent to submit vulnerabilities to Datadog"
+  description = "Specifies the API key required by the Agentless Scanner to submit vulnerabilities to Datadog - Make sure the API key is Remote Configuration enabled."
   sensitive   = true
   type        = string
   default     = null
@@ -64,7 +64,7 @@ variable "agent_configuration" {
 }
 
 variable "api_key_secret_arn" {
-  description = "ARN of the secret holding the Datadog API key. Takes precedence over api_key variable"
+  description = "ARN of the secret holding the Datadog API key. Takes precedence over api_key variable - Make sure the API key is Remote Configuration enabled."
   type        = string
   default     = null
 }

@@ -93,8 +93,8 @@ terraform apply -var="datadog-api-key=$DD_API_KEY"
 |------|-------------|------|---------|:--------:|
 | <a name="input_admin_ssh_key"></a> [admin\_ssh\_key](#input\_admin\_ssh\_key) | SSH public key of the admin user. | `string` | n/a | yes |
 | <a name="input_agent_configuration"></a> [agent\_configuration](#input\_agent\_configuration) | Specifies a custom configuration for the Datadog Agent. The specified object is passed directly as a configuration input for the Datadog Agent. | `any` | `{}` | no |
-| <a name="input_api_key"></a> [api\_key](#input\_api\_key) | Specifies the API key required by the Agentless Scanner to submit vulnerabilities to Datadog. | `string` | `null` | no |
-| <a name="input_api_key_secret_id"></a> [api\_key\_secret\_id](#input\_api\_key\_secret\_id) | The versionless resource ID of the Azure Key Vault secret holding the Datadog API key. Ignored if api\_key is specified. | `string` | `null` | no |
+| <a name="input_api_key"></a> [api\_key](#input\_api\_key) | Specifies the API key required by the Agentless Scanner to submit vulnerabilities to Datadog - Make sure the API key is Remote Configuration enabled. | `string` | `null` | no |
+| <a name="input_api_key_secret_id"></a> [api\_key\_secret\_id](#input\_api\_key\_secret\_id) | The versionless resource ID of the Azure Key Vault secret holding the Datadog API key. Ignored if api\_key is specified - Make sure the API key is Remote Configuration enabled. | `string` | `null` | no |
 | <a name="input_bastion"></a> [bastion](#input\_bastion) | Create a bastion in the subnet. | `bool` | `false` | no |
 | <a name="input_create_roles"></a> [create\_roles](#input\_create\_roles) | Specifies whether to create the role definitions and assignments required to scan resources. | `bool` | `true` | no |
 | <a name="input_instance_count"></a> [instance\_count](#input\_instance\_count) | Size of the scale set the scanner instance is in (i.e. number of instances to run) | `number` | `1` | no |
