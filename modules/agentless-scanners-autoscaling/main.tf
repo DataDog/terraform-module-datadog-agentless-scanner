@@ -1,3 +1,5 @@
+data "aws_partition" "current" {}
+
 resource "aws_iam_role_policy" "agentless_autoscaling_policy" {
   name   = "DatadogAgentlessScannerAutoscalingPolicy"
   role   = var.datadog_integration_role
@@ -14,7 +16,10 @@ data "aws_iam_policy_document" "agentless_autoscaling_policy_document" {
       "autoscaling:DescribeAutoScalingGroups",
       "ec2:GetConsoleOutput",
     ]
-    resources = ["*"]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:autoscaling:*:*:autoScalingGroup:*",
+      "arn:${data.aws_partition.current.partition}:ec2:*:*:instance/*",
+    ]
     // Enforce that any of these actions can be performed on resources
     // that have the DatadogAgentlessScanner tag.
     condition {
