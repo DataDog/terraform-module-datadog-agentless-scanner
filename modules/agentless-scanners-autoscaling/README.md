@@ -26,7 +26,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_datadog_integration_role"></a> [datadog\_integration\_role](#input\_datadog\_integration\_role) | Role name of the Datadog Integration that was used to integrate the AWS account to Datadog | `string` | `null` | no |
+| <a name="input_datadog_integration_role"></a> [datadog\_integration\_role](#input\_datadog\_integration\_role) | Role name of the Datadog integration that was used to integrate the AWS account to Datadog | `string` | `null` | no |
 
 ## Outputs
 
