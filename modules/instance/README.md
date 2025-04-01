@@ -40,7 +40,7 @@ No modules.
 | <a name="input_instance_root_volume_size"></a> [instance\_root\_volume\_size](#input\_instance\_root\_volume\_size) | The instance root volume size in GiB | `number` | `30` | no |
 | <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | The type of instance | `string` | `"t4g.large"` | no |
 | <a name="input_key_name"></a> [key\_name](#input\_key\_name) | Key name of the Key Pair to use for the instance; which can be managed using the `aws_key_pair` resource | `string` | `null` | no |
-| <a name="input_max_asg_size"></a> [max\_asg\_size](#input\_max\_asg\_size) | Maximum size of the autoscaling group the instance is in (i.e. maximum number of instances to run) | `number` | `10` | no |
+| <a name="input_max_asg_size"></a> [max\_asg\_size](#input\_max\_asg\_size) | Maximum size of the autoscaling group the instance is in (i.e. maximum number of instances to run) | `number` | `50` | no |
 | <a name="input_min_asg_size"></a> [min\_asg\_size](#input\_min\_asg\_size) | Minimum size of the autoscaling group the instance is in (i.e. minimum number of instances to run) | `number` | `0` | no |
 | <a name="input_monitoring"></a> [monitoring](#input\_monitoring) | If true, the launched EC2 instance will have detailed monitoring enabled | `bool` | `false` | no |
 | <a name="input_name"></a> [name](#input\_name) | Name prefix to be used on EC2 instance created | `string` | `"DatadogAgentlessScanner"` | no |

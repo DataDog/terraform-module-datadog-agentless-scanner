@@ -89,7 +89,7 @@ variable "instance_type" {
 }
 
 variable "instance_count" {
-  description = "Size of the autoscaling group the instance is in (i.e. number of instances with scanners to run)"
+  description = "Default size of the autoscaling group the instance is in (i.e. number of instances with scanners to run)"
   type        = number
   default     = 1
 }

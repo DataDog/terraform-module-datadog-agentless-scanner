@@ -70,7 +70,7 @@ variable "min_asg_size" {
 variable "max_asg_size" {
   description = "Maximum size of the autoscaling group the instance is in (i.e. maximum number of instances to run)"
   type        = number
-  default     = 10
+  default     = 50
 }
 
 variable "asg_size" {
