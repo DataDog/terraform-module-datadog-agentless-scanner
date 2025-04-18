@@ -21,12 +21,13 @@ No modules.
 |------|------|
 | [aws_iam_role_policy.agentless_autoscaling_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy) | resource |
 | [aws_iam_policy_document.agentless_autoscaling_policy_document](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
+| [aws_partition.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/partition) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_datadog_integration_role"></a> [datadog\_integration\_role](#input\_datadog\_integration\_role) | Role name of the Datadog integration that was used to integrate the AWS account to Datadog | `string` | `null` | no |
+| <a name="input_datadog_integration_role"></a> [datadog\_integration\_role](#input\_datadog\_integration\_role) | Role name of the Datadog integration that was used to integrate the scanners' AWS account to Datadog | `string` | `null` | no |
 
 ## Outputs
 

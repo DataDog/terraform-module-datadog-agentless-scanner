@@ -13,7 +13,6 @@ data "aws_iam_policy_document" "agentless_autoscaling_policy_document" {
     actions = [
       "autoscaling:StartInstanceRefresh",
       "autoscaling:SetDesiredCapacity",
-      "autoscaling:DescribeAutoScalingGroups",
       "ec2:GetConsoleOutput",
     ]
     resources = [
@@ -27,5 +26,13 @@ data "aws_iam_policy_document" "agentless_autoscaling_policy_document" {
       variable = "aws:ResourceTag/DatadogAgentlessScanner"
       values   = ["true"]
     }
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "autoscaling:DescribeAutoScalingGroups",
+    ]
+    resources = ["*"]
   }
 }
