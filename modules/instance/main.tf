@@ -74,8 +74,8 @@ resource "aws_security_group" "default_scanner_security_group" {
 
 resource "aws_autoscaling_group" "asg" {
   name_prefix      = "datadog-agentless-scanner-asg"
-  min_size         = var.asg_size
-  max_size         = var.asg_size
+  min_size         = var.min_asg_size
+  max_size         = var.max_asg_size
   desired_capacity = var.asg_size
 
   # references:

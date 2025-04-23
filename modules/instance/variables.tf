@@ -61,11 +61,25 @@ variable "monitoring" {
   default     = false
 }
 
+variable "min_asg_size" {
+  description = "Minimum size of the autoscaling group the instance is in (i.e. minimum number of instances to run)"
+  type        = number
+  default     = 0
+}
+
+variable "max_asg_size" {
+  description = "Maximum size of the autoscaling group the instance is in (i.e. maximum number of instances to run)"
+  type        = number
+  default     = 50
+}
+
 variable "asg_size" {
-  description = "Size of the autoscaling group the instance is in (i.e. number of instances to run)"
+  description = "Default size of the autoscaling group the instance is in (i.e. default number of instances to run)"
   type        = number
   default     = 1
 }
+
+
 
 variable "tags" {
   description = "A map of additional tags to add to the instance/volume created"
