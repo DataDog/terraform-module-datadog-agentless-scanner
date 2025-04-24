@@ -33,7 +33,7 @@ module "scanner_role" {
   api_key_secret_arns = [module.agentless_scanner.api_key_secret_arn]
 }
 
-# Finally we can create the agentless scanner instance. It requires the instance profile name that was created by the scanner_role.
+# We can now create the agentless scanner instance. It requires the instance profile name that was created by the scanner_role.
 # This module will define the VPC, subnets, network and compute resources required for the agentless scanner.
 # See the documentation of each module for more information or our examples for a complete setup.
 module "agentless_scanner" {
@@ -41,6 +41,21 @@ module "agentless_scanner" {
 
   api_key               = var.datadog-api-key
   instance_profile_name = module.scanner_role.instance_profile.name
+}
+
+# Finally, we can enable automatic scaling of agentless scanners.
+# Agentless scanners will scale up when there are many resources to scan and scale down them when fewer resources are present.
+# This ensures efficient performance and cost optimization.
+# It shall be created in the same account as the agentless scanner instance.
+module "autoscaling_scanners" {
+  source                   = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanners-autoscaling"
+  datadog_integration_role = var.datadog-integration-role
+}
+
+# This is the AWS role name that was used to create the Datadog integration in AWS for the account where the agentless scanner is deployed.
+# The role name can be found in the "Account details" tab in the AWS integration page: https://app.datadoghq.com/integrations/amazon-web-services
+variable "datadog-integration-role" {
+
 }
 
 variable "datadog-api-key" {
@@ -51,7 +66,9 @@ variable "datadog-api-key" {
 And run:
 ```sh
 terraform init
-terraform apply -var="datadog-api-key=$DD_API_KEY"
+terraform apply \
+  -var="datadog-api-key=$DD_API_KEY" \
+  -var="datadog-integration-role=$DD_INTEGRATION_ROLE"
 ```
 
 > [!IMPORTANT]
