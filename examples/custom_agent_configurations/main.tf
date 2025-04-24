@@ -71,3 +71,8 @@ module "agentless_scanner" {
     ]
   }
 }
+
+module "autoscaling_scanners" {
+  source                   = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanners-autoscaling?ref=0.11.10"
+  datadog_integration_role = var.datadog_integration_role
+}
