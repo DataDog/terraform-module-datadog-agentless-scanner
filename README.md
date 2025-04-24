@@ -44,7 +44,7 @@ module "agentless_scanner" {
 }
 
 # Finally, we can enable automatic scaling of agentless scanners.
-# Agentless scanners will scale up when there are many resources to scan and scale down them when fewer resources are present.
+# Agentless scanners will scale up when there are many resources to scan and scale down when fewer resources are present.
 # This ensures efficient performance and cost optimization.
 # It shall be created in the same account as the agentless scanner instance.
 module "autoscaling_scanners" {
