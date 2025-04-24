@@ -12,3 +12,8 @@ variable "subnet_id" {
   description = "The VPC Subnet ID to launch in"
   type        = string
 }
+
+variable "datadog_integration_role" {
+  description = "Role name of the Datadog integration that was used to integrate the AWS account to Datadog"
+  type        = string
+}
