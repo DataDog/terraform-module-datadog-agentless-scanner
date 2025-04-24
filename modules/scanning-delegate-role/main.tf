@@ -73,14 +73,29 @@ data "aws_iam_policy_document" "scanning_orchestrator_policy_document" {
     }
   }
 
+  // IAM makes a distinction between source and destination snapshot permissions
+  // when using CopySnapshot. We need a policy statement for both of them.
+  //
+  // reference: https://aws.amazon.com/blogs/storage/enhancing-resource-level-permissions-for-copying-amazon-ebs-snapshots/
   statement {
-    sid    = "DatadogAgentlessScannerCopySnapshot"
+    sid    = "DatadogAgentlessScannerCopySnapshotSource"
     effect = "Allow"
     actions = [
       "ec2:CopySnapshot"
     ]
     resources = [
-      "arn:${data.aws_partition.current.partition}:ec2:*:*:snapshot/*",
+      "arn:${data.aws_partition.current.partition}:ec2:*:*:snapshot/snap-*",
+    ]
+  }
+
+  statement {
+    sid    = "DatadogAgentlessScannerCopySnapshotDestination"
+    effect = "Allow"
+    actions = [
+      "ec2:CopySnapshot"
+    ]
+    resources = [
+      "arn:${data.aws_partition.current.partition}:ec2:*:*:snapshot/$${*}",
     ]
     // Enforcing created snapshot has DatadogAgentlessScanner tag
     condition {
