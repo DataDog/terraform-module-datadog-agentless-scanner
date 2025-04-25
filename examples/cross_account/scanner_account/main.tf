@@ -51,3 +51,8 @@ module "agentless_scanner" {
   api_key               = var.api_key
   instance_profile_name = module.scanner_role.instance_profile.name
 }
+
+module "autoscaling_scanners" {
+  source                   = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanners-autoscaling?ref=0.11.10"
+  datadog_integration_role = var.datadog_integration_role
+}
