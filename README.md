@@ -53,7 +53,8 @@ module "autoscaling_scanners" {
 }
 
 # This is the AWS role name that was used to create the Datadog integration in AWS for the account where the agentless scanner is deployed.
-# The role name can be found in the "Account details" tab in the AWS integration page: https://app.datadoghq.com/integrations/amazon-web-services
+# In order to fetch the role name, please navigate to the AWS Integration page (https://app.datadoghq.com/integrations/amazon-web-services),
+# click on the account in which the agentless scanner will be running, then click on the "Account details" tab.
 variable "datadog-integration-role" {
 
 }
