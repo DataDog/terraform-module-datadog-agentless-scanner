@@ -444,19 +444,13 @@ data "aws_iam_policy_document" "assume_role_policy" {
 
     principals {
       type        = "AWS"
-      identifiers = ["*"]
+      identifiers = var.scanner_roles
     }
 
     condition {
       test     = "StringEquals"
       variable = "iam:ResourceTag/DatadogAgentlessScanner"
       values   = ["true"]
-    }
-
-    condition {
-      test     = "ArnLike"
-      variable = "aws:PrincipalArn"
-      values   = var.scanner_roles
     }
 
     condition {
