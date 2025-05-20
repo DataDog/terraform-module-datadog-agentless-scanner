@@ -117,30 +117,6 @@ data "aws_iam_policy_document" "scanning_orchestrator_policy_document" {
   }
 
   statement {
-    sid    = "DatadogAgentlessScannerCopyImage"
-    effect = "Allow"
-    actions = [
-      "ec2:CopyImage"
-    ]
-    resources = [
-      "arn:${data.aws_partition.current.partition}:ec2:*:*:image/*",
-      "arn:${data.aws_partition.current.partition}:ec2:*:*:snapshot/*",
-    ]
-    // Enforcing created image has DatadogAgentlessScanner tag
-    condition {
-      test     = "StringEquals"
-      variable = "aws:RequestTag/DatadogAgentlessScanner"
-      values   = ["true"]
-    }
-    // Enforcing created image has only tags with DatadogAgentlessScanner* prefix
-    condition {
-      test     = "ForAllValues:StringLike"
-      variable = "aws:TagKeys"
-      values   = ["DatadogAgentlessScanner*"]
-    }
-  }
-
-  statement {
     sid    = "DatadogAgentlessScannerImageCleanup"
     effect = "Allow"
     actions = [
