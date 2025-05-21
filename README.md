@@ -6,7 +6,7 @@ This Terraform module provides a simple and reusable configuration for installin
 
 Before using this module, make sure you have the following:
 
-1. [Terraform](https://www.terraform.io/) installed on your local machine.
+1. [Terraform](https://www.terraform.io/) v1.2.0 or later installed on your local machine.
 2. AWS credentials configured with the necessary permissions.
 3. A Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/) with Remote Configuration enabled.
 
@@ -161,7 +161,7 @@ See [changelog](CHANGELOG.md).
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.2.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.0 |
 
 ## Providers
