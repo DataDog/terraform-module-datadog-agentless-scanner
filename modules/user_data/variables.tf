@@ -11,7 +11,7 @@ variable "scanner_version" {
   default     = "0.11"
   validation {
     condition     = can(regex("^[0-9]+\\.[0-9]+", var.scanner_version))
-    error_message = "The scanner version must start with a number, followed by a period and a number (X.Y)"
+    error_message = "The scanner version must start with a number, followed by a period and a number (X.Y)."
   }
 }
 
@@ -21,7 +21,7 @@ variable "scanner_channel" {
   default     = "stable"
   validation {
     condition     = contains(["stable", "beta", "nightly"], var.scanner_channel)
-    error_message = "The scanner channel must be either 'stable', 'beta' or 'nightly'"
+    error_message = "The scanner channel must be either 'stable', 'beta' or 'nightly'."
   }
 }
 
@@ -31,7 +31,7 @@ variable "scanner_repository" {
   default     = "https://apt.datadoghq.com/"
   validation {
     condition     = can(regex("^https://", var.scanner_repository))
-    error_message = "The scanner repository must be a valid HTTPs URL"
+    error_message = "The scanner repository must be a valid HTTPs URL."
   }
 }
 
@@ -41,7 +41,7 @@ variable "scanner_configuration" {
   default     = {}
   validation {
     condition     = can(yamlencode(var.scanner_configuration))
-    error_message = "The scanner_configuration variable cannot be properly encoded to YAML"
+    error_message = "The scanner_configuration variable cannot be properly encoded to YAML."
   }
   validation {
     condition     = !contains(keys(var.scanner_configuration), "api_key") && !contains(keys(var.scanner_configuration), "hostname") && !contains(keys(var.scanner_configuration), "site")
@@ -55,7 +55,7 @@ variable "agent_configuration" {
   default     = {}
   validation {
     condition     = can(yamlencode(var.agent_configuration))
-    error_message = "The agent_configuration variable cannot be properly encoded to YAML"
+    error_message = "The agent_configuration variable cannot be properly encoded to YAML."
   }
   validation {
     condition     = !contains(keys(var.agent_configuration), "api_key") && !contains(keys(var.agent_configuration), "hostname") && !contains(keys(var.agent_configuration), "site") && !contains(keys(var.agent_configuration), "logs_enabled") && !contains(keys(var.agent_configuration), "ec2_prefer_imdsv2")
