@@ -35,13 +35,6 @@ resource "aws_secretsmanager_secret_version" "api_key_version" {
 }
 
 resource "terraform_data" "template" {
-  lifecycle {
-    precondition {
-      condition     = (var.api_key != null && var.api_key_secret_arn == null) || (var.api_key == null && var.api_key_secret_arn != null)
-      error_message = "Please provide either api_key or api_key_secret_arn"
-    }
-  }
-
   input = templatefile("${path.module}/templates/install.sh.tftpl", {
     api_key_secret_arn    = local.api_key_secret_arn
     site                  = var.site,

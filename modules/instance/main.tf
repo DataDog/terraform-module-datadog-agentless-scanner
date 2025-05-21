@@ -111,8 +111,4 @@ resource "aws_autoscaling_group" "asg" {
       propagate_at_launch = false # tagging is handled by the launch template, here we only tag the ASG itself
     }
   }
-
-  lifecycle {
-    replace_triggered_by = [aws_security_group.default_scanner_security_group]
-  }
 }
