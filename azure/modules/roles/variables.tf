@@ -25,6 +25,6 @@ variable "scan_scopes" {
     condition = alltrue([
       for s in var.scan_scopes : can(regex("^(?i:/subscriptions/([a-f0-9-]{36}))/?$", s))
     ])
-    error_message = "All scan scopes must be subscriptions."
+    error_message = "All scan scopes must be valid Azure subscription IDs in the format '/subscriptions/<subscription-id>'"
   }
 }
