@@ -19,6 +19,7 @@ param datadogAppKey string = ''
   'us3.datadoghq.com'
   'us5.datadoghq.com'
   'ap1.datadoghq.com'
+  'ap2.datadoghq.com'
   'datad0g.com'
 ])
 param datadogSite string = 'datadoghq.com'
