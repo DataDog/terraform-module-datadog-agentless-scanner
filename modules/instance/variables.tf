@@ -7,7 +7,7 @@ variable "name" {
 variable "instance_type" {
   description = "The type of instance"
   type        = string
-  default     = "t4g.large"
+  default     = "t4g.medium"
 }
 
 variable "instance_image_id" {

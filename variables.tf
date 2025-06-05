@@ -85,7 +85,7 @@ variable "agent_configuration" {
 variable "instance_type" {
   description = "The type of instance running the scanner"
   type        = string
-  default     = "t4g.large"
+  default     = "t4g.medium"
 }
 
 variable "instance_count" {
