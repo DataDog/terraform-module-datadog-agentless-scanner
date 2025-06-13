@@ -1,5 +1,17 @@
 # Changelog
 
+## Version 0.11.11 - 2025-06-16
+
+- Adapt CopySnapshot policy to latest IAM changes requiring both source and destination statements
+- Use t4g.medium instance type for Agentless ec2 instances
+- Remove unnecessary ec2:CopyImage permission
+
+## Version 0.11.10 - 2025-04-24
+
+- aws: add autoscaling module allowing the automated auto-scaling of scanners
+- azure/arm: upgrade az bicep version
+- azure/arm: call Agentless API on deployment
+
 ## Version 0.11.9 - 2025-02-14
 
 - Azure: expose vnet_cidr parameter in main module
