@@ -15,9 +15,10 @@ function Set-AzureAgentlessOptions {
     begin {
         $url = "https://api.${DatadogSite}/api/v2/agentless_scanning/accounts/azure"
         $headers = @{
-            'DD-API-KEY'         = $APIKey
-            'DD-APPLICATION-KEY' = $ApplicationKey
-            'Dd-Call-Source'     = "arm-agentless"
+            "Content-Type"       = "application/vnd.api+json"
+            "DD-API-KEY"         = $APIKey
+            "DD-APPLICATION-KEY" = $ApplicationKey
+            "Dd-Call-Source"     = "arm-agentless"
         }
     }
     process {
