@@ -29,6 +29,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "bucket_lifecycle" {
   rule {
     status = "Enabled"
     id     = "expire_all_files"
+    filter {}
     expiration {
       days = 2
     }
@@ -36,6 +37,7 @@ resource "aws_s3_bucket_lifecycle_configuration" "bucket_lifecycle" {
   rule {
     status = "Enabled"
     id     = "Abort incomplete multipart uploads"
+    filter {}
     abort_incomplete_multipart_upload {
       days_after_initiation = 2
     }
