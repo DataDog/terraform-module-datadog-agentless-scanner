@@ -61,6 +61,7 @@ resource "aws_security_group" "default_scanner_security_group" {
   ingress = []
 
   egress {
+    description = "Allow all outbound traffic"
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
