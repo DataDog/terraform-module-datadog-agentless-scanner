@@ -33,6 +33,13 @@ resource "aws_s3_bucket_lifecycle_configuration" "bucket_lifecycle" {
       days = 2
     }
   }
+  rule {
+    status = "Enabled"
+    id     = "Abort incomplete multipart uploads"
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 2
+    }
+  }
 }
 
 data "aws_iam_policy_document" "bucket_access_policy_document" {
