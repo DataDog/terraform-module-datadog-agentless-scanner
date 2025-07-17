@@ -51,6 +51,12 @@ variable "ssh_username" {
   default     = "ubuntu"
 }
 
+variable "instance_count" {
+  description = "Number of instances in the managed instance group"
+  type        = number
+  default     = 1
+}
+
 variable "scanner_version" {
   description = "Specifies the version of the scanner to install"
   type        = string
