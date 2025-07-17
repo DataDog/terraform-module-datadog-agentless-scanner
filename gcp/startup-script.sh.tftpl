@@ -1,0 +1,113 @@
+#!/bin/bash
+set +x
+set -u
+set -e
+set -o pipefail
+
+DD_API_KEY="${api_key}"
+DD_SITE="${site}"
+DD_AGENTLESS_VERSION="${scanner_version}"
+DD_AGENTLESS_REPOSITORY="${scanner_repository}"
+DD_AGENTLESS_CHANNEL="${scanner_channel}"
+
+GCP_ZONE=$(curl -s -H "Metadata-Flavor: Google"   http://metadata.google.internal/computeMetadata/v1/instance/zone | cut -d/ -f4)
+GCP_INSTANCE_ID=$(curl -s -H "Metadata-Flavor: Google"   http://metadata.google.internal/computeMetadata/v1/instance/id)
+
+DD_HOSTNAME="agentless-scanning-$GCP_ZONE-$GCP_INSTANCE_ID"
+
+DD_INSTALL_ONLY=true \
+  DD_API_KEY="TBD" \
+  DD_SITE="$DD_SITE" \
+  DD_HOSTNAME="$DD_HOSTNAME" \
+  bash -c "$(curl -L https://s3.amazonaws.com/dd-agent/scripts/install_script_agent7.sh)"
+
+# Install the agentless-scanner
+echo "deb [signed-by=/usr/share/keyrings/datadog-archive-keyring.gpg] https://apt.datadoghq.com/ $DD_AGENTLESS_CHANNEL agentless-scanner" >> /etc/apt/sources.list.d/datadog.list
+apt update
+agentless_pkg_pattern="([[:digit:]]:)?$DD_AGENTLESS_VERSION(\.[[:digit:]]+){0,1}(~rc\.[[:digit:]]+)?(-[[:digit:]])?"
+agentless_version_custom="$(apt-cache madison datadog-agentless-scanner | grep -E "$agentless_pkg_pattern" -om1)" || true
+if [ -z "$agentless_version_custom" ]; then
+  printf "Could not find a version of datadog-agentless-scanner from %s" "$DD_AGENTLESS_VERSION"
+  exit 1
+fi
+# We mask/unmask because apt auto-starts the service, and we do
+# not want to start it before the configuration is in place.
+systemctl mask datadog-agentless-scanner.service
+apt install -y "datadog-agentless-scanner=$agentless_version_custom"
+systemctl unmask datadog-agentless-scanner.service
+
+# Adding automatic reboot on kernel updates
+cat << EOF >> /etc/apt/apt.conf.d/50unattended-upgrades
+Unattended-Upgrade::Automatic-Reboot "true";
+Unattended-Upgrade::Automatic-Reboot-WithUsers "true";
+Unattended-Upgrade::Automatic-Reboot-Time "now";
+EOF
+
+# Perform unattended upgrades 10 min after boot, then every 3 hours
+cat << EOF > /etc/systemd/system/apt-daily-upgrade.timer
+[Unit]
+Description=Daily apt upgrade and clean activities
+After=apt-daily.timer
+
+[Timer]
+OnActiveSec=10min
+OnCalendar=0/3:00:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+EOF
+
+systemctl daemon-reload
+systemctl restart apt-daily-upgrade.timer
+
+# Activate agentless scanner logging
+mkdir -p /etc/datadog-agent/conf.d/agentless-scanner.d
+cat <<EOF > /etc/datadog-agent/conf.d/agentless-scanner.d/conf.yaml
+logs:
+  - type: file
+    path: "/var/log/datadog/agentless-scanner.log"
+    service: "agentless-scanner"
+    source: go
+    sourcecategory: sourcecode
+EOF
+
+chown -R dd-agent: /etc/datadog-agent/conf.d/agentless-scanner.d
+
+# Custom configuration for agent
+cat <<EOF > /etc/datadog-agent/datadog.yaml
+api_key: $DD_API_KEY
+site: $DD_SITE
+hostname: $DD_HOSTNAME
+logs_enabled: true
+ec2_prefer_imdsv2: true
+secret_backend_command: /usr/local/bin/dd-secret-backend
+EOF
+
+cat <<EOF > /usr/local/bin/dd-secret-backend
+#!/bin/bash
+datadog-agentless-scanner secrets || exit 1
+EOF
+chown dd-agent: /usr/local/bin/dd-secret-backend
+chmod 700 /usr/local/bin/dd-secret-backend
+
+cat <<EOF > /etc/datadog-agent/agentless-scanner.yaml
+hostname: $DD_HOSTNAME
+api_key: $DD_API_KEY
+site: $DD_SITE
+installation_mode: terraform
+installation_version: 0.11.10
+EOF
+
+chown dd-agent: /etc/datadog-agent/agentless-scanner.yaml
+chmod 600 /etc/datadog-agent/agentless-scanner.yaml
+
+# Restart the agent
+systemctl restart datadog-agent
+
+# Stop the scanner after 24 hours. This will cause the health
+# probe to fail and trigger an automatic instance replacement.
+systemd-run --on-boot=24h systemctl stop datadog-agentless-scanner
+
+# Enable and start datadog-agentless-scaner
+systemctl enable --now datadog-agentless-scanner
