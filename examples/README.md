@@ -2,7 +2,7 @@
 
 With this option, a single Agentless scanner is deployed in a single region. Datadog recommends this option. However, this option can incur higher costs, as it requires each Agentless scanner to perform cross-region scans per account.
 
-To deploy in a single region, see the [example](multi_region/README.md).
+To deploy in a single region, see the [example](single_region/README.md).
 
 # Multi Region Example
 
