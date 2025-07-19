@@ -29,8 +29,17 @@ resource "aws_s3_bucket_lifecycle_configuration" "bucket_lifecycle" {
   rule {
     status = "Enabled"
     id     = "expire_all_files"
+    filter {}
     expiration {
       days = 2
+    }
+  }
+  rule {
+    status = "Enabled"
+    id     = "Abort incomplete multipart uploads"
+    filter {}
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 2
     }
   }
 }
@@ -124,9 +133,10 @@ resource "aws_s3_bucket_policy" "bucket_access_policy" {
 
 // KMS Key for RDS S3 Exports
 resource "aws_kms_key" "agentless_kms_key" {
-  description = "This key is used to encrypt bucket objects"
-  tags        = merge(var.tags, local.dd_tags)
-  policy      = data.aws_iam_policy_document.kms_key_policy_document.json
+  description         = "This key is used to encrypt bucket objects"
+  tags                = merge(var.tags, local.dd_tags)
+  policy              = data.aws_iam_policy_document.kms_key_policy_document.json
+  enable_key_rotation = true
 }
 
 data "aws_iam_policy_document" "kms_key_policy_document" {
