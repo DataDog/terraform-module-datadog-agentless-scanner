@@ -15,14 +15,50 @@ variable "zone" {
   default     = "us-central1-a"
 }
 
+variable "vpc_name" {
+  description = "Name prefix for VPC resources"
+  type        = string
+  default     = "datadog-agentless-scanner"
+}
+
+variable "subnet_cidr" {
+  description = "The CIDR block for the subnet"
+  type        = string
+  default     = "10.0.0.0/24"
+}
+
+variable "enable_nat" {
+  description = "Whether to enable NAT Gateway for outbound internet access"
+  type        = bool
+  default     = true
+}
+
+variable "enable_ssh" {
+  description = "Whether to enable SSH firewall rule"
+  type        = bool
+  default     = true
+}
+
+variable "ssh_source_ranges" {
+  description = "Source IP ranges allowed for SSH access"
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
+variable "tags" {
+  description = "A map of additional labels to add to resources"
+  type        = map(string)
+  default     = {}
+}
+
 variable "network_name" {
-  description = "The name of the network"
+  description = "The name of the network (deprecated - use vpc_name instead)"
   type        = string
   default     = "default"
 }
 
 variable "subnetwork_name" {
-  description = "The name of the subnetwork"
+  description = "The name of the subnetwork (deprecated - use subnet_cidr instead)"
   type        = string
   default     = "default"
 }
