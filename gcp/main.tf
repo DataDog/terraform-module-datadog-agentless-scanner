@@ -4,6 +4,21 @@ provider "google" {
   zone    = var.zone
 }
 
+# VPC Module - Creates network infrastructure for scanner instances
+module "vpc" {
+  source = "./modules/vpc"
+
+  name        = var.vpc_name
+  region      = var.region
+  subnet_cidr = var.subnet_cidr
+
+  enable_nat = var.enable_nat
+  enable_ssh = var.enable_ssh
+
+  ssh_source_ranges = var.ssh_source_ranges
+
+  tags = var.tags
+}
 
 # Agentless Impersonated Service Account Module - IAM resources for disk scanning
 module "agentless_impersonated_service_account" {

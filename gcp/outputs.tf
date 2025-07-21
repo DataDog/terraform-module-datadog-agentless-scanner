@@ -44,3 +44,29 @@ output "scanner_service_account_email" {
   description = "Email of the scanner service account"
   value       = module.agentless_scanner_service_account.scanner_service_account_email
 }
+
+# Outputs from VPC Module
+output "vpc_network" {
+  description = "The VPC network created for the scanner"
+  value       = module.vpc.vpc
+}
+
+output "vpc_network_name" {
+  description = "The name of the VPC network"
+  value       = module.vpc.network_name
+}
+
+output "vpc_subnet" {
+  description = "The subnet created for the scanner"
+  value       = module.vpc.subnet
+}
+
+output "vpc_subnet_name" {
+  description = "The name of the VPC subnet"
+  value       = module.vpc.subnetwork_name
+}
+
+output "vpc_nat_gateway" {
+  description = "The NAT Gateway (if enabled)"
+  value       = module.vpc.nat_gateway
+}
