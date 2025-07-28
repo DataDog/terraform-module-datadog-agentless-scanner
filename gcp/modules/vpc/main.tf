@@ -42,29 +42,6 @@ resource "google_compute_router_nat" "nat" {
   }
 }
 
-# Firewall rule to allow internal communication
-resource "google_compute_firewall" "allow_internal" {
-  name    = "${var.name}-allow-internal"
-  network = google_compute_network.vpc.name
-
-  allow {
-    protocol = "icmp"
-  }
-
-  allow {
-    protocol = "tcp"
-    ports    = ["0-65535"]
-  }
-
-  allow {
-    protocol = "udp"
-    ports    = ["0-65535"]
-  }
-
-  source_ranges = [var.subnet_cidr]
-  description   = "Allow internal communication within VPC"
-}
-
 # Firewall rule to allow health checks from Google Cloud
 resource "google_compute_firewall" "allow_health_checks" {
   name    = "${var.name}-allow-health-checks"
@@ -94,22 +71,6 @@ resource "google_compute_firewall" "allow_ssh" {
   source_ranges = ["35.235.240.0/20"] # Google IAP source range
   target_tags   = ["ssh-enabled"]
   description   = "Allow SSH access via Identity-Aware Proxy to instances with ssh-enabled tag"
-}
-
-# Firewall rule to allow HTTP/HTTPS access (if enabled)
-resource "google_compute_firewall" "allow_http" {
-  count   = var.enable_http ? 1 : 0
-  name    = "${var.name}-allow-http"
-  network = google_compute_network.vpc.name
-
-  allow {
-    protocol = "tcp"
-    ports    = ["80", "443"]
-  }
-
-  source_ranges = ["0.0.0.0/0"]
-  target_tags   = ["http-server", "https-server"]
-  description   = "Allow HTTP/HTTPS access to instances with http-server/https-server tags"
 }
 
 # Private Service Connect endpoint for Google APIs (optional)

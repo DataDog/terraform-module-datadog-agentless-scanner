@@ -27,12 +27,6 @@ variable "enable_ssh" {
   default     = true
 }
 
-variable "enable_http" {
-  description = "Whether to enable HTTP/HTTPS firewall rules"
-  type        = bool
-  default     = false
-}
-
 variable "enable_private_service_connect" {
   description = "Whether to enable Private Service Connect for Google APIs"
   type        = bool
