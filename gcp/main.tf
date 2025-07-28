@@ -12,7 +12,7 @@ module "vpc" {
   region      = var.region
   subnet_cidr = var.subnet_cidr
 
-  enable_nat = var.enable_nat
+  enable_nat = true
   enable_ssh = var.enable_ssh
 
   tags = var.tags

@@ -53,7 +53,7 @@ resource "google_compute_health_check" "agentless_scanner_health" {
   unhealthy_threshold = 3
 
   tcp_health_check {
-    port = 22 # SSH port as basic connectivity check
+    port = 8080 # Health check port for application health check
   }
 
   log_config {

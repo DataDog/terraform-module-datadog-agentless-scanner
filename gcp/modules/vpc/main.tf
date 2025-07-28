@@ -65,7 +65,22 @@ resource "google_compute_firewall" "allow_internal" {
   description   = "Allow internal communication within VPC"
 }
 
-# Firewall rule to allow SSH access via IAP (if enabled)
+# Firewall rule to allow health checks from Google Cloud
+resource "google_compute_firewall" "allow_health_checks" {
+  name    = "${var.name}-allow-health-checks"
+  network = google_compute_network.vpc.name
+
+  allow {
+    protocol = "tcp"
+    ports    = ["8080"]
+  }
+
+  source_ranges = ["130.211.0.0/22", "35.191.0.0/16"] # Google Cloud health check ranges
+  target_tags   = ["ssh-enabled"]                     # Same tag as instances
+  description   = "Allow health checks from Google Cloud health check systems"
+}
+
+# Firewall rule to allow SSH access (if enabled)
 resource "google_compute_firewall" "allow_ssh" {
   count   = var.enable_ssh ? 1 : 0
   name    = "${var.name}-allow-ssh-iap"

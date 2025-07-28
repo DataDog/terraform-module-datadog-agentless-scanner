@@ -109,5 +109,36 @@ systemctl restart datadog-agent
 # probe to fail and trigger an automatic instance replacement.
 systemd-run --on-boot=24h systemctl stop datadog-agentless-scanner
 
+# Install socat for minimal TCP listener
+apt install -y socat
+
+# Create a minimal TCP health check listener on port 8080
+cat <<EOF > /etc/systemd/system/health-check.service
+[Unit]
+Description=Health Check TCP Listener
+After=network.target
+
+[Service]
+Type=simple
+DynamicUser=true
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectControlGroups=true
+RestrictRealtime=true
+ExecStart=/usr/bin/socat TCP-LISTEN:8080,fork,reuseaddr SYSTEM:echo
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+# Enable and start health check service
+systemctl enable --now health-check.service
+
 # Enable and start datadog-agentless-scaner
 systemctl enable --now datadog-agentless-scanner 
