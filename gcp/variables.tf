@@ -27,12 +27,6 @@ variable "subnet_cidr" {
   default     = "10.0.0.0/24"
 }
 
-variable "enable_nat" {
-  description = "Whether to enable NAT Gateway for outbound internet access"
-  type        = bool
-  default     = true
-}
-
 variable "enable_ssh" {
   description = "Whether to enable SSH firewall rule"
   type        = bool
