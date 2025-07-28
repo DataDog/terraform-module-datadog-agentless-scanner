@@ -17,7 +17,6 @@ resource "google_compute_instance_template" "agentless_scanner_template" {
   network_interface {
     network    = "projects/${var.project_id}/global/networks/${var.network_name}"
     subnetwork = "projects/${var.project_id}/regions/${var.region}/subnetworks/${var.subnetwork_name}"
-    access_config {} # This gives the VM an external IP
   }
 
   service_account {

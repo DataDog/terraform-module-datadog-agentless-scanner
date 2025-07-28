@@ -65,10 +65,10 @@ resource "google_compute_firewall" "allow_internal" {
   description   = "Allow internal communication within VPC"
 }
 
-# Firewall rule to allow SSH access (if enabled)
+# Firewall rule to allow SSH access via IAP (if enabled)
 resource "google_compute_firewall" "allow_ssh" {
   count   = var.enable_ssh ? 1 : 0
-  name    = "${var.name}-allow-ssh"
+  name    = "${var.name}-allow-ssh-iap"
   network = google_compute_network.vpc.name
 
   allow {
@@ -76,9 +76,9 @@ resource "google_compute_firewall" "allow_ssh" {
     ports    = ["22"]
   }
 
-  source_ranges = ["0.0.0.0/0"]
+  source_ranges = ["35.235.240.0/20"] # Google IAP source range
   target_tags   = ["ssh-enabled"]
-  description   = "Allow SSH access to instances with ssh-enabled tag"
+  description   = "Allow SSH access via Identity-Aware Proxy to instances with ssh-enabled tag"
 }
 
 # Firewall rule to allow HTTP/HTTPS access (if enabled)
