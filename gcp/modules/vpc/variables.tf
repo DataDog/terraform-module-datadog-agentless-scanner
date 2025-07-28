@@ -15,15 +15,6 @@ variable "subnet_cidr" {
   default     = "10.0.0.0/24"
 }
 
-variable "secondary_ranges" {
-  description = "Secondary IP ranges for the subnet"
-  type = list(object({
-    range_name    = string
-    ip_cidr_range = string
-  }))
-  default = []
-}
-
 variable "enable_nat" {
   description = "Whether to enable NAT Gateway for outbound internet access"
   type        = bool
@@ -34,12 +25,6 @@ variable "enable_ssh" {
   description = "Whether to enable SSH firewall rule"
   type        = bool
   default     = true
-}
-
-variable "ssh_source_ranges" {
-  description = "Source IP ranges allowed for SSH access"
-  type        = list(string)
-  default     = ["0.0.0.0/0"]
 }
 
 variable "enable_http" {
@@ -58,4 +43,4 @@ variable "tags" {
   description = "A map of additional labels to add to resources"
   type        = map(string)
   default     = {}
-} 
+}

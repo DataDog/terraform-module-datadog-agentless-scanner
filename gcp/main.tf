@@ -15,8 +15,6 @@ module "vpc" {
   enable_nat = var.enable_nat
   enable_ssh = var.enable_ssh
 
-  ssh_source_ranges = var.ssh_source_ranges
-
   tags = var.tags
 }
 
@@ -42,8 +40,8 @@ module "instance" {
   project_id            = var.project_id
   region                = var.region
   zone                  = var.zone
-  network_name          = var.network_name
-  subnetwork_name       = var.subnetwork_name
+  network_name          = module.vpc.vpc_name
+  subnetwork_name       = module.vpc.subnet_name
   service_account_email = module.agentless_scanner_service_account.scanner_service_account_email
 
   api_key            = var.api_key
@@ -54,4 +52,6 @@ module "instance" {
   scanner_version    = var.scanner_version
   scanner_channel    = var.scanner_channel
   scanner_repository = var.scanner_repository
+
+  depends_on = [module.vpc]
 }
