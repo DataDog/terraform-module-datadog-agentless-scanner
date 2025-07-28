@@ -1,16 +1,4 @@
-# Firewall rule to allow SSH access
-resource "google_compute_firewall" "allow_ssh" {
-  name    = "allow-ssh-terraform"
-  network = var.network_name
-
-  allow {
-    protocol = "tcp"
-    ports    = ["22"]
-  }
-
-  source_ranges = ["0.0.0.0/0"]
-  target_tags   = ["ssh-enabled"]
-}
+# Note: SSH firewall rule is now managed by the VPC module
 
 # Instance Template for Managed Instance Group
 resource "google_compute_instance_template" "agentless_scanner_template" {

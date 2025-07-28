@@ -15,15 +15,6 @@ resource "google_compute_subnetwork" "subnet" {
 
   # Enable private Google access for instances without external IPs
   private_ip_google_access = true
-
-  # Configure secondary IP ranges if needed (for future use)
-  dynamic "secondary_ip_range" {
-    for_each = var.secondary_ranges
-    content {
-      range_name    = secondary_ip_range.value.range_name
-      ip_cidr_range = secondary_ip_range.value.ip_cidr_range
-    }
-  }
 }
 
 # Cloud Router for NAT Gateway
@@ -85,7 +76,7 @@ resource "google_compute_firewall" "allow_ssh" {
     ports    = ["22"]
   }
 
-  source_ranges = var.ssh_source_ranges
+  source_ranges = ["0.0.0.0/0"]
   target_tags   = ["ssh-enabled"]
   description   = "Allow SSH access to instances with ssh-enabled tag"
 }
