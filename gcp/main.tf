@@ -13,8 +13,6 @@ module "vpc" {
   subnet_cidr = var.subnet_cidr
 
   enable_ssh = var.enable_ssh
-
-  tags = var.tags
 }
 
 # Agentless Impersonated Service Account Module - IAM resources for disk scanning

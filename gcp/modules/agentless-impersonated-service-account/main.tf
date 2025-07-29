@@ -15,7 +15,7 @@ resource "google_project_iam_custom_role" "disk_reader" {
 
 # Service account for reading disk information
 resource "google_service_account" "disk_reader_sa" {
-  account_id   = "datadog-agentless-disk-reader-sa"
+  account_id   = "dd-agentless-disk-reader-sa"
   display_name = "Datadog Agentless Disk Reader Service Account"
   description  = "Service account for reading disk information"
 }
