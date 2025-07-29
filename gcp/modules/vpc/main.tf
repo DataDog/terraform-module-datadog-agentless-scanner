@@ -19,7 +19,6 @@ resource "google_compute_subnetwork" "subnet" {
 
 # Cloud Router for NAT Gateway
 resource "google_compute_router" "router" {
-  count   = var.enable_nat ? 1 : 0
   name    = "${var.name}-router"
   region  = var.region
   network = google_compute_network.vpc.id
@@ -29,9 +28,8 @@ resource "google_compute_router" "router" {
 
 # NAT Gateway for outbound internet access from private instances
 resource "google_compute_router_nat" "nat" {
-  count                              = var.enable_nat ? 1 : 0
   name                               = "${var.name}-nat"
-  router                             = google_compute_router.router[0].name
+  router                             = google_compute_router.router.name
   region                             = var.region
   nat_ip_allocate_option             = "AUTO_ONLY"
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
@@ -53,7 +51,7 @@ resource "google_compute_firewall" "allow_health_checks" {
   }
 
   source_ranges = ["130.211.0.0/22", "35.191.0.0/16"] # Google Cloud health check ranges
-  target_tags   = ["ssh-enabled"]                     # Same tag as instances
+  target_tags   = ["datadog-agentless-scanner"]       # Same tag as instances
   description   = "Allow health checks from Google Cloud health check systems"
 }
 
@@ -69,26 +67,6 @@ resource "google_compute_firewall" "allow_ssh" {
   }
 
   source_ranges = ["35.235.240.0/20"] # Google IAP source range
-  target_tags   = ["ssh-enabled"]
-  description   = "Allow SSH access via Identity-Aware Proxy to instances with ssh-enabled tag"
-}
-
-# Private Service Connect endpoint for Google APIs (optional)
-resource "google_compute_global_address" "private_service_connect" {
-  count        = var.enable_private_service_connect ? 1 : 0
-  name         = "${var.name}-psc-address"
-  purpose      = "PRIVATE_SERVICE_CONNECT"
-  network      = google_compute_network.vpc.id
-  address_type = "INTERNAL"
-  description  = "Private Service Connect address for Google APIs"
-}
-
-resource "google_compute_global_forwarding_rule" "private_service_connect" {
-  count                 = var.enable_private_service_connect ? 1 : 0
-  name                  = "${var.name}-psc-endpoint"
-  target                = "all-apis"
-  network               = google_compute_network.vpc.id
-  ip_address            = google_compute_global_address.private_service_connect[0].id
-  load_balancing_scheme = ""
-  description           = "Private Service Connect endpoint for Google APIs"
+  target_tags   = ["datadog-agentless-scanner"]
+  description   = "Allow SSH access via Identity-Aware Proxy to instances with datadog-agentless-scanner tag"
 }

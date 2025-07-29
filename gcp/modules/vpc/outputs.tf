@@ -37,18 +37,3 @@ output "subnetwork_name" {
   description = "The name of the subnet (for backward compatibility)"
   value       = google_compute_subnetwork.subnet.name
 }
-
-output "router" {
-  description = "The Cloud Router (if NAT is enabled)"
-  value       = var.enable_nat ? google_compute_router.router[0] : null
-}
-
-output "nat_gateway" {
-  description = "The NAT Gateway (if enabled)"
-  value       = var.enable_nat ? google_compute_router_nat.nat[0] : null
-}
-
-output "private_service_connect_address" {
-  description = "The Private Service Connect address (if enabled)"
-  value       = var.enable_private_service_connect ? google_compute_global_address.private_service_connect[0].address : null
-} 

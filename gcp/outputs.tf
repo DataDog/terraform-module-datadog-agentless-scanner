@@ -19,16 +19,6 @@ output "mig_target_size" {
   value       = module.instance.mig_target_size
 }
 
-output "ssh_command" {
-  description = "SSH command to connect to instances in the group"
-  value       = module.instance.ssh_command
-}
-
-output "mig_management_commands" {
-  description = "Useful commands for managing the MIG"
-  value       = module.instance.mig_management_commands
-}
-
 # Outputs from Agentless Impersonated Service Account Module
 output "disk_reader_service_account_email" {
   description = "Email of the disk reader service account"
@@ -64,9 +54,4 @@ output "vpc_subnet" {
 output "vpc_subnet_name" {
   description = "The name of the VPC subnet"
   value       = module.vpc.subnetwork_name
-}
-
-output "vpc_nat_gateway" {
-  description = "The NAT Gateway (if enabled)"
-  value       = module.vpc.nat_gateway
 }
