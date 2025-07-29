@@ -21,4 +21,4 @@ output "disk_reader_custom_role" {
 output "disk_reader_custom_role_name" {
   description = "Name of the custom disk reader role"
   value       = google_project_iam_custom_role.disk_reader.name
-} 
+}
