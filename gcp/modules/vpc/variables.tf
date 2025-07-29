@@ -20,9 +20,3 @@ variable "enable_ssh" {
   type        = bool
   default     = true
 }
-
-variable "tags" {
-  description = "A map of additional labels to add to resources"
-  type        = map(string)
-  default     = {}
-}
