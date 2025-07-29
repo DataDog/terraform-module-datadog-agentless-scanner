@@ -38,6 +38,11 @@ resource "google_compute_instance_template" "agentless_scanner_template" {
 
   tags = ["datadog-agentless-scanner"]
 
+  labels = {
+    datadog                 = "true"
+    datadogagentlessscanner = "true"
+  }
+
   lifecycle {
     create_before_destroy = true
   }
