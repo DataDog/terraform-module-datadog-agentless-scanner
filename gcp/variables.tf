@@ -33,28 +33,10 @@ variable "enable_ssh" {
   default     = true
 }
 
-variable "ssh_source_ranges" {
-  description = "Source IP ranges allowed for SSH access"
-  type        = list(string)
-  default     = ["0.0.0.0/0"]
-}
-
 variable "tags" {
   description = "A map of additional labels to add to resources"
   type        = map(string)
   default     = {}
-}
-
-variable "network_name" {
-  description = "The name of the network (deprecated - use vpc_name instead)"
-  type        = string
-  default     = "default"
-}
-
-variable "subnetwork_name" {
-  description = "The name of the subnetwork (deprecated - use subnet_cidr instead)"
-  type        = string
-  default     = "default"
 }
 
 variable "api_key" {
