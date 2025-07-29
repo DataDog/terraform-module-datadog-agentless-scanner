@@ -25,4 +25,4 @@ resource "google_project_iam_member" "disk_reader_binding" {
   project = var.project_id
   role    = google_project_iam_custom_role.disk_reader.name
   member  = "serviceAccount:${google_service_account.disk_reader_sa.email}"
-} 
+}
