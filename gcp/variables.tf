@@ -33,12 +33,6 @@ variable "enable_ssh" {
   default     = true
 }
 
-variable "tags" {
-  description = "A map of additional labels to add to resources"
-  type        = map(string)
-  default     = {}
-}
-
 variable "api_key" {
   description = "Datadog API key"
   type        = string
