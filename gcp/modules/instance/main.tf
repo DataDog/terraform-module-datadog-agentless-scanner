@@ -36,7 +36,7 @@ resource "google_compute_instance_template" "agentless_scanner_template" {
     })
   }
 
-  tags = ["http-server", "ssh-enabled"]
+  tags = ["datadog-agentless-scanner"]
 
   lifecycle {
     create_before_destroy = true
@@ -87,10 +87,5 @@ resource "google_compute_instance_group_manager" "agentless_scanner_mig" {
     max_surge_fixed       = 0 # Must be 0 when using RECREATE method
     max_unavailable_fixed = 1 # Allow 1 instance to be unavailable during recreate
     replacement_method    = "RECREATE"
-  }
-
-  named_port {
-    name = "ssh"
-    port = 22
   }
 }

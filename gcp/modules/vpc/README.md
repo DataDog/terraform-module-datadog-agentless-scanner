@@ -20,9 +20,7 @@ module "vpc" {
   region     = "us-central1"
   subnet_cidr = "10.0.1.0/24"
   
-  enable_nat  = true
   enable_ssh  = true
-  enable_http = false
   
   ssh_source_ranges = ["0.0.0.0/0"]
   
