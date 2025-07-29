@@ -1,5 +1,5 @@
 output "disk_reader_service_account" {
-  description = "The service account for reading disk information"
+  description = "The service account to be impersonated by Datadog Agentless Scanner for reading disk information"
   value       = google_service_account.disk_reader_sa
 }
 
