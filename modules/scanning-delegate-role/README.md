@@ -83,6 +83,7 @@ No modules.
 
 | Name | Description |
 |------|-------------|
+| <a name="output_managed_policies"></a> [managed\_policies](#output\_managed\_policies) | The customer managed policies attached to the scanning role |
 | <a name="output_rds_service_role_arn"></a> [rds\_service\_role\_arn](#output\_rds\_service\_role\_arn) | The ARN of the service role used by RDS to write the export to the S3 bucket |
 | <a name="output_role"></a> [role](#output\_role) | The scanning role created |
 <!-- END_TF_DOCS -->
