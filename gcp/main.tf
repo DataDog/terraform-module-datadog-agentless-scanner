@@ -15,6 +15,7 @@ module "vpc" {
   enable_ssh = var.enable_ssh
 }
 
+
 # Agentless Impersonated Service Account Module - IAM resources for disk scanning
 module "agentless_impersonated_service_account" {
   source = "./modules/agentless-impersonated-service-account"

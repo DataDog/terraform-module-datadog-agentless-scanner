@@ -4,14 +4,14 @@
 resource "google_compute_instance_template" "agentless_scanner_template" {
   name_prefix  = "agentless-scanner-template-"
   description  = "Template for Datadog Agentless Scanner instances"
-  machine_type = "e2-small"
+  machine_type = "n4-standard-2"
 
   disk {
-    source_image = "ubuntu-os-cloud/ubuntu-2404-lts-amd64"
+    source_image = "ubuntu-os-cloud/ubuntu-minimal-2404-lts-amd64"
     auto_delete  = true
     boot         = true
     disk_size_gb = 30
-    disk_type    = "pd-standard"
+    disk_type    = "hyperdisk-balanced"
   }
 
   network_interface {
