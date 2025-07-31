@@ -6,10 +6,25 @@ resource "google_project_iam_custom_role" "disk_reader" {
   permissions = [
     "compute.disks.get",
     "compute.disks.list",
+    "compute.disks.create",
+    "compute.disks.use",
+    "compute.disks.createSnapshot",
+
+    "compute.instances.attachDisk",
+
+    "compute.snapshots.create",
     "compute.snapshots.get",
     "compute.snapshots.list",
+    "compute.snapshots.setLabels",
+    "compute.snapshots.useReadOnly",
+
     "compute.diskTypes.get",
-    "compute.diskTypes.list"
+    "compute.diskTypes.list",
+
+    "compute.instances.list", # offline mode
+
+    "compute.globalOperations.get",
+    "compute.zoneOperations.get",
   ]
 }
 
