@@ -27,6 +27,7 @@ module "agentless_impersonated_service_account" {
 module "agentless_scanner_service_account" {
   source = "./modules/agentless-scanner-service-account"
 
+  project_id                        = var.project_id
   impersonated_service_account_name = module.agentless_impersonated_service_account.disk_reader_service_account_name
 }
 
