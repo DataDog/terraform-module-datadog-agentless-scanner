@@ -16,19 +16,19 @@ module "vpc" {
 }
 
 
-# Agentless Impersonated Service Account Module - IAM resources for disk scanning
-module "agentless_impersonated_service_account" {
-  source = "./modules/agentless-impersonated-service-account"
-
-  project_id = var.project_id
-}
-
 # Agentless Scanner Service Account Module - Service account for compute instances
 module "agentless_scanner_service_account" {
   source = "./modules/agentless-scanner-service-account"
 
-  project_id                        = var.project_id
-  impersonated_service_account_name = module.agentless_impersonated_service_account.disk_reader_service_account_name
+  project_id = var.project_id
+}
+
+# Agentless Impersonated Service Account Module - IAM resources for disk scanning
+module "agentless_impersonated_service_account" {
+  source = "./modules/agentless-impersonated-service-account"
+
+  project_id                    = var.project_id
+  scanner_service_account_email = module.agentless_scanner_service_account.scanner_service_account_email
 }
 
 # Instance Module - Managed Instance Group for Agentless Scanners
