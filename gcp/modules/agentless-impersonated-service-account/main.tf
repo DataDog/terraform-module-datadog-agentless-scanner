@@ -10,8 +10,6 @@ resource "google_project_iam_custom_role" "disk_reader" {
     "compute.disks.use",
     "compute.disks.createSnapshot",
 
-    "compute.instances.attachDisk",
-
     "compute.snapshots.create",
     "compute.snapshots.get",
     "compute.snapshots.list",
