@@ -52,5 +52,7 @@ No modules.
 
 ## Outputs
 
-No outputs.
+| Name | Description |
+|------|-------------|
+| <a name="output_asg"></a> [asg](#output\_asg) | The Auto Scaling group of the Agentless Scanner |
 <!-- END_TF_DOCS -->
