@@ -4,6 +4,12 @@ variable "name" {
   default     = "datadog-agentless-scanner"
 }
 
+variable "unique_suffix" {
+  description = "Unique suffix to append to resource names to avoid collisions"
+  type        = string
+  default     = ""
+}
+
 variable "region" {
   description = "The region to deploy VPC resources"
   type        = string

@@ -1,13 +1,13 @@
 # Service account for the scanner
 resource "google_service_account" "scanner_service_account" {
-  account_id   = "scanner-service-account"
+  account_id   = "scanner-service-account-${var.unique_suffix}"
   display_name = "Scanner Service Account"
   description  = "Service account for the scanner"
 }
 
 # Custom role for attaching disks
 resource "google_project_iam_custom_role" "attach_disk" {
-  role_id     = "scannerAttachDisk"
+  role_id     = "scannerAttachDisk${title(var.unique_suffix)}"
   title       = "Scanner Attach Disk"
   description = "Custom role for attaching disks to instances"
   permissions = [

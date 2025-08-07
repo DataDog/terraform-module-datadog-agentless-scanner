@@ -1,6 +1,6 @@
 # Custom role for reading disk information
 resource "google_project_iam_custom_role" "disk_reader" {
-  role_id     = "datadogAgentlessDiskReader"
+  role_id     = "datadogAgentlessDiskReader${title(var.unique_suffix)}"
   title       = "Datadog Agentless Disk Reader"
   description = "Custom role for reading disk information"
   permissions = [
@@ -27,7 +27,7 @@ resource "google_project_iam_custom_role" "disk_reader" {
 }
 
 resource "google_service_account" "disk_reader_sa" {
-  account_id   = "dd-agentless-disk-reader-sa"
+  account_id   = "dd-agentless-disk-reader-sa-${var.unique_suffix}"
   display_name = "Datadog Agentless Disk Reader Service Account"
   description  = "Service account to be impersonated by Datadog Agentless Scanner for reading disk information"
 }
