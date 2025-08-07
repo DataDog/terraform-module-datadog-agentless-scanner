@@ -7,8 +7,18 @@ resource "random_id" "deployment_suffix" {
   }
 }
 
+# Get current provider configuration and available zones
+data "google_client_config" "current" {}
+
+data "google_compute_zones" "available" {
+  project = var.project_id
+  region  = data.google_client_config.current.region != null ? data.google_client_config.current.region : "us-central1"
+}
+
 locals {
   unique_suffix = var.unique_suffix != "" ? var.unique_suffix : random_id.deployment_suffix.hex
+  region        = data.google_client_config.current.region
+  zones         = length(var.zones) > 0 ? var.zones : slice(data.google_compute_zones.available.names, 0, min(3, length(data.google_compute_zones.available.names)))
 }
 
 # VPC Module - Creates network infrastructure for scanner instances
@@ -16,7 +26,7 @@ module "vpc" {
   source = "./modules/vpc"
 
   name          = var.vpc_name
-  region        = var.region
+  region        = local.region
   subnet_cidr   = var.subnet_cidr
   unique_suffix = local.unique_suffix
 
@@ -45,8 +55,8 @@ module "instance" {
   source = "./modules/instance"
 
   project_id            = var.project_id
-  region                = var.region
-  zone                  = var.zone
+  region                = local.region
+  zones                 = local.zones
   network_name          = module.vpc.vpc_name
   subnetwork_name       = module.vpc.subnet_name
   service_account_email = module.agentless_scanner_service_account.scanner_service_account_email

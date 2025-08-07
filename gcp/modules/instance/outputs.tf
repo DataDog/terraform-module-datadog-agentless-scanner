@@ -1,6 +1,6 @@
 output "instance_group_manager" {
   description = "The managed instance group manager"
-  value       = google_compute_instance_group_manager.agentless_scanner_mig.id
+  value       = google_compute_region_instance_group_manager.agentless_scanner_mig.id
 }
 
 output "instance_template" {
@@ -15,5 +15,10 @@ output "health_check" {
 
 output "mig_target_size" {
   description = "Target size of the managed instance group"
-  value       = google_compute_instance_group_manager.agentless_scanner_mig.target_size
+  value       = google_compute_region_instance_group_manager.agentless_scanner_mig.target_size
+}
+
+output "zones" {
+  description = "Zones where instances are distributed"
+  value       = var.zones
 }

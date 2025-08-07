@@ -8,9 +8,9 @@ variable "region" {
   type        = string
 }
 
-variable "zone" {
-  description = "The zone to deploy resources"
-  type        = string
+variable "zones" {
+  description = "List of zones to deploy resources across"
+  type        = list(string)
 }
 
 variable "network_name" {
