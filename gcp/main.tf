@@ -1,9 +1,3 @@
-provider "google" {
-  project = var.project_id
-  region  = var.region
-  zone    = var.zone
-}
-
 # Random ID for unique resource naming
 resource "random_id" "deployment_suffix" {
   byte_length = 4
