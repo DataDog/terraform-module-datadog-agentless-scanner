@@ -93,7 +93,7 @@ resource "google_compute_region_instance_group_manager" "agentless_scanner_mig" 
     minimal_action = "REPLACE"
 
     max_surge_fixed       = length(var.zones) # Allow one instance per zone during surge
-    max_unavailable_fixed = 1                 # Allow 1 instance to be unavailable during update
+    max_unavailable_fixed = 0                 # Must be 0 or >= number of zones for regional MIG
     replacement_method    = "SUBSTITUTE"      # Use SUBSTITUTE for better availability during updates
   }
 }
