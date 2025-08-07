@@ -66,13 +66,16 @@ resource "google_compute_health_check" "agentless_scanner_health" {
   }
 }
 
-# Managed Instance Group (Autoscaling Group) - Zonal
-resource "google_compute_instance_group_manager" "agentless_scanner_mig" {
-  name = "agentless-scanner-mig-${var.unique_suffix}"
-  zone = var.zone
+# Managed Instance Group (Autoscaling Group) - Regional
+resource "google_compute_region_instance_group_manager" "agentless_scanner_mig" {
+  name   = "agentless-scanner-mig-${var.unique_suffix}"
+  region = var.region
 
   base_instance_name = "agentless-scanner-${var.unique_suffix}"
   target_size        = var.instance_count # Configurable size - will auto-replace if instance fails
+
+  # Distribution policy to spread instances across specified zones
+  distribution_policy_zones = var.zones
 
   version {
     instance_template = google_compute_instance_template.agentless_scanner_template.id
@@ -84,13 +87,13 @@ resource "google_compute_instance_group_manager" "agentless_scanner_mig" {
     initial_delay_sec = 300 # Wait 5 minutes before starting health checks
   }
 
-  # Update policy for rolling updates (simpler for zonal MIG)
+  # Update policy for rolling updates (enhanced for regional MIG)
   update_policy {
     type           = "PROACTIVE"
     minimal_action = "REPLACE"
 
-    max_surge_fixed       = 0 # Must be 0 when using RECREATE method
-    max_unavailable_fixed = 1 # Allow 1 instance to be unavailable during recreate
-    replacement_method    = "RECREATE"
+    max_surge_fixed       = length(var.zones) # Allow one instance per zone during surge
+    max_unavailable_fixed = 1                 # Allow 1 instance to be unavailable during update
+    replacement_method    = "SUBSTITUTE"      # Use SUBSTITUTE for better availability during updates
   }
 }

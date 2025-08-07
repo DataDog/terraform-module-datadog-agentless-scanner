@@ -60,3 +60,8 @@ output "unique_suffix" {
   description = "Unique suffix used in resource names"
   value       = local.unique_suffix
 }
+
+output "zones" {
+  description = "Zones where instances are deployed"
+  value       = module.instance.zones
+}

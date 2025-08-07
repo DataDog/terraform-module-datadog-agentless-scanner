@@ -3,18 +3,6 @@ variable "project_id" {
   type        = string
 }
 
-variable "region" {
-  description = "The region to deploy resources"
-  type        = string
-  default     = "us-central1"
-}
-
-variable "zone" {
-  description = "The zone to deploy resources"
-  type        = string
-  default     = "us-central1-a"
-}
-
 variable "vpc_name" {
   description = "Name prefix for VPC resources"
   type        = string
@@ -91,6 +79,12 @@ variable "scanner_repository" {
     condition     = can(regex("^https://", var.scanner_repository))
     error_message = "The scanner repository must be a valid HTTPs URL."
   }
+}
+
+variable "zones" {
+  description = "List of zones to deploy resources across. If empty, will automatically select up to 3 zones in the region."
+  type        = list(string)
+  default     = []
 }
 
 variable "unique_suffix" {
