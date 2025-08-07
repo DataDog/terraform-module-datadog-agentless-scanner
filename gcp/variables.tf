@@ -91,4 +91,8 @@ variable "unique_suffix" {
   description = "Unique suffix to append to resource names to avoid collisions. If not provided, a random suffix will be generated."
   type        = string
   default     = ""
+  validation {
+    condition     = length(var.unique_suffix) <= 8
+    error_message = "The unique_suffix must be 8 characters or less."
+  }
 }

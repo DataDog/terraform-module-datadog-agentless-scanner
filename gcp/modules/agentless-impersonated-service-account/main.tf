@@ -1,5 +1,6 @@
 # Custom role for reading disk information
-resource "google_project_iam_custom_role" "delegate_role" {
+
+resource "google_project_iam_custom_role" "target_role" {
   role_id = "datadogAgentlessDelegate${title(var.unique_suffix)}"
   title   = "Datadog Agentless Delegate Role"
 
@@ -27,22 +28,22 @@ resource "google_project_iam_custom_role" "delegate_role" {
   ]
 }
 
-resource "google_service_account" "delegate_service_account" {
-  account_id   = "dd-agentless-delegate-${var.unique_suffix}"
-  display_name = "Datadog Agentless Disk Reader Service Account"
+resource "google_service_account" "target_service_account" {
+  account_id   = "dd-agentless-target-${var.unique_suffix}"
+  display_name = "Datadog Agentless Target Service Account"
   description  = "Service account to be impersonated by Datadog Agentless Scanner for reading disk information"
 }
 
 # Binding the custom role to the service account
 resource "google_project_iam_member" "agentless_role_binding" {
   project = var.project_id
-  role    = google_project_iam_custom_role.delegate_role.name
-  member  = "serviceAccount:${google_service_account.delegate_service_account.email}"
+  role    = google_project_iam_custom_role.target_role.name
+  member  = "serviceAccount:${google_service_account.target_service_account.email}"
 }
 
 # Binding the scanner service account to the impersonated service account
 resource "google_service_account_iam_member" "impersonation_binding" {
-  service_account_id = google_service_account.delegate_service_account.name
+  service_account_id = google_service_account.target_service_account.name
   role               = "roles/iam.serviceAccountTokenCreator"
   member             = "serviceAccount:${var.scanner_service_account_email}"
 }
