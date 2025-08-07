@@ -55,3 +55,8 @@ output "vpc_subnet_name" {
   description = "The name of the VPC subnet"
   value       = module.vpc.subnetwork_name
 }
+
+output "unique_suffix" {
+  description = "Unique suffix used in resource names"
+  value       = local.unique_suffix
+}

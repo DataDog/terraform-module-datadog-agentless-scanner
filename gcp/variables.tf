@@ -92,3 +92,9 @@ variable "scanner_repository" {
     error_message = "The scanner repository must be a valid HTTPs URL."
   }
 }
+
+variable "unique_suffix" {
+  description = "Unique suffix to append to resource names to avoid collisions. If not provided, a random suffix will be generated."
+  type        = string
+  default     = ""
+}

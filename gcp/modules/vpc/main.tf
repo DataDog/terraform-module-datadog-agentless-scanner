@@ -1,13 +1,17 @@
+locals {
+  vpc_name = "${var.name}-${var.unique_suffix}"
+}
+
 # VPC Network
 resource "google_compute_network" "vpc" {
-  name                    = var.name
+  name                    = local.vpc_name
   auto_create_subnetworks = false
   description             = "VPC network for Datadog Agentless Scanner"
 }
 
 # Subnet for instances
 resource "google_compute_subnetwork" "subnet" {
-  name          = "${var.name}-subnet"
+  name          = "${local.vpc_name}-subnet"
   ip_cidr_range = var.subnet_cidr
   network       = google_compute_network.vpc.id
   region        = var.region
@@ -19,7 +23,7 @@ resource "google_compute_subnetwork" "subnet" {
 
 # Cloud Router for NAT Gateway
 resource "google_compute_router" "router" {
-  name    = "${var.name}-router"
+  name    = "${local.vpc_name}-router"
   region  = var.region
   network = google_compute_network.vpc.id
 
@@ -28,7 +32,7 @@ resource "google_compute_router" "router" {
 
 # NAT Gateway for outbound internet access from private instances
 resource "google_compute_router_nat" "nat" {
-  name                               = "${var.name}-nat"
+  name                               = "${local.vpc_name}-nat"
   router                             = google_compute_router.router.name
   region                             = var.region
   nat_ip_allocate_option             = "AUTO_ONLY"
@@ -42,7 +46,7 @@ resource "google_compute_router_nat" "nat" {
 
 # Firewall rule to allow health checks from Google Cloud
 resource "google_compute_firewall" "allow_health_checks" {
-  name    = "${var.name}-allow-health-checks"
+  name    = "${local.vpc_name}-allow-health-checks"
   network = google_compute_network.vpc.name
 
   allow {
@@ -58,7 +62,7 @@ resource "google_compute_firewall" "allow_health_checks" {
 # Firewall rule to allow SSH access (if enabled)
 resource "google_compute_firewall" "allow_ssh" {
   count   = var.enable_ssh ? 1 : 0
-  name    = "${var.name}-allow-ssh-iap"
+  name    = "${local.vpc_name}-allow-ssh-iap"
   network = google_compute_network.vpc.name
 
   allow {

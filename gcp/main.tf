@@ -4,23 +4,37 @@ provider "google" {
   zone    = var.zone
 }
 
+# Random ID for unique resource naming
+resource "random_id" "deployment_suffix" {
+  byte_length = 4
+  keepers = {
+    project_id = var.project_id
+    vpc_name   = var.vpc_name
+  }
+}
+
+locals {
+  unique_suffix = var.unique_suffix != "" ? var.unique_suffix : random_id.deployment_suffix.hex
+}
+
 # VPC Module - Creates network infrastructure for scanner instances
 module "vpc" {
   source = "./modules/vpc"
 
-  name        = var.vpc_name
-  region      = var.region
-  subnet_cidr = var.subnet_cidr
+  name          = var.vpc_name
+  region        = var.region
+  subnet_cidr   = var.subnet_cidr
+  unique_suffix = local.unique_suffix
 
   enable_ssh = var.enable_ssh
 }
-
 
 # Agentless Scanner Service Account Module - Service account for compute instances
 module "agentless_scanner_service_account" {
   source = "./modules/agentless-scanner-service-account"
 
-  project_id = var.project_id
+  project_id    = var.project_id
+  unique_suffix = local.unique_suffix
 }
 
 # Agentless Impersonated Service Account Module - IAM resources for disk scanning
@@ -29,6 +43,7 @@ module "agentless_impersonated_service_account" {
 
   project_id                    = var.project_id
   scanner_service_account_email = module.agentless_scanner_service_account.scanner_service_account_email
+  unique_suffix                 = local.unique_suffix
 }
 
 # Instance Module - Managed Instance Group for Agentless Scanners
@@ -50,6 +65,7 @@ module "instance" {
   scanner_version    = var.scanner_version
   scanner_channel    = var.scanner_channel
   scanner_repository = var.scanner_repository
+  unique_suffix      = local.unique_suffix
 
   depends_on = [module.vpc]
 }
