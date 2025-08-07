@@ -22,12 +22,12 @@ output "mig_target_size" {
 # Outputs from Agentless Impersonated Service Account Module
 output "disk_reader_service_account_email" {
   description = "Email of the disk reader service account"
-  value       = module.agentless_impersonated_service_account.disk_reader_service_account_email
+  value       = module.agentless_impersonated_service_account.service_account_email
 }
 
 output "disk_reader_custom_role_name" {
   description = "Name of the custom disk reader role"
-  value       = module.agentless_impersonated_service_account.disk_reader_custom_role_name
+  value       = module.agentless_impersonated_service_account.custom_role_name
 }
 
 output "scanner_service_account_email" {
