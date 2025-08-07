@@ -1,6 +1,6 @@
 # Service account for the scanner
 resource "google_service_account" "scanner_service_account" {
-  account_id   = "scanner-service-account-${var.unique_suffix}"
+  account_id   = "dd-agentless-scanner-${var.unique_suffix}"
   display_name = "Scanner Service Account"
   description  = "Service account for the scanner"
 }
@@ -29,5 +29,3 @@ resource "google_service_account_iam_member" "self_impersonation_binding" {
   role               = "roles/iam.serviceAccountUser"
   member             = "serviceAccount:${google_service_account.scanner_service_account.email}"
 }
-
-
