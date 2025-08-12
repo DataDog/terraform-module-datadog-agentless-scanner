@@ -1,13 +1,3 @@
-variable "project_id" {
-  description = "The ID of the project in which to create the VM"
-  type        = string
-}
-
-variable "region" {
-  description = "The region to deploy resources"
-  type        = string
-}
-
 variable "zones" {
   description = "List of zones to deploy resources across"
   type        = list(string)

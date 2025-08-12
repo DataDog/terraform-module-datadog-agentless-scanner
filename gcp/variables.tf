@@ -1,8 +1,3 @@
-variable "project_id" {
-  description = "The ID of the project in which to create the VM"
-  type        = string
-}
-
 variable "vpc_name" {
   description = "Name prefix for VPC resources"
   type        = string
