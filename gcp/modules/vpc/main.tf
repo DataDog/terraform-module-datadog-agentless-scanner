@@ -1,4 +1,7 @@
+data "google_client_config" "current" {}
+
 locals {
+  region   = data.google_client_config.current.region
   vpc_name = "${var.name}-${var.unique_suffix}"
 }
 
@@ -14,7 +17,7 @@ resource "google_compute_subnetwork" "subnet" {
   name          = "${local.vpc_name}-subnet"
   ip_cidr_range = var.subnet_cidr
   network       = google_compute_network.vpc.id
-  region        = var.region
+  region        = local.region
   description   = "Subnet for Datadog Agentless Scanner instances"
 
   # Enable private Google access for instances without external IPs
@@ -24,7 +27,7 @@ resource "google_compute_subnetwork" "subnet" {
 # Cloud Router for NAT Gateway
 resource "google_compute_router" "router" {
   name    = "${local.vpc_name}-router"
-  region  = var.region
+  region  = local.region
   network = google_compute_network.vpc.id
 
   description = "Cloud Router for NAT Gateway"
@@ -34,7 +37,7 @@ resource "google_compute_router" "router" {
 resource "google_compute_router_nat" "nat" {
   name                               = "${local.vpc_name}-nat"
   router                             = google_compute_router.router.name
-  region                             = var.region
+  region                             = local.region
   nat_ip_allocate_option             = "AUTO_ONLY"
   source_subnetwork_ip_ranges_to_nat = "ALL_SUBNETWORKS_ALL_IP_RANGES"
 

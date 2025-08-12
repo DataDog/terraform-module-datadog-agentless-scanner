@@ -1,3 +1,9 @@
+data "google_client_config" "current" {}
+
+locals {
+  project_id = data.google_client_config.current.project
+}
+
 # Service account for the scanner
 resource "google_service_account" "scanner_service_account" {
   account_id   = "dd-agentless-scanner-${var.unique_suffix}"
@@ -18,7 +24,7 @@ resource "google_project_iam_custom_role" "attach_disk" {
 
 # Binding the attach disk role to the scanner service account
 resource "google_project_iam_member" "attach_disk_binding" {
-  project = var.project_id
+  project = local.project_id
   role    = google_project_iam_custom_role.attach_disk.name
   member  = "serviceAccount:${google_service_account.scanner_service_account.email}"
 }

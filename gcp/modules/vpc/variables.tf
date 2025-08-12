@@ -10,11 +10,6 @@ variable "unique_suffix" {
   default     = ""
 }
 
-variable "region" {
-  description = "The region to deploy VPC resources"
-  type        = string
-}
-
 variable "subnet_cidr" {
   description = "The CIDR block for the subnet"
   type        = string

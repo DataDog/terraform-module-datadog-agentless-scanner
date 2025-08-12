@@ -2,22 +2,22 @@
 resource "random_id" "deployment_suffix" {
   byte_length = 4
   keepers = {
-    project_id = var.project_id
+    project_id = local.project_id
     vpc_name   = var.vpc_name
   }
 }
 
-# Get current provider configuration and available zones
 data "google_client_config" "current" {}
 
 data "google_compute_zones" "available" {
-  project = var.project_id
-  region  = data.google_client_config.current.region != null ? data.google_client_config.current.region : "us-central1"
+  project = local.project_id
+  region  = local.region
 }
 
 locals {
   unique_suffix = var.unique_suffix != "" ? var.unique_suffix : random_id.deployment_suffix.hex
   region        = data.google_client_config.current.region
+  project_id    = data.google_client_config.current.project
   zones         = length(var.zones) > 0 ? var.zones : slice(data.google_compute_zones.available.names, 0, min(3, length(data.google_compute_zones.available.names)))
 }
 
@@ -26,7 +26,6 @@ module "vpc" {
   source = "./modules/vpc"
 
   name          = var.vpc_name
-  region        = local.region
   subnet_cidr   = var.subnet_cidr
   unique_suffix = local.unique_suffix
 
@@ -37,7 +36,6 @@ module "vpc" {
 module "agentless_scanner_service_account" {
   source = "./modules/agentless-scanner-service-account"
 
-  project_id    = var.project_id
   unique_suffix = local.unique_suffix
 }
 
@@ -45,7 +43,6 @@ module "agentless_scanner_service_account" {
 module "agentless_impersonated_service_account" {
   source = "./modules/agentless-impersonated-service-account"
 
-  project_id                    = var.project_id
   scanner_service_account_email = module.agentless_scanner_service_account.scanner_service_account_email
   unique_suffix                 = local.unique_suffix
 }
@@ -54,8 +51,6 @@ module "agentless_impersonated_service_account" {
 module "instance" {
   source = "./modules/instance"
 
-  project_id            = var.project_id
-  region                = local.region
   zones                 = local.zones
   network_name          = module.vpc.vpc_name
   subnetwork_name       = module.vpc.subnet_name

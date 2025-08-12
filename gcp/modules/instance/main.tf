@@ -1,5 +1,12 @@
 # Note: SSH firewall rule is now managed by the VPC module
 
+data "google_client_config" "current" {}
+
+locals {
+  project_id = data.google_client_config.current.project
+  region     = data.google_client_config.current.region
+}
+
 # Instance Template for Managed Instance Group
 resource "google_compute_instance_template" "agentless_scanner_template" {
   name_prefix  = "agentless-scanner-template-${var.unique_suffix}-"
@@ -15,8 +22,8 @@ resource "google_compute_instance_template" "agentless_scanner_template" {
   }
 
   network_interface {
-    network    = "projects/${var.project_id}/global/networks/${var.network_name}"
-    subnetwork = "projects/${var.project_id}/regions/${var.region}/subnetworks/${var.subnetwork_name}"
+    network    = "projects/${local.project_id}/global/networks/${var.network_name}"
+    subnetwork = "projects/${local.project_id}/regions/${local.region}/subnetworks/${var.subnetwork_name}"
   }
 
   service_account {
@@ -69,7 +76,7 @@ resource "google_compute_health_check" "agentless_scanner_health" {
 # Managed Instance Group (Autoscaling Group) - Regional
 resource "google_compute_region_instance_group_manager" "agentless_scanner_mig" {
   name   = "agentless-scanner-mig-${var.unique_suffix}"
-  region = var.region
+  region = local.region
 
   base_instance_name = "agentless-scanner-${var.unique_suffix}"
   target_size        = var.instance_count # Configurable size - will auto-replace if instance fails
