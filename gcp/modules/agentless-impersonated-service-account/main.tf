@@ -6,8 +6,8 @@ locals {
 
 # Custom role for reading disk information
 resource "google_project_iam_custom_role" "target_role" {
-  role_id = "datadogAgentlessDelegate${title(var.unique_suffix)}"
-  title   = "Datadog Agentless Delegate Role"
+  role_id = "datadogAgentlessTarget${title(var.unique_suffix)}"
+  title   = "Datadog Agentless Target Role"
 
   description = "Custom role for Datadog Agentless scanner"
   permissions = [
@@ -21,7 +21,6 @@ resource "google_project_iam_custom_role" "target_role" {
     "compute.snapshots.get",
     "compute.snapshots.list",
     "compute.snapshots.setLabels",
-    "compute.snapshots.useReadOnly",
 
     "compute.diskTypes.get",
     "compute.diskTypes.list",
@@ -51,4 +50,26 @@ resource "google_service_account_iam_member" "impersonation_binding" {
   service_account_id = google_service_account.target_service_account.name
   role               = "roles/iam.serviceAccountTokenCreator"
   member             = "serviceAccount:${var.scanner_service_account_email}"
+}
+
+# Custom role for reading snapshots
+resource "google_project_iam_custom_role" "snapshot_readonly_role" {
+  role_id = "datadogAgentlessSnapshotReadonly${title(var.unique_suffix)}"
+  title   = "Datadog Agentless Snapshot Readonly Role"
+
+  description = "Custom role for Datadog Agentless scanner to read snapshots"
+  permissions = [
+    "compute.snapshots.useReadOnly",
+  ]
+}
+
+resource "google_project_iam_member" "agentless_use_snapshot_role_binding" {
+  project = local.project_id
+  role    = google_project_iam_custom_role.snapshot_readonly_role.name
+  member  = "serviceAccount:${var.scanner_service_account_email}"
+  # condition {
+  #   title       = "Only snapshots with a datadog-agentless-scanner label"
+  #   description = "This condition ensures that the scanner can only access snapshots with the specified label."
+  #   expression  = "resource.name.startsWith(\"foobar\")"
+  # }
 }
