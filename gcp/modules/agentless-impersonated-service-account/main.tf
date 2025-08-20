@@ -11,24 +11,24 @@ resource "google_project_iam_custom_role" "target_role" {
 
   description = "Custom role for Datadog Agentless scanner"
   permissions = [
-    "compute.disks.get",
-    "compute.disks.list",
-    "compute.disks.create",
-    "compute.disks.use",
     "compute.disks.createSnapshot",
+    "compute.disks.get",
 
     "compute.snapshots.create",
     "compute.snapshots.get",
     "compute.snapshots.list",
+    "compute.snapshots.delete",
     "compute.snapshots.setLabels",
 
-    "compute.diskTypes.get",
-    "compute.diskTypes.list",
+    # is it necessary ?
+    # "compute.diskTypes.get",
+    # "compute.diskTypes.list",
+    # "compute.zoneOperations.get",
 
-    "compute.instances.list", # offline mode
+    # offline mode
+    "compute.instances.list",
 
     "compute.globalOperations.get",
-    "compute.zoneOperations.get",
   ]
 }
 

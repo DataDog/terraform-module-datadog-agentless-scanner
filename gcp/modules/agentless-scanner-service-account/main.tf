@@ -14,11 +14,18 @@ resource "google_service_account" "scanner_service_account" {
 # Custom role for attaching disks
 resource "google_project_iam_custom_role" "attach_disk" {
   role_id     = "scannerAttachDisk${title(var.unique_suffix)}"
-  title       = "Scanner Attach Disk"
-  description = "Custom role for attaching disks to instances"
+  title       = "Datadog Agentless Scanner"
+  description = "Custom role for creating and attaching disks to instances"
   permissions = [
-    "compute.instances.attachDisk",
+    "compute.disks.create",
+    "compute.disks.delete",
+    "compute.disks.get",
+    "compute.disks.list",
+    "compute.disks.setLabels",
     "compute.disks.use",
+    "compute.instances.attachDisk",
+
+    "compute.zoneOperations.get",
   ]
 }
 
