@@ -22,3 +22,8 @@ output "zones" {
   description = "Zones where instances are distributed"
   value       = var.zones
 }
+
+output "api_key_secret_id" {
+  description = "The name of the Secret Manager secret containing the Datadog API key"
+  value       = local.api_key_secret_id
+}

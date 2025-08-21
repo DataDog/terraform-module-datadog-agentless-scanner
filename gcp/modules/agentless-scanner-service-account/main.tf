@@ -36,6 +36,14 @@ resource "google_project_iam_member" "attach_disk_binding" {
   member  = "serviceAccount:${google_service_account.scanner_service_account.email}"
 }
 
+# Binding the secretmanager secret accessor role to the scanner service account
+resource "google_secret_manager_secret_iam_member" "scanner_secret_access" {
+  project   = local.project_id
+  secret_id = var.api_key_secret_id
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${google_service_account.scanner_service_account.email}"
+}
+
 # Allow the scanner service account to use itself
 resource "google_service_account_iam_member" "self_impersonation_binding" {
   service_account_id = google_service_account.scanner_service_account.name

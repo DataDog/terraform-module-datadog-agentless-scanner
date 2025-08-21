@@ -3,8 +3,9 @@
 data "google_client_config" "current" {}
 
 locals {
-  project_id = data.google_client_config.current.project
-  region     = data.google_client_config.current.region
+  project_id        = data.google_client_config.current.project
+  region            = data.google_client_config.current.region
+  api_key_secret_id = var.api_key_secret_id != null ? var.api_key_secret_id : google_secret_manager_secret.api_key_secret[0].name
 }
 
 # Instance Template for Managed Instance Group
@@ -35,7 +36,7 @@ resource "google_compute_instance_template" "agentless_scanner_template" {
     ssh-keys       = var.ssh_public_key != null ? "${var.ssh_username}:${var.ssh_public_key}" : null
     enable-oslogin = "FALSE"
     startup-script = templatefile("${path.module}/startup-script.sh.tftpl", {
-      api_key            = var.api_key
+      api_key_secret_id  = local.api_key_secret_id
       site               = var.site
       scanner_version    = var.scanner_version
       scanner_repository = var.scanner_repository
@@ -103,4 +104,18 @@ resource "google_compute_region_instance_group_manager" "agentless_scanner_mig" 
     max_unavailable_fixed = 0                 # Must be 0 or >= number of zones for regional MIG
     replacement_method    = "SUBSTITUTE"      # Use SUBSTITUTE for better availability during updates
   }
+}
+
+resource "google_secret_manager_secret" "api_key_secret" {
+  count     = var.api_key_secret_id != null ? 0 : 1
+  secret_id = "datadog-agentless-scanner-api-key-${var.unique_suffix}"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_version" "api_key_version" {
+  count       = var.api_key_secret_id != null ? 0 : 1
+  secret      = google_secret_manager_secret.api_key_secret[0].id
+  secret_data = var.api_key
 }
