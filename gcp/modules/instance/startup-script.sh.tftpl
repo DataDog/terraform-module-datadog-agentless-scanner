@@ -4,7 +4,7 @@ set -u
 set -e
 set -o pipefail
 
-DD_API_KEY="${api_key}"
+DD_API_KEY="ENC[//secretmanager.googleapis.com/${api_key_secret_id}]"
 DD_SITE="${site}"
 DD_AGENTLESS_VERSION="${scanner_version}"
 DD_AGENTLESS_REPOSITORY="${scanner_repository}"
@@ -142,4 +142,4 @@ systemd-run --on-boot=24h systemctl stop health-check.service
 systemd-run --on-boot=24h systemctl stop datadog-agentless-scanner
 
 # Enable and start datadog-agentless-scaner
-systemctl enable --now datadog-agentless-scanner 
+systemctl enable --now datadog-agentless-scanner

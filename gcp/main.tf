@@ -36,7 +36,8 @@ module "vpc" {
 module "agentless_scanner_service_account" {
   source = "./modules/agentless-scanner-service-account"
 
-  unique_suffix = local.unique_suffix
+  unique_suffix     = local.unique_suffix
+  api_key_secret_id = module.instance.api_key_secret_id
 }
 
 # Agentless Impersonated Service Account Module - IAM resources for disk scanning

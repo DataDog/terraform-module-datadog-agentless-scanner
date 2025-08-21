@@ -73,6 +73,16 @@ variable "scanner_repository" {
   }
 }
 
+variable "api_key_secret_id" {
+  description = "Identifier of the pre-provisioned Secret Manager secret containing the Datadog API key"
+  type        = string
+  default     = null
+  validation {
+    condition     = var.api_key_secret_id == null || can(regex("^projects/[a-zA-Z0-9-]+/secrets/[a-zA-Z0-9-]+$", var.api_key_secret_id))
+    error_message = "The ID must be in the format 'projects/[project_id]/secrets/[secret_name]'."
+  }
+}
+
 variable "unique_suffix" {
   description = "Unique suffix to append to resource names to avoid collisions"
   type        = string
