@@ -57,6 +57,13 @@ repos:
 
   - repo: local
     hooks:
+      - id: check-version-references
+        name: Check for outdated version references in .tf files
+        language: system
+        entry: bash ci/check-version-references.sh
+        files: \.tf$
+        pass_filenames: false
+        stages: [commit, manual]
       - id: bicep
         name: Build Azure ARM template with Bicep
         language: system
