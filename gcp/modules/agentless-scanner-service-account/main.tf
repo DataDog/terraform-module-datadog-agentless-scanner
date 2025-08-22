@@ -23,7 +23,9 @@ resource "google_project_iam_custom_role" "attach_disk" {
     "compute.disks.list",
     "compute.disks.setLabels",
     "compute.disks.use",
+
     "compute.instances.attachDisk",
+    "compute.instances.detachDisk",
 
     "compute.zoneOperations.get",
   ]

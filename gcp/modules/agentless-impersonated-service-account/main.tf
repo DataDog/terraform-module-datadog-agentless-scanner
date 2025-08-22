@@ -20,14 +20,6 @@ resource "google_project_iam_custom_role" "target_role" {
     "compute.snapshots.delete",
     "compute.snapshots.setLabels",
 
-    # is it necessary ?
-    # "compute.diskTypes.get",
-    # "compute.diskTypes.list",
-    # "compute.zoneOperations.get",
-
-    # offline mode
-    "compute.instances.list",
-
     "compute.globalOperations.get",
   ]
 }
@@ -67,9 +59,9 @@ resource "google_project_iam_member" "agentless_use_snapshot_role_binding" {
   project = local.project_id
   role    = google_project_iam_custom_role.snapshot_readonly_role.name
   member  = "serviceAccount:${var.scanner_service_account_email}"
-  # condition {
-  #   title       = "Only snapshots with a datadog-agentless-scanner label"
-  #   description = "This condition ensures that the scanner can only access snapshots with the specified label."
-  #   expression  = "resource.name.startsWith(\"foobar\")"
-  # }
+  condition {
+    title       = "Limit to snapshots created by the scanner"
+    description = "This condition ensures that the scanner can only access snapshots that it created."
+    expression  = "resource.name.extract(\"projects/${local.project_id}/global/snapshots/{name}\").startsWith(\"datadog-agentless\")"
+  }
 }
