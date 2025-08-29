@@ -20,14 +20,11 @@ resource "google_project_iam_custom_role" "attach_disk" {
     "compute.disks.create",
     "compute.disks.delete",
     "compute.disks.get",
-    "compute.disks.list",
     "compute.disks.setLabels",
     "compute.disks.use",
 
     "compute.instances.attachDisk",
     "compute.instances.detachDisk",
-
-    "compute.zoneOperations.get",
   ]
 }
 
@@ -35,6 +32,32 @@ resource "google_project_iam_custom_role" "attach_disk" {
 resource "google_project_iam_member" "attach_disk_binding" {
   project = local.project_id
   role    = google_project_iam_custom_role.attach_disk.name
+  member  = "serviceAccount:${google_service_account.scanner_service_account.email}"
+  condition {
+    title       = "Restrict to datadog-agentless disks"
+    description = "Only allow operations on disks starting with datadog-agentless"
+    expression  = <<-EOT
+      resource.name.extract("disks/{name}").startsWith("datadog-agentless") ||
+      resource.name.extract("instances/{name}").startsWith("datadog-agentless")
+    EOT
+  }
+}
+
+# Custom role for zone operations (cannot be restricted with conditions)
+resource "google_project_iam_custom_role" "zone_operations" {
+  role_id     = "scannerZoneOps${title(var.unique_suffix)}"
+  title       = "Datadog Agentless Scanner - Zone Operations"
+  description = "Custom role for checking zone operation status"
+  permissions = [
+    "compute.disks.list",
+    "compute.zoneOperations.get",
+  ]
+}
+
+# Binding for zone operations
+resource "google_project_iam_member" "zone_operations_binding" {
+  project = local.project_id
+  role    = google_project_iam_custom_role.zone_operations.name
   member  = "serviceAccount:${google_service_account.scanner_service_account.email}"
 }
 

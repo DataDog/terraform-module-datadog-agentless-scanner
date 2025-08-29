@@ -10,7 +10,7 @@ locals {
 
 # Instance Template for Managed Instance Group
 resource "google_compute_instance_template" "agentless_scanner_template" {
-  name_prefix  = "agentless-scanner-template-${var.unique_suffix}-"
+  name_prefix  = "datadog-agentless-scanner-template-${var.unique_suffix}-"
   description  = "Template for Datadog Agentless Scanner instances"
   machine_type = "n4-standard-2"
 
@@ -58,7 +58,7 @@ resource "google_compute_instance_template" "agentless_scanner_template" {
 
 # Health Check for Auto-healing
 resource "google_compute_health_check" "agentless_scanner_health" {
-  name                = "agentless-scanner-health-check-${var.unique_suffix}"
+  name                = "datadog-agentless-scanner-health-check-${var.unique_suffix}"
   description         = "Health check for Datadog Agentless Scanner"
   check_interval_sec  = 60
   timeout_sec         = 10
@@ -76,10 +76,10 @@ resource "google_compute_health_check" "agentless_scanner_health" {
 
 # Managed Instance Group (Autoscaling Group) - Regional
 resource "google_compute_region_instance_group_manager" "agentless_scanner_mig" {
-  name   = "agentless-scanner-mig-${var.unique_suffix}"
+  name   = "datadog-agentless-scanner-mig-${var.unique_suffix}"
   region = local.region
 
-  base_instance_name = "agentless-scanner-${var.unique_suffix}"
+  base_instance_name = "datadog-agentless-scanner-${var.unique_suffix}"
   target_size        = var.instance_count # Configurable size - will auto-replace if instance fails
 
   # Distribution policy to spread instances across specified zones
