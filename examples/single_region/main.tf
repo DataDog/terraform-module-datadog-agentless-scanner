@@ -6,11 +6,31 @@ terraform {
       source  = "hashicorp/aws"
       version = ">= 5.0"
     }
+    datadog = {
+      source  = "DataDog/datadog"
+      version = ">= 3.72.0"
+    }
   }
 }
 
 provider "aws" {
-  region = "eu-west-1"
+  region = "us-east-1"
+}
+
+data "aws_caller_identity" "current" {}
+
+provider "datadog" {
+  api_key = var.datadog_api_key
+  app_key = var.datadog_app_key
+  api_url = "https://api.${var.datadog_site}/"
+}
+
+resource "datadog_agentless_scanning_aws_scan_options" "scan_options" {
+  aws_account_id     = data.aws_caller_identity.current.account_id
+  vuln_host_os       = true
+  vuln_containers_os = true
+  lambda             = true
+  sensitive_data     = false
 }
 
 module "scanner_role" {
@@ -28,7 +48,8 @@ module "delegate_role" {
 module "agentless_scanner" {
   source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner?ref=0.11.11"
 
-  api_key               = var.api_key
+  api_key               = var.datadog_api_key
+  site                  = var.datadog_site
   instance_profile_name = module.scanner_role.instance_profile.name
 }
 
