@@ -5,7 +5,6 @@ This folder shows an example of Terraform code that uses the [datadog-agentless-
 In this example, the full scanner setup is deployed in an account designated for scanning.
 All your other accounts can be scanned from that account by deploying a single IAM role.
 
-
 ## Quick start
 
 To deploy a Datadog Agentless scanner:
@@ -24,8 +23,10 @@ To deploy the delegate role:
 1. Set the ARN of the scanner role you got from the previous step.
 1. Run `terraform output delegate_role` and copy that ARN.
 
-Finally, because cross-account delegate roles need bidirectional permission:
+Finally, to activate Agentless Scanning:
 
-1. Go back to the `scanner_account` folder.
+1. Go to the `activation` folder.
+1. Run `terraform init`.
 1. Run `terraform apply`.
-1. Set the ARN of the delegate role you created in your other account.
+1. Set your Datadog credentials.
+1. List the AWS accounts where you deployed delegate roles (e.g. `["123456789012", "234567890123"]`)
