@@ -48,7 +48,8 @@ module "self_delegate_role" {
 module "agentless_scanner" {
   source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner?ref=0.11.11"
 
-  api_key               = var.api_key
+  api_key               = var.datadog_api_key
+  site                  = var.datadog_site
   instance_profile_name = module.scanner_role.instance_profile.name
 }
 
