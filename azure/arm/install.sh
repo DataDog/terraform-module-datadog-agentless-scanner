@@ -30,6 +30,9 @@ apt autoremove -y
 # Perform unattended upgrades
 unattended-upgrade -v
 
+# Remove previously installed kernels after security upgrades
+apt autoremove -y --purge
+
 re='@Microsoft.KeyVault\(SecretUri=(https://.*)\)'
 if [[ "${api_key}" =~ $re ]]; then
   echo "Datadog API key is a Key Vault reference"
@@ -74,6 +77,8 @@ cat << EOF >> /etc/apt/apt.conf.d/50unattended-upgrades
 Unattended-Upgrade::Automatic-Reboot "true";
 Unattended-Upgrade::Automatic-Reboot-WithUsers "true";
 Unattended-Upgrade::Automatic-Reboot-Time "now";
+Unattended-Upgrade::Remove-Unused-Dependencies "true";
+Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";
 EOF
 
 # Perform unattended upgrades 10 min after boot, then every 3 hours
