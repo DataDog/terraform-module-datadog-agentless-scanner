@@ -23,7 +23,7 @@ variable "api_key" {
 }
 
 variable "site" {
-  description = "Datadog site (e.g., datadoghq.com, datadoghq.eu)"
+  description = "Datadog site (for example, datadoghq.com, datadoghq.eu)"
   type        = string
   default     = "datadoghq.com"
 }
@@ -77,13 +77,13 @@ variable "scanner_repository" {
 }
 
 variable "zones" {
-  description = "List of zones to deploy resources across. If empty, will automatically select up to 3 zones in the region."
+  description = "List of zones to deploy resources across. If empty, up to 3 zones in the region are automatically selected."
   type        = list(string)
   default     = []
 }
 
 variable "unique_suffix" {
-  description = "Unique suffix to append to resource names to avoid collisions. If not provided, a random suffix will be generated."
+  description = "Unique suffix to append to resource names to avoid collisions. If not provided, a random suffix is generated."
   type        = string
   default     = ""
   validation {

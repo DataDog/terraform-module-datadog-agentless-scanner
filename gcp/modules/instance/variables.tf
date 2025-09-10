@@ -25,7 +25,7 @@ variable "api_key" {
 }
 
 variable "site" {
-  description = "Datadog site (e.g., datadoghq.com, datadoghq.eu)"
+  description = "Datadog site (for example, datadoghq.com, datadoghq.eu)"
   type        = string
 }
 
