@@ -18,7 +18,7 @@ To use this module in your Terraform configuration, add the following code in yo
 variable "datadog-api-key" {}
 
 module "datadog-agentless-scanner" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/azure"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//azure"
 
   site                = "datadoghq.com"
   location            = "East US"
