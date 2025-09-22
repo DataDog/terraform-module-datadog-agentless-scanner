@@ -14,7 +14,7 @@ variable "datadog_app_key" {
 }
 
 variable "datadog_site" {
-  description = "The site of your Datadog account. Choose from: datadoghq.com (US1), us3.datadoghq.com (US3), us5.datadoghq.com (US5), datadoghq.eu (EU1), ap1.datadoghq.com (AP1), ddog-gov.com (US1-FED). See https://docs.datadoghq.com/getting_started/site/"
+  description = "The site of your Datadog account. Choose from: datadoghq.com (US1), us3.datadoghq.com (US3), us5.datadoghq.com (US5), datadoghq.eu (EU1), ap1.datadoghq.com (AP1). See https://docs.datadoghq.com/getting_started/site/"
   type        = string
 
   validation {
@@ -25,6 +25,6 @@ variable "datadog_site" {
       "datadoghq.eu",
       "ap1.datadoghq.com"
     ], var.datadog_site)
-    error_message = "The datadog_site must be one of: datadoghq.com (US1), us3.datadoghq.com (US3), us5.datadoghq.com (US5), datadoghq.eu (EU1), ap1.datadoghq.com (AP1), ddog-gov.com (US1-FED)."
+    error_message = "The datadog_site must be one of: datadoghq.com (US1), us3.datadoghq.com (US3), us5.datadoghq.com (US5), datadoghq.eu (EU1), ap1.datadoghq.com (AP1)."
   }
 }
