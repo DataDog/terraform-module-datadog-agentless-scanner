@@ -4,7 +4,7 @@ variable "datadog_api_key" {
 }
 
 variable "datadog_app_key" {
-  description = "Datadog Application key"
+  description = "Datadog Application key required to enable the Agentless Scanning options in your Datadog account."
   type        = string
 }
 
