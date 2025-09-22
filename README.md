@@ -66,6 +66,7 @@ module "agentless_scanner" {
   source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner"
 
   api_key               = var.datadog-api-key
+  site                  = var.datadog-site
   instance_profile_name = module.scanner_role.instance_profile.name
 }
 
@@ -95,7 +96,7 @@ variable "datadog-app-key" {
   type        = string
 }
 
-variable "datadog_site" {
+variable "datadog-site" {
   description = "The site of your Datadog account. Choose from: datadoghq.com (US1), us3.datadoghq.com (US3), us5.datadoghq.com (US5), datadoghq.eu (EU1), ap1.datadoghq.com (AP1). See https://docs.datadoghq.com/getting_started/site/"
   type        = string
 
@@ -106,8 +107,8 @@ variable "datadog_site" {
       "us5.datadoghq.com",
       "datadoghq.eu",
       "ap1.datadoghq.com"
-    ], var.datadog_site)
-    error_message = "The datadog_site must be one of: datadoghq.com (US1), us3.datadoghq.com (US3), us5.datadoghq.com (US5), datadoghq.eu (EU1), ap1.datadoghq.com (AP1)."
+    ], var.datadog-site)
+    error_message = "The datadog-site must be one of: datadoghq.com (US1), us3.datadoghq.com (US3), us5.datadoghq.com (US5), datadoghq.eu (EU1), ap1.datadoghq.com (AP1)."
   }
 }
 

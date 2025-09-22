@@ -23,9 +23,19 @@ variable "api_key" {
 }
 
 variable "site" {
-  description = "Datadog site (for example, datadoghq.com, datadoghq.eu)"
+  description = "The site of your Datadog account. Choose from: datadoghq.com (US1), us3.datadoghq.com (US3), us5.datadoghq.com (US5), datadoghq.eu (EU1), ap1.datadoghq.com (AP1). See https://docs.datadoghq.com/getting_started/site/"
   type        = string
-  default     = "datadoghq.com"
+
+  validation {
+    condition = contains([
+      "datadoghq.com",
+      "us3.datadoghq.com",
+      "us5.datadoghq.com",
+      "datadoghq.eu",
+      "ap1.datadoghq.com"
+    ], var.site)
+    error_message = "The site must be one of: datadoghq.com (US1), us3.datadoghq.com (US3), us5.datadoghq.com (US5), datadoghq.eu (EU1), ap1.datadoghq.com (AP1)."
+  }
 }
 
 variable "ssh_public_key" {
