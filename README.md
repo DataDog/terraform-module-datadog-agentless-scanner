@@ -15,6 +15,21 @@ Before using this module, make sure you have the following:
 To use this module in your Terraform configuration, add the following code in your existing Terraform code:
 
 ```hcl
+terraform {
+  required_providers {
+    datadog = {
+      source  = "DataDog/datadog"
+      version = ">= 3.72.0"
+    }
+  }
+}
+
+provider "datadog" {
+  api_key = var.datadog-api-key
+  app_key = var.datadog-app-key
+  api_url = "https://api.${var.datadog-site}/"
+}
+
 # First we need to define the proper roles for our scanners. It consists of two different modules.
 
 # 1. The "scanning delegate role" defines all the policies and IAM roles necessary for the scanner to interact and scan some specific account resources.
@@ -24,6 +39,17 @@ module "delegate_role" {
 
   scanner_roles = [module.scanner_role.role.arn]
 }
+
+# Enable scan options for the AWS account where the delegate role is being deployed
+resource "datadog_agentless_scanning_aws_scan_options" "scan_options" {
+  aws_account_id     = data.aws_caller_identity.current.account_id
+  vuln_host_os       = true
+  vuln_containers_os = true
+  lambda             = true
+  sensitive_data     = false
+}
+
+data "aws_caller_identity" "current" {}
 
 # 2. The "agentless scanner role" creates an EC2 instance profile along with an IAM role allowing the EC2 instance scanner to assume the scanning delegate role(s).
 # It shall be created in the same account as the agentless scanner instance.
@@ -63,6 +89,17 @@ variable "datadog-integration-role" {
 variable "datadog-api-key" {
 
 }
+
+variable "datadog-app-key" {
+  description = "Datadog Application key required to enable the Agentless Scanning options"
+  type        = string
+}
+
+variable "datadog-site" {
+  description = "The site of your Datadog account (datadoghq.com, datadoghq.eu, etc.)"
+  type        = string
+  default     = "datadoghq.com"
+}
 ```
 
 And run:
@@ -70,11 +107,24 @@ And run:
 terraform init
 terraform apply \
   -var="datadog-api-key=$DD_API_KEY" \
+  -var="datadog-app-key=$DD_APP_KEY" \
+  -var="datadog-site=$DD_SITE" \
   -var="datadog-integration-role=$DD_INTEGRATION_ROLE"
 ```
 
 > [!IMPORTANT]
 > Datadog strongly recommends [pinning](https://developer.hashicorp.com/terraform/language/modules/sources#selecting-a-revision) the version of the module to keep repeatable deployment and to avoid unexpected changes.
+
+## AWS Scan Options
+
+The `datadog_agentless_scanning_aws_scan_options` resource enables vulnerability scanning for different AWS resource types:
+
+- `vuln_host_os`: Enable scanning of the Host OS.
+- `vuln_containers_os`:  Enable scanning for containers.
+- `lambda`: Enable scanning of AWS Lambda functions
+- `sensitive_data`: Enable scanning of S3 buckets for sensitive data scanning
+
+For cross-account scanning, deploy this resource in each account to be scanned. See the [cross-account example](./examples/cross_account/) for details.
 
 ## Uninstall
 
