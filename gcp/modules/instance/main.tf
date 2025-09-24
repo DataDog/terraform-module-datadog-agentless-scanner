@@ -66,7 +66,7 @@ resource "google_compute_health_check" "agentless_scanner_health" {
   unhealthy_threshold = 3
 
   tcp_health_check {
-    port = 8080 # Health check port for application health check
+    port = 6253 # Health check port exposed by datadog-agentless-scanner
   }
 
   log_config {
