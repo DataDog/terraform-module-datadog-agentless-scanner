@@ -25,11 +25,6 @@ output "target_service_account_email" {
   value       = module.agentless_impersonated_service_account.service_account_email
 }
 
-output "target_custom_role_name" {
-  description = "Name of the custom target role"
-  value       = module.agentless_impersonated_service_account.custom_role_name
-}
-
 output "scanner_service_account_email" {
   description = "Email of the scanner service account"
   value       = module.agentless_scanner_service_account.scanner_service_account_email

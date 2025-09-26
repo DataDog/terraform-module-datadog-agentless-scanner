@@ -4,8 +4,8 @@ locals {
   project_id = data.google_client_config.current.project
 }
 
-# Custom role for reading disk information
-resource "google_project_iam_custom_role" "target_role" {
+# Custom role for creating snapshots
+resource "google_project_iam_custom_role" "create_snapshot" {
   role_id = "datadogAgentlessTarget${title(var.unique_suffix)}"
   title   = "Datadog Agentless Target Role"
 
@@ -33,7 +33,14 @@ resource "google_service_account" "target_service_account" {
 # Binding the custom role to the service account
 resource "google_project_iam_member" "agentless_role_binding" {
   project = local.project_id
-  role    = google_project_iam_custom_role.target_role.name
+  role    = google_project_iam_custom_role.create_snapshot.name
+  member  = "serviceAccount:${google_service_account.target_service_account.email}"
+}
+
+# Binding the predefined role to the service account
+resource "google_project_iam_member" "agentless_artifactregistry_role_binding" {
+  project = local.project_id
+  role    = "roles/artifactregistry.reader"
   member  = "serviceAccount:${google_service_account.target_service_account.email}"
 }
 
