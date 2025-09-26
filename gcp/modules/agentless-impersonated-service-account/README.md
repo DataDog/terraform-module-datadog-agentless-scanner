@@ -24,15 +24,16 @@ module "agentless_impersonated_service_account" {
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
 
-| Name                                                             | Version |
-| ---------------------------------------------------------------- | ------- |
-| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 6.0  |
+| Name | Version |
+|------|---------|
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
+| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 6.0 |
 
 ## Providers
 
-| Name                                                       | Version |
-| ---------------------------------------------------------- | ------- |
-| <a name="provider_google"></a> [google](#provider\_google) | ~> 6.0  |
+| Name | Version |
+|------|---------|
+| <a name="provider_google"></a> [google](#provider\_google) | ~> 6.0 |
 
 ## Modules
 
@@ -40,30 +41,29 @@ No modules.
 
 ## Resources
 
-| Name                                                                                                                                                                 | Type        |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| [google_project_iam_custom_role.snapshot_readonly_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role)      | resource    |
-| [google_project_iam_custom_role.target_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role)                 | resource    |
-| [google_project_iam_member.agentless_role_binding](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member)                | resource    |
-| [google_project_iam_member.agentless_use_snapshot_role_binding](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member)   | resource    |
-| [google_service_account.target_service_account](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account)                      | resource    |
-| [google_service_account_iam_member.impersonation_binding](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account_iam_member) | resource    |
-| [google_client_config.current](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/client_config)                                      | data source |
+| Name | Type |
+|------|------|
+| [google_project_iam_custom_role.create_snapshot](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role) | resource |
+| [google_project_iam_custom_role.snapshot_readonly_role](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_custom_role) | resource |
+| [google_project_iam_member.agentless_artifactregistry_role_binding](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
+| [google_project_iam_member.agentless_role_binding](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
+| [google_project_iam_member.agentless_use_snapshot_role_binding](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_iam_member) | resource |
+| [google_service_account.target_service_account](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account) | resource |
+| [google_service_account_iam_member.impersonation_binding](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/service_account_iam_member) | resource |
+| [google_client_config.current](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/client_config) | data source |
 
 ## Inputs
 
-| Name                                                                                                                            | Description                                                                 | Type     | Default | Required |
-| ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | -------- | ------- | :------: |
-| <a name="input_scanner_service_account_email"></a> [scanner\_service\_account\_email](#input\_scanner\_service\_account\_email) | Email of the scanner service account that impersonates this service account | `string` | n/a     |   yes    |
-| <a name="input_unique_suffix"></a> [unique\_suffix](#input\_unique\_suffix)                                                     | Unique suffix to append to resource names to avoid collisions               | `string` | `""`    |    no    |
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_scanner_service_account_email"></a> [scanner\_service\_account\_email](#input\_scanner\_service\_account\_email) | Email of the scanner service account that impersonates this service account | `string` | n/a | yes |
+| <a name="input_unique_suffix"></a> [unique\_suffix](#input\_unique\_suffix) | Unique suffix to append to resource names to avoid collisions | `string` | `""` | no |
 
 ## Outputs
 
-| Name                                                                                                    | Description                                                                                      |
-| ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
-| <a name="output_custom_role"></a> [custom\_role](#output\_custom\_role)                                 | The custom role for reading disk information                                                     |
-| <a name="output_custom_role_name"></a> [custom\_role\_name](#output\_custom\_role\_name)                | Name of the custom target role                                                                   |
-| <a name="output_service_account"></a> [service\_account](#output\_service\_account)                     | The service account to be impersonated by Datadog Agentless Scanner for reading disk information |
-| <a name="output_service_account_email"></a> [service\_account\_email](#output\_service\_account\_email) | Email of the target service account                                                              |
-| <a name="output_service_account_name"></a> [service\_account\_name](#output\_service\_account\_name)    | Name of the target service account                                                               |
+| Name | Description |
+|------|-------------|
+| <a name="output_service_account"></a> [service\_account](#output\_service\_account) | The service account to be impersonated by Datadog Agentless Scanner for reading disk information |
+| <a name="output_service_account_email"></a> [service\_account\_email](#output\_service\_account\_email) | Email of the target service account |
+| <a name="output_service_account_name"></a> [service\_account\_name](#output\_service\_account\_name) | Name of the target service account |
 <!-- END_TF_DOCS -->

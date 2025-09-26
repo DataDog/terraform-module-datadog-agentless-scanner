@@ -44,7 +44,22 @@ repos:
       - id: terraform-docs-go
         name: terraform docs for the 'azure/virtual-network' module
         args: ["markdown", "table", "--output-file", "README.md", "./azure/modules/virtual-network"]
-  
+      - id: terraform-docs-go
+        name: terraform docs for the GCP root module
+        args: ["markdown", "table", "--lockfile=false", "--output-file", "README.md", "./gcp"]
+      - id: terraform-docs-go
+        name: terraform docs for the 'gcp/agentless-impersonated-service-account' module
+        args: ["markdown", "table", "--output-file", "README.md", "./gcp/modules/agentless-impersonated-service-account"]
+      - id: terraform-docs-go
+        name: terraform docs for the 'gcp/agentless-scanner-service-account' module
+        args: ["markdown", "table", "--output-file", "README.md", "./gcp/modules/agentless-scanner-service-account"]
+      - id: terraform-docs-go
+        name: terraform docs for the 'gcp/instance' module
+        args: ["markdown", "table", "--output-file", "README.md", "./gcp/modules/instance"]
+      - id: terraform-docs-go
+        name: terraform docs for the 'gcp/vpc' module
+        args: ["markdown", "table", "--output-file", "README.md", "./gcp/modules/vpc"]
+
   - repo: https://github.com/antonbabenko/pre-commit-terraform
     rev: "v1.83.6"
     hooks:
