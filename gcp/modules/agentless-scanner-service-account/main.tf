@@ -1,21 +1,27 @@
 data "google_client_config" "current" {}
 
+# Random ID for unique resource naming when unique_suffix is empty
+resource "random_id" "deployment_suffix" {
+  byte_length = 4
+  count       = var.unique_suffix == "" ? 1 : 0
+}
+
 locals {
   project_id = data.google_client_config.current.project
-  # Remove trailing hyphen when unique_suffix is empty
-  service_account_suffix = var.unique_suffix != "" ? "-${var.unique_suffix}" : ""
+  # Use provided unique_suffix or generate random one
+  effective_suffix = var.unique_suffix != "" ? var.unique_suffix : random_id.deployment_suffix[0].hex
 }
 
 # Service account for the scanner
 resource "google_service_account" "scanner_service_account" {
-  account_id   = "dd-agentless-scanner${local.service_account_suffix}"
+  account_id   = "dd-agentless-scanner-${local.effective_suffix}"
   display_name = "Scanner Service Account"
   description  = "Service account for the scanner"
 }
 
 # Custom role for attaching disks
 resource "google_project_iam_custom_role" "attach_disk" {
-  role_id     = "scannerAttachDisk${title(var.unique_suffix)}"
+  role_id     = "scannerAttachDisk${title(local.effective_suffix)}"
   title       = "Datadog Agentless Scanner"
   description = "Custom role for creating and attaching disks to instances"
   permissions = [
@@ -47,7 +53,7 @@ resource "google_project_iam_member" "attach_disk_binding" {
 
 # Custom role for zone operations (cannot be restricted with conditions)
 resource "google_project_iam_custom_role" "zone_operations" {
-  role_id     = "scannerZoneOps${title(var.unique_suffix)}"
+  role_id     = "scannerZoneOps${title(local.effective_suffix)}"
   title       = "Datadog Agentless Scanner - Zone Operations"
   description = "Custom role for checking zone operation status"
   permissions = [

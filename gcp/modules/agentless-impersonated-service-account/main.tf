@@ -1,14 +1,20 @@
 data "google_client_config" "current" {}
 
+# Random ID for unique resource naming when unique_suffix is empty
+resource "random_id" "deployment_suffix" {
+  byte_length = 4
+  count       = var.unique_suffix == "" ? 1 : 0
+}
+
 locals {
   project_id = data.google_client_config.current.project
-  # Remove trailing hyphen when unique_suffix is empty
-  service_account_suffix = var.unique_suffix != "" ? "-${var.unique_suffix}" : ""
+  # Use provided unique_suffix or generate random one
+  effective_suffix = var.unique_suffix != "" ? var.unique_suffix : random_id.deployment_suffix[0].hex
 }
 
 # Custom role for creating snapshots
 resource "google_project_iam_custom_role" "create_snapshot" {
-  role_id = "datadogAgentlessTarget${title(var.unique_suffix)}"
+  role_id = "datadogAgentlessTarget${title(local.effective_suffix)}"
   title   = "Datadog Agentless Target Role"
 
   description = "Custom role for Datadog Agentless scanner"
@@ -27,7 +33,7 @@ resource "google_project_iam_custom_role" "create_snapshot" {
 }
 
 resource "google_service_account" "target_service_account" {
-  account_id   = "dd-agentless-target${local.service_account_suffix}"
+  account_id   = "dd-agentless-target-${local.effective_suffix}"
   display_name = "Datadog Agentless Target Service Account"
   description  = "Service account to be impersonated by Datadog Agentless Scanner for reading disk information"
 }
@@ -55,7 +61,7 @@ resource "google_service_account_iam_member" "impersonation_binding" {
 
 # Custom role for reading snapshots
 resource "google_project_iam_custom_role" "snapshot_readonly_role" {
-  role_id = "datadogAgentlessSnapshotReadonly${title(var.unique_suffix)}"
+  role_id = "datadogAgentlessSnapshotReadonly${title(local.effective_suffix)}"
   title   = "Datadog Agentless Snapshot Readonly Role"
 
   description = "Custom role for Datadog Agentless scanner to read snapshots"
