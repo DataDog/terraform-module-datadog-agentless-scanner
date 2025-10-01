@@ -2,6 +2,8 @@ data "google_client_config" "current" {}
 
 locals {
   project_id = data.google_client_config.current.project
+  # Remove trailing hyphen when unique_suffix is empty
+  service_account_suffix = var.unique_suffix != "" ? "-${var.unique_suffix}" : ""
 }
 
 # Custom role for creating snapshots
@@ -25,7 +27,7 @@ resource "google_project_iam_custom_role" "create_snapshot" {
 }
 
 resource "google_service_account" "target_service_account" {
-  account_id   = "dd-agentless-target-${var.unique_suffix}"
+  account_id   = "dd-agentless-target${local.service_account_suffix}"
   display_name = "Datadog Agentless Target Service Account"
   description  = "Service account to be impersonated by Datadog Agentless Scanner for reading disk information"
 }

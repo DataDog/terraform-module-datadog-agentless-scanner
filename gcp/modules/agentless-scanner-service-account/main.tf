@@ -2,11 +2,13 @@ data "google_client_config" "current" {}
 
 locals {
   project_id = data.google_client_config.current.project
+  # Remove trailing hyphen when unique_suffix is empty
+  service_account_suffix = var.unique_suffix != "" ? "-${var.unique_suffix}" : ""
 }
 
 # Service account for the scanner
 resource "google_service_account" "scanner_service_account" {
-  account_id   = "dd-agentless-scanner-${var.unique_suffix}"
+  account_id   = "dd-agentless-scanner${local.service_account_suffix}"
   display_name = "Scanner Service Account"
   description  = "Service account for the scanner"
 }
