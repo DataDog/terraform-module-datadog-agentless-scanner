@@ -14,6 +14,8 @@ locals {
   api_key_secret_id = var.api_key_secret_id != null ? var.api_key_secret_id : google_secret_manager_secret.api_key_secret[0].name
   # Use provided unique_suffix or generate random one
   effective_suffix = var.unique_suffix != "" ? var.unique_suffix : random_id.deployment_suffix[0].hex
+  # Validation for api_key XOR api_key_secret_id
+  api_key_validation = (var.api_key != null && var.api_key_secret_id == null) || (var.api_key == null && var.api_key_secret_id != null)
 }
 
 # Instance Template for Managed Instance Group
@@ -126,4 +128,14 @@ resource "google_secret_manager_secret_version" "api_key_version" {
   count       = var.api_key_secret_id != null ? 0 : 1
   secret      = google_secret_manager_secret.api_key_secret[0].id
   secret_data = var.api_key
+}
+
+# Validation to ensure exactly one of api_key or api_key_secret_id is provided
+resource "null_resource" "api_key_validation" {
+  lifecycle {
+    precondition {
+      condition     = local.api_key_validation
+      error_message = "Exactly one of 'api_key' or 'api_key_secret_id' must be provided, but not both."
+    }
+  }
 }

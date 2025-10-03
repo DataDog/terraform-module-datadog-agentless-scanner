@@ -19,8 +19,9 @@ variable "service_account_email" {
 }
 
 variable "api_key" {
-  description = "Datadog API key"
+  description = "Datadog API key. Either api_key or api_key_secret_id must be provided, but not both."
   type        = string
+  default     = null
   sensitive   = true
 }
 
