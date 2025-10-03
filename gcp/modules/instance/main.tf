@@ -11,7 +11,7 @@ resource "random_id" "deployment_suffix" {
 locals {
   project_id        = data.google_client_config.current.project
   region            = data.google_client_config.current.region
-  api_key_secret_id = var.api_key_secret_id != null ? var.api_key_secret_id : google_secret_manager_secret.api_key_secret[0].name
+  api_key_secret_id = var.api_key_secret_id != null ? var.api_key_secret_id : google_secret_manager_secret.api_key_secret[0].id
   # Use provided unique_suffix or generate random one
   effective_suffix = var.unique_suffix != "" ? var.unique_suffix : random_id.deployment_suffix[0].hex
   # Validation for api_key XOR api_key_secret_id

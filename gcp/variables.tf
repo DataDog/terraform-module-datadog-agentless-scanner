@@ -17,8 +17,9 @@ variable "enable_ssh" {
 }
 
 variable "api_key" {
-  description = "Datadog API key"
+  description = "Datadog API key. Required when not using api_key_secret_id."
   type        = string
+  default     = null
   sensitive   = true
 }
 
@@ -80,6 +81,16 @@ variable "zones" {
   description = "List of zones to deploy resources across. If empty, up to 3 zones in the region are automatically selected."
   type        = list(string)
   default     = []
+}
+
+variable "api_key_secret_id" {
+  description = "Identifier of the pre-provisioned Secret Manager secret containing the Datadog API key. Alternative to api_key."
+  type        = string
+  default     = null
+  validation {
+    condition     = var.api_key_secret_id == null || can(regex("^projects/[a-zA-Z0-9-]+/secrets/[a-zA-Z0-9-]+$", var.api_key_secret_id))
+    error_message = "The ID must be in the format 'projects/[project_id]/secrets/[secret_name]'."
+  }
 }
 
 variable "unique_suffix" {

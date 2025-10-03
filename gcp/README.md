@@ -50,6 +50,7 @@ terraform apply -var="datadog-api-key=$DD_API_KEY"
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
 | <a name="requirement_google"></a> [google](#requirement\_google) | ~> 6.0 |
+| <a name="requirement_null"></a> [null](#requirement\_null) | ~> 3.0 |
 | <a name="requirement_random"></a> [random](#requirement\_random) | ~> 3.0 |
 
 ## Providers
@@ -57,6 +58,7 @@ terraform apply -var="datadog-api-key=$DD_API_KEY"
 | Name | Version |
 |------|---------|
 | <a name="provider_google"></a> [google](#provider\_google) | ~> 6.0 |
+| <a name="provider_null"></a> [null](#provider\_null) | ~> 3.0 |
 | <a name="provider_random"></a> [random](#provider\_random) | ~> 3.0 |
 
 ## Modules
@@ -72,6 +74,7 @@ terraform apply -var="datadog-api-key=$DD_API_KEY"
 
 | Name | Type |
 |------|------|
+| [null_resource.api_key_validation](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [random_id.deployment_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [google_client_config.current](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/client_config) | data source |
 | [google_compute_zones.available](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/compute_zones) | data source |
@@ -80,7 +83,8 @@ terraform apply -var="datadog-api-key=$DD_API_KEY"
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_api_key"></a> [api\_key](#input\_api\_key) | Datadog API key | `string` | n/a | yes |
+| <a name="input_api_key"></a> [api\_key](#input\_api\_key) | Datadog API key. Required when not using api\_key\_secret\_id. | `string` | `null` | no |
+| <a name="input_api_key_secret_id"></a> [api\_key\_secret\_id](#input\_api\_key\_secret\_id) | Identifier of the pre-provisioned Secret Manager secret containing the Datadog API key. Alternative to api\_key. | `string` | `null` | no |
 | <a name="input_enable_ssh"></a> [enable\_ssh](#input\_enable\_ssh) | Whether to enable SSH firewall rule | `bool` | `true` | no |
 | <a name="input_instance_count"></a> [instance\_count](#input\_instance\_count) | Number of instances in the managed instance group | `number` | `1` | no |
 | <a name="input_scanner_channel"></a> [scanner\_channel](#input\_scanner\_channel) | Specifies the channel to use for installing the scanner | `string` | `"stable"` | no |
