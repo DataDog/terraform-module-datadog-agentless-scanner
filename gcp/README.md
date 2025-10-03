@@ -90,7 +90,7 @@ terraform apply -var="datadog-api-key=$DD_API_KEY"
 | <a name="input_ssh_public_key"></a> [ssh\_public\_key](#input\_ssh\_public\_key) | SSH public key for instance access | `string` | `null` | no |
 | <a name="input_ssh_username"></a> [ssh\_username](#input\_ssh\_username) | Username for SSH access | `string` | `"ubuntu"` | no |
 | <a name="input_subnet_cidr"></a> [subnet\_cidr](#input\_subnet\_cidr) | The CIDR block for the subnet | `string` | `"10.0.0.0/24"` | no |
-| <a name="input_unique_suffix"></a> [unique\_suffix](#input\_unique\_suffix) | Unique suffix to append to resource names to avoid collisions. If not provided, a random suffix is generated. | `string` | `""` | no |
+| <a name="input_unique_suffix"></a> [unique\_suffix](#input\_unique\_suffix) | Unique suffix to append to resource names to avoid collisions. Must be alphanumeric only (no hyphens or underscores) and maximum 8 characters. If not provided, a random suffix is generated. | `string` | `""` | no |
 | <a name="input_vpc_name"></a> [vpc\_name](#input\_vpc\_name) | Name prefix for VPC resources | `string` | `"datadog-agentless-scanner"` | no |
 | <a name="input_zones"></a> [zones](#input\_zones) | List of zones to deploy resources across. If empty, up to 3 zones in the region are automatically selected. | `list(string)` | `[]` | no |
 

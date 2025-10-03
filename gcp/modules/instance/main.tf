@@ -2,15 +2,23 @@
 
 data "google_client_config" "current" {}
 
+# Random ID for unique resource naming when unique_suffix is empty
+resource "random_id" "deployment_suffix" {
+  byte_length = 4
+  count       = var.unique_suffix == "" ? 1 : 0
+}
+
 locals {
   project_id        = data.google_client_config.current.project
   region            = data.google_client_config.current.region
   api_key_secret_id = var.api_key_secret_id != null ? var.api_key_secret_id : google_secret_manager_secret.api_key_secret[0].name
+  # Use provided unique_suffix or generate random one
+  effective_suffix = var.unique_suffix != "" ? var.unique_suffix : random_id.deployment_suffix[0].hex
 }
 
 # Instance Template for Managed Instance Group
 resource "google_compute_instance_template" "agentless_scanner_template" {
-  name_prefix  = "datadog-agentless-scanner-template-${var.unique_suffix}-"
+  name_prefix  = "datadog-agentless-scanner-template-${local.effective_suffix}-"
   description  = "Template for Datadog Agentless Scanner instances"
   machine_type = "n4-standard-2"
 
@@ -58,7 +66,7 @@ resource "google_compute_instance_template" "agentless_scanner_template" {
 
 # Health Check for Auto-healing
 resource "google_compute_health_check" "agentless_scanner_health" {
-  name                = "datadog-agentless-scanner-health-check-${var.unique_suffix}"
+  name                = "datadog-agentless-scanner-health-check-${local.effective_suffix}"
   description         = "Health check for Datadog Agentless Scanner"
   check_interval_sec  = 60
   timeout_sec         = 10
@@ -76,10 +84,10 @@ resource "google_compute_health_check" "agentless_scanner_health" {
 
 # Managed Instance Group (Autoscaling Group) - Regional
 resource "google_compute_region_instance_group_manager" "agentless_scanner_mig" {
-  name   = "datadog-agentless-scanner-mig-${var.unique_suffix}"
+  name   = "datadog-agentless-scanner-mig-${local.effective_suffix}"
   region = local.region
 
-  base_instance_name = "datadog-agentless-scanner-${var.unique_suffix}"
+  base_instance_name = "datadog-agentless-scanner-${local.effective_suffix}"
   target_size        = var.instance_count # Configurable size - will auto-replace if instance fails
 
   # Distribution policy to spread instances across specified zones
@@ -108,7 +116,7 @@ resource "google_compute_region_instance_group_manager" "agentless_scanner_mig" 
 
 resource "google_secret_manager_secret" "api_key_secret" {
   count     = var.api_key_secret_id != null ? 0 : 1
-  secret_id = "datadog-agentless-scanner-api-key-${var.unique_suffix}"
+  secret_id = "datadog-agentless-scanner-api-key-${local.effective_suffix}"
   replication {
     auto {}
   }
