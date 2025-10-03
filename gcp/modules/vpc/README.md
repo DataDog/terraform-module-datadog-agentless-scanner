@@ -74,7 +74,6 @@ No modules.
 | <a name="output_subnet"></a> [subnet](#output\_subnet) | The subnet created for the Datadog agentless scanner |
 | <a name="output_subnet_id"></a> [subnet\_id](#output\_subnet\_id) | The ID of the subnet |
 | <a name="output_subnet_name"></a> [subnet\_name](#output\_subnet\_name) | The name of the subnet |
-| <a name="output_subnetwork_name"></a> [subnetwork\_name](#output\_subnetwork\_name) | The name of the subnet (for backward compatibility) |
 | <a name="output_vpc"></a> [vpc](#output\_vpc) | The VPC network created for the Datadog agentless scanner |
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | The ID of the VPC network |
 | <a name="output_vpc_name"></a> [vpc\_name](#output\_vpc\_name) | The name of the VPC network |

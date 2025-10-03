@@ -33,7 +33,3 @@ output "network_name" {
   value       = google_compute_network.vpc.name
 }
 
-output "subnetwork_name" {
-  description = "The name of the subnet (for backward compatibility)"
-  value       = google_compute_subnetwork.subnet.name
-}
