@@ -23,5 +23,5 @@ variable "subnet_cidr" {
 variable "enable_ssh" {
   description = "Whether to enable SSH firewall rule"
   type        = bool
-  default     = true
+  default     = false
 }
