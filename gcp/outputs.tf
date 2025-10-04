@@ -48,7 +48,7 @@ output "vpc_subnet" {
 
 output "vpc_subnet_name" {
   description = "The name of the VPC subnet"
-  value       = module.vpc.subnetwork_name
+  value       = module.vpc.subnet_name
 }
 
 output "unique_suffix" {
