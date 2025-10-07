@@ -11,7 +11,7 @@ locals {
   # Use provided unique_suffix or generate random one
   effective_suffix = var.unique_suffix != "" ? var.unique_suffix : random_id.deployment_suffix[0].hex
   # Extract secret name from full path (projects/PROJECT_ID/secrets/SECRET_NAME -> SECRET_NAME)
-  secret_name = regex("projects/[^/]+/secrets/(.+)$", var.api_key_secret_id)[0]
+  secret_name = regex("^projects/[a-zA-Z0-9-]+/secrets/([a-zA-Z0-9-]+)$", var.api_key_secret_id)[0]
 }
 
 # Service account for the scanner

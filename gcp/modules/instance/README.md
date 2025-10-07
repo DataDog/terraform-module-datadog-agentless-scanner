@@ -73,7 +73,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_api_key"></a> [api\_key](#input\_api\_key) | Datadog API key. Either api\_key or api\_key\_secret\_id must be provided, but not both. | `string` | `null` | no |
-| <a name="input_api_key_secret_id"></a> [api\_key\_secret\_id](#input\_api\_key\_secret\_id) | Identifier of the pre-provisioned Secret Manager secret containing the Datadog API key | `string` | `null` | no |
+| <a name="input_api_key_secret_id"></a> [api\_key\_secret\_id](#input\_api\_key\_secret\_id) | Identifier of the Secret Manager secret containing the Datadog API key in the format projects/[project\_id]/secrets/[secret\_name] | `string` | `null` | no |
 | <a name="input_instance_count"></a> [instance\_count](#input\_instance\_count) | Number of instances in the managed instance group | `number` | `1` | no |
 | <a name="input_network_name"></a> [network\_name](#input\_network\_name) | The name of the network | `string` | n/a | yes |
 | <a name="input_scanner_channel"></a> [scanner\_channel](#input\_scanner\_channel) | Specifies the channel to use for installing the scanner | `string` | n/a | yes |

@@ -9,7 +9,7 @@ variable "unique_suffix" {
 }
 
 variable "api_key_secret_id" {
-  description = "Identifier of the Secret Manager secret containing the Datadog API key"
+  description = "Identifier of the Secret Manager secret containing the Datadog API key in the format projects/[project_id]/secrets/[secret_name]"
   type        = string
   validation {
     condition     = can(regex("^projects/[a-zA-Z0-9-]+/secrets/[a-zA-Z0-9-]+$", var.api_key_secret_id))
