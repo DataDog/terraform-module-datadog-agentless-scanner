@@ -19,6 +19,8 @@ locals {
   region        = data.google_client_config.current.region
   project_id    = data.google_client_config.current.project
   zones         = length(var.zones) > 0 ? var.zones : slice(data.google_compute_zones.available.names, 0, min(3, length(data.google_compute_zones.available.names)))
+  # Validation to ensure exactly one of api_key or api_key_secret_id is provided
+  api_key_validation = (var.api_key != null && var.api_key_secret_id == null) || (var.api_key == null && var.api_key_secret_id != null)
 }
 
 # VPC Module - Creates network infrastructure for scanner instances
@@ -58,6 +60,7 @@ module "instance" {
   service_account_email = module.agentless_scanner_service_account.scanner_service_account_email
 
   api_key            = var.api_key
+  api_key_secret_id  = var.api_key_secret_id
   site               = var.site
   ssh_public_key     = var.ssh_public_key
   ssh_username       = var.ssh_username
@@ -68,4 +71,15 @@ module "instance" {
   unique_suffix      = local.unique_suffix
 
   depends_on = [module.vpc]
+}
+
+# NOTE: Using count-based validation instead of preconditions because preconditions were
+# introduced in Terraform 1.2, which is too recent for our requirements.
+# See: https://github.com/hashicorp/terraform/blob/v1.2/CHANGELOG.md
+resource "null_resource" "api_key_validation" {
+  count = local.api_key_validation ? 0 : 1
+
+  triggers = {
+    error = "Exactly one of 'api_key' or 'api_key_secret_id' must be provided, but not both."
+  }
 }

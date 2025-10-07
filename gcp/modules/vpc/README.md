@@ -61,7 +61,7 @@ No modules.
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_enable_ssh"></a> [enable\_ssh](#input\_enable\_ssh) | Whether to enable SSH firewall rule | `bool` | `true` | no |
+| <a name="input_enable_ssh"></a> [enable\_ssh](#input\_enable\_ssh) | Whether to enable SSH firewall rule | `bool` | `false` | no |
 | <a name="input_name"></a> [name](#input\_name) | Name prefix for VPC resources | `string` | `"datadog-agentless-scanner"` | no |
 | <a name="input_subnet_cidr"></a> [subnet\_cidr](#input\_subnet\_cidr) | The CIDR block for the subnet | `string` | `"10.0.0.0/24"` | no |
 | <a name="input_unique_suffix"></a> [unique\_suffix](#input\_unique\_suffix) | Unique suffix to append to resource names to avoid collisions. Must be alphanumeric only (no hyphens or underscores) and maximum 8 characters. If not provided, a random suffix is generated. | `string` | `""` | no |
@@ -74,7 +74,6 @@ No modules.
 | <a name="output_subnet"></a> [subnet](#output\_subnet) | The subnet created for the Datadog agentless scanner |
 | <a name="output_subnet_id"></a> [subnet\_id](#output\_subnet\_id) | The ID of the subnet |
 | <a name="output_subnet_name"></a> [subnet\_name](#output\_subnet\_name) | The name of the subnet |
-| <a name="output_subnetwork_name"></a> [subnetwork\_name](#output\_subnetwork\_name) | The name of the subnet (for backward compatibility) |
 | <a name="output_vpc"></a> [vpc](#output\_vpc) | The VPC network created for the Datadog agentless scanner |
 | <a name="output_vpc_id"></a> [vpc\_id](#output\_vpc\_id) | The ID of the VPC network |
 | <a name="output_vpc_name"></a> [vpc\_name](#output\_vpc\_name) | The name of the VPC network |

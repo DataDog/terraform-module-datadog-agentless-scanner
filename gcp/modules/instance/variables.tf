@@ -19,8 +19,9 @@ variable "service_account_email" {
 }
 
 variable "api_key" {
-  description = "Datadog API key"
+  description = "Datadog API key. Either api_key or api_key_secret_id must be provided, but not both."
   type        = string
+  default     = null
   sensitive   = true
 }
 
@@ -74,7 +75,7 @@ variable "scanner_repository" {
 }
 
 variable "api_key_secret_id" {
-  description = "Identifier of the pre-provisioned Secret Manager secret containing the Datadog API key"
+  description = "Identifier of the Secret Manager secret containing the Datadog API key in the format projects/[project_id]/secrets/[secret_name]"
   type        = string
   default     = null
   validation {
