@@ -15,18 +15,11 @@ To deploy a Datadog Agentless scanner:
 1. Set your Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/).
 1. Run `terraform output scanner_role` and copy that ARN.
 
-To deploy the delegate role:
+To deploy the delegate role and activate scanning options:
 
 1. Go to the `other_account` folder.
 1. Run `terraform init`.
 1. Run `terraform apply`.
+1. Set your Datadog [API and APP keys](https://docs.datadoghq.com/account_management/api-app-keys/).
 1. Set the ARN of the scanner role you got from the previous step.
 1. Run `terraform output delegate_role` and copy that ARN.
-
-Finally, to activate Agentless Scanning:
-
-1. Go to the `activation` folder.
-1. Run `terraform init`.
-1. Run `terraform apply`.
-1. Set your Datadog credentials.
-1. List the AWS accounts where you deployed delegate roles (e.g. `["123456789012", "234567890123"]`)
