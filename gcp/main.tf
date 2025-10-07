@@ -73,11 +73,13 @@ module "instance" {
   depends_on = [module.vpc]
 }
 
+# NOTE: Using count-based validation instead of preconditions because preconditions were
+# introduced in Terraform 1.2, which is too recent for our requirements.
+# See: https://github.com/hashicorp/terraform/blob/v1.2/CHANGELOG.md
 resource "null_resource" "api_key_validation" {
-  lifecycle {
-    precondition {
-      condition     = local.api_key_validation
-      error_message = "Exactly one of 'api_key' or 'api_key_secret_id' must be provided, but not both."
-    }
+  count = local.api_key_validation ? 0 : 1
+
+  triggers = {
+    error = "Exactly one of 'api_key' or 'api_key_secret_id' must be provided, but not both."
   }
 }
