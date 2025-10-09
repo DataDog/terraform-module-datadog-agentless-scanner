@@ -14,6 +14,8 @@ locals {
   api_key_secret_id = var.api_key_secret_id != null ? var.api_key_secret_id : google_secret_manager_secret.api_key_secret[0].id
   # Use provided unique_suffix or generate random one
   effective_suffix = var.unique_suffix != "" ? var.unique_suffix : random_id.deployment_suffix[0].hex
+  # Extract secret name from full path (projects/PROJECT_ID/secrets/SECRET_NAME -> SECRET_NAME)
+  secret_name = regex("^projects/[a-zA-Z0-9-]+/secrets/([a-zA-Z0-9-]+)$", local.api_key_secret_id)[0]
   # Validation for api_key XOR api_key_secret_id
   api_key_validation = (var.api_key != null && var.api_key_secret_id == null) || (var.api_key == null && var.api_key_secret_id != null)
 }
@@ -140,4 +142,12 @@ resource "null_resource" "api_key_validation" {
   triggers = {
     error = "Exactly one of 'api_key' or 'api_key_secret_id' must be provided, but not both."
   }
+}
+
+# Binding the secretmanager secret accessor role to the scanner service account
+resource "google_secret_manager_secret_iam_member" "scanner_secret_access" {
+  project   = local.project_id
+  secret_id = local.secret_name
+  role      = "roles/secretmanager.secretAccessor"
+  member    = "serviceAccount:${var.service_account_email}"
 }
