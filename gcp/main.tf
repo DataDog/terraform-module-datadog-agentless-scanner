@@ -21,6 +21,8 @@ locals {
   zones         = length(var.zones) > 0 ? var.zones : slice(data.google_compute_zones.available.names, 0, min(3, length(data.google_compute_zones.available.names)))
   # Validation to ensure exactly one of api_key or api_key_secret_id is provided
   api_key_validation = (var.api_key != null && var.api_key_secret_id == null) || (var.api_key == null && var.api_key_secret_id != null)
+  # Validation to ensure both SSH variables are provided or neither
+  ssh_validation = (var.ssh_public_key != null && var.ssh_username != null) || (var.ssh_public_key == null && var.ssh_username == null)
 }
 
 # VPC Module - Creates network infrastructure for scanner instances
@@ -80,5 +82,13 @@ resource "null_resource" "api_key_validation" {
 
   triggers = {
     error = "Exactly one of 'api_key' or 'api_key_secret_id' must be provided, but not both."
+  }
+}
+
+resource "null_resource" "ssh_validation" {
+  count = local.ssh_validation ? 0 : 1
+
+  triggers = {
+    error = "Both 'ssh_public_key' and 'ssh_username' must be provided together, or neither should be provided."
   }
 }
