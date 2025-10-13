@@ -39,6 +39,7 @@ variable "ssh_public_key" {
 variable "ssh_username" {
   description = "Username for SSH access"
   type        = string
+  default     = null
 }
 
 variable "instance_count" {

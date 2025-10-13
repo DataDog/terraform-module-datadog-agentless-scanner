@@ -18,6 +18,8 @@ locals {
   secret_name = regex("^projects/[a-zA-Z0-9-]+/secrets/([a-zA-Z0-9-]+)$", local.api_key_secret_id)[0]
   # Validation for api_key XOR api_key_secret_id
   api_key_validation = (var.api_key != null && var.api_key_secret_id == null) || (var.api_key == null && var.api_key_secret_id != null)
+  # Validation to ensure both SSH variables are provided or neither
+  ssh_validation = (var.ssh_public_key != null && var.ssh_username != null) || (var.ssh_public_key == null && var.ssh_username == null)
 }
 
 # Instance Template for Managed Instance Group
@@ -150,4 +152,12 @@ resource "google_secret_manager_secret_iam_member" "scanner_secret_access" {
   secret_id = local.secret_name
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${var.service_account_email}"
+}
+
+resource "null_resource" "ssh_validation" {
+  count = local.ssh_validation ? 0 : 1
+
+  triggers = {
+    error = "Both 'ssh_public_key' and 'ssh_username' must be provided together, or neither should be provided."
+  }
 }
