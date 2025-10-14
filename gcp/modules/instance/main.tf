@@ -20,9 +20,10 @@ locals {
   ssh_validation = (var.ssh_public_key != null && var.ssh_username != null) || (var.ssh_public_key == null && var.ssh_username == null)
 }
 
-# Instance Template for Managed Instance Group
-resource "google_compute_instance_template" "agentless_scanner_template" {
+# Instance Template for Managed Instance Group (Regional)
+resource "google_compute_region_instance_template" "agentless_scanner_template" {
   name_prefix  = "datadog-agentless-scanner-template-${local.effective_suffix}-"
+  region       = local.region
   description  = "Template for Datadog Agentless Scanner instances"
   machine_type = "n4-standard-2"
 
@@ -68,9 +69,10 @@ resource "google_compute_instance_template" "agentless_scanner_template" {
   }
 }
 
-# Health Check for Auto-healing
-resource "google_compute_health_check" "agentless_scanner_health" {
+# Health Check for Auto-healing (Regional)
+resource "google_compute_region_health_check" "agentless_scanner_health" {
   name                = "datadog-agentless-scanner-health-check-${local.effective_suffix}"
+  region              = local.region
   description         = "Health check for Datadog Agentless Scanner"
   check_interval_sec  = 60
   timeout_sec         = 10
@@ -98,12 +100,12 @@ resource "google_compute_region_instance_group_manager" "agentless_scanner_mig" 
   distribution_policy_zones = var.zones
 
   version {
-    instance_template = google_compute_instance_template.agentless_scanner_template.id
+    instance_template = google_compute_region_instance_template.agentless_scanner_template.id
   }
 
   # Auto-healing configuration
   auto_healing_policies {
-    health_check      = google_compute_health_check.agentless_scanner_health.id
+    health_check      = google_compute_region_health_check.agentless_scanner_health.id
     initial_delay_sec = 300 # Wait 5 minutes before starting health checks
   }
 

@@ -59,9 +59,9 @@ No modules.
 
 | Name | Type |
 |------|------|
-| [google_compute_health_check.agentless_scanner_health](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_health_check) | resource |
-| [google_compute_instance_template.agentless_scanner_template](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_instance_template) | resource |
+| [google_compute_region_health_check.agentless_scanner_health](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_region_health_check) | resource |
 | [google_compute_region_instance_group_manager.agentless_scanner_mig](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_region_instance_group_manager) | resource |
+| [google_compute_region_instance_template.agentless_scanner_template](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_region_instance_template) | resource |
 | [google_secret_manager_secret.api_key_secret](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret) | resource |
 | [google_secret_manager_secret_version.api_key_version](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret_version) | resource |
 | [null_resource.api_key_validation](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
