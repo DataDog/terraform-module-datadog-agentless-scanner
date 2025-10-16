@@ -22,6 +22,8 @@ resource "google_project_iam_custom_role" "create_snapshot" {
     "compute.disks.createSnapshot",
     "compute.disks.get",
 
+    "compute.images.get",
+
     "compute.snapshots.create",
     "compute.snapshots.get",
     "compute.snapshots.list",
@@ -67,6 +69,7 @@ resource "google_project_iam_custom_role" "snapshot_readonly_role" {
   description = "Custom role for Datadog Agentless scanner to read snapshots"
   permissions = [
     "compute.snapshots.useReadOnly",
+    "compute.images.useReadOnly",
   ]
 }
 
@@ -77,6 +80,9 @@ resource "google_project_iam_member" "agentless_use_snapshot_role_binding" {
   condition {
     title       = "Limit to snapshots created by the scanner"
     description = "This condition ensures that the scanner can only access snapshots that it created."
-    expression  = "resource.name.extract(\"projects/${local.project_id}/global/snapshots/{name}\").startsWith(\"datadog-agentless\")"
+    expression  = <<EOT
+resource.name.extract("projects/${local.project_id}/global/snapshots/{name}").startsWith("datadog-agentless") ||
+resource.name.startsWith("projects/${local.project_id}/global/images/")
+EOT
   }
 }
