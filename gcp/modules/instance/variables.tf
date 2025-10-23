@@ -26,7 +26,7 @@ variable "api_key" {
 }
 
 variable "site" {
-  description = "Datadog site (for example, datadoghq.com, datadoghq.eu)"
+  description = "The Datadog site of your organization where scanner data will be sent (for example, datadoghq.com, datadoghq.eu, us5.datadoghq.com). See https://docs.datadoghq.com/getting_started/site/"
   type        = string
 }
 
