@@ -15,6 +15,21 @@ Before using this module, make sure you have the following:
 To use this module in your Terraform configuration, add the following code in your existing Terraform code:
 
 ```hcl
+terraform {
+  required_providers {
+    datadog = {
+      source  = "DataDog/datadog"
+      version = ">= 3.72.0"
+    }
+  }
+}
+
+provider "datadog" {
+  api_key = var.datadog-api-key
+  app_key = var.datadog-app-key
+  api_url = "https://api.${var.datadog-site}/"
+}
+
 # First we need to define the proper roles for our scanners. It consists of two different modules.
 
 # 1. The "scanning delegate role" defines all the policies and IAM roles necessary for the scanner to interact and scan some specific account resources.
@@ -24,6 +39,17 @@ module "delegate_role" {
 
   scanner_roles = [module.scanner_role.role.arn]
 }
+
+# Enable scan options for the AWS account where the delegate role is being deployed
+resource "datadog_agentless_scanning_aws_scan_options" "scan_options" {
+  aws_account_id     = data.aws_caller_identity.current.account_id
+  vuln_host_os       = true
+  vuln_containers_os = true
+  lambda             = true
+  sensitive_data     = false
+}
+
+data "aws_caller_identity" "current" {}
 
 # 2. The "agentless scanner role" creates an EC2 instance profile along with an IAM role allowing the EC2 instance scanner to assume the scanning delegate role(s).
 # It shall be created in the same account as the agentless scanner instance.
@@ -40,6 +66,7 @@ module "agentless_scanner" {
   source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner"
 
   api_key               = var.datadog-api-key
+  site                  = var.datadog-site
   instance_profile_name = module.scanner_role.instance_profile.name
 }
 
@@ -63,6 +90,28 @@ variable "datadog-integration-role" {
 variable "datadog-api-key" {
 
 }
+
+variable "datadog-app-key" {
+  description = "Datadog Application key required to enable the Agentless Scanning options"
+  type        = string
+}
+
+variable "datadog-site" {
+  description = "The site of your Datadog account. Choose from: datadoghq.com (US1), us3.datadoghq.com (US3), us5.datadoghq.com (US5), datadoghq.eu (EU1), ap1.datadoghq.com (AP1). See https://docs.datadoghq.com/getting_started/site/"
+  type        = string
+
+  validation {
+    condition = contains([
+      "datadoghq.com",
+      "us3.datadoghq.com",
+      "us5.datadoghq.com",
+      "datadoghq.eu",
+      "ap1.datadoghq.com"
+    ], var.datadog-site)
+    error_message = "The datadog-site must be one of: datadoghq.com (US1), us3.datadoghq.com (US3), us5.datadoghq.com (US5), datadoghq.eu (EU1), ap1.datadoghq.com (AP1)."
+  }
+}
+
 ```
 
 And run:
@@ -70,11 +119,24 @@ And run:
 terraform init
 terraform apply \
   -var="datadog-api-key=$DD_API_KEY" \
+  -var="datadog-app-key=$DD_APP_KEY" \
+  -var="datadog-site=$DD_SITE" \
   -var="datadog-integration-role=$DD_INTEGRATION_ROLE"
 ```
 
 > [!IMPORTANT]
 > Datadog strongly recommends [pinning](https://developer.hashicorp.com/terraform/language/modules/sources#selecting-a-revision) the version of the module to keep repeatable deployment and to avoid unexpected changes.
+
+## AWS Scan Options
+
+The `datadog_agentless_scanning_aws_scan_options` resource enables vulnerability scanning for different AWS resource types:
+
+- `vuln_host_os`: Enable scanning of the Host OS.
+- `vuln_containers_os`:  Enable scanning for containers.
+- `lambda`: Enable scanning of AWS Lambda functions
+- `sensitive_data`: Enable scanning of S3 buckets for sensitive data scanning
+
+For cross-account scanning, deploy this resource in each account to be scanned. See the [cross-account example](./examples/cross_account/) for details.
 
 ## Uninstall
 
@@ -196,7 +258,7 @@ No resources.
 | <a name="input_scanner_configuration"></a> [scanner\_configuration](#input\_scanner\_configuration) | Specifies a custom configuration for the scanner. The specified object is passed directly as a configuration input for the scanner. Warning: this is an advanced feature and can break the scanner if not used correctly. | `any` | `{}` | no |
 | <a name="input_scanner_repository"></a> [scanner\_repository](#input\_scanner\_repository) | Repository URL to install the scanner from. | `string` | `"https://apt.datadoghq.com/"` | no |
 | <a name="input_scanner_version"></a> [scanner\_version](#input\_scanner\_version) | Version of the scanner to install | `string` | `"0.11"` | no |
-| <a name="input_site"></a> [site](#input\_site) | By default the Agent sends its data to Datadog US site. If your organization is on another site, you must update it. See https://docs.datadoghq.com/getting_started/site/ | `string` | `null` | no |
+| <a name="input_site"></a> [site](#input\_site) | The site of your Datadog account. Choose from: datadoghq.com (US1), us3.datadoghq.com (US3), us5.datadoghq.com (US5), datadoghq.eu (EU1), ap1.datadoghq.com (AP1). See https://docs.datadoghq.com/getting_started/site/ | `string` | `"datadoghq.com"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of additional tags to add to the IAM role/profile created | `map(string)` | `{}` | no |
 
 ## Outputs
