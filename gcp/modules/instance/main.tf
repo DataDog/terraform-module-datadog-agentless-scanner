@@ -22,7 +22,7 @@ locals {
 
 # Instance Template for Managed Instance Group (Regional)
 resource "google_compute_region_instance_template" "agentless_scanner_template" {
-  name_prefix  = "datadog-agentless-scanner-template-${local.effective_suffix}-"
+  name_prefix  = "datadog-agentless-tmpl-${local.effective_suffix}-"
   region       = local.region
   description  = "Template for Datadog Agentless Scanner instances"
   machine_type = "n4-standard-2"
