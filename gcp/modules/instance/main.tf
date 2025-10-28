@@ -22,6 +22,7 @@ locals {
 
 # Instance Template for Managed Instance Group (Regional)
 resource "google_compute_region_instance_template" "agentless_scanner_template" {
+  # This prefix must remain short. Reason: https://github.com/DataDog/terraform-module-datadog-agentless-scanner/pull/235
   name_prefix  = "datadog-agentless-tmpl-${local.effective_suffix}-"
   region       = local.region
   description  = "Template for Datadog Agentless Scanner instances"
