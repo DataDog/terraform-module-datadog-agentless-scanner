@@ -50,11 +50,13 @@ resource "google_compute_region_instance_template" "agentless_scanner_template" 
     ssh-keys       = var.ssh_public_key != null ? "${var.ssh_username}:${var.ssh_public_key}" : null
     enable-oslogin = "FALSE"
     startup-script = templatefile("${path.module}/startup-script.sh.tftpl", {
-      api_key_secret_id  = local.api_key_secret_id
-      site               = var.site
-      scanner_version    = var.scanner_version
-      scanner_repository = var.scanner_repository
-      scanner_channel    = var.scanner_channel
+      api_key_secret_id     = local.api_key_secret_id
+      site                  = var.site
+      scanner_version       = var.scanner_version
+      scanner_repository    = var.scanner_repository
+      scanner_channel       = var.scanner_channel
+      scanner_configuration = var.scanner_configuration
+      agent_configuration   = var.agent_configuration
     })
   }
 

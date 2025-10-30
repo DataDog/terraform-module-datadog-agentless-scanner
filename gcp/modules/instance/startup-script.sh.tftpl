@@ -81,6 +81,9 @@ site: $DD_SITE
 hostname: $DD_HOSTNAME
 logs_enabled: true
 secret_backend_command: /usr/local/bin/dd-secret-backend
+%{if length(agent_configuration) > 0}
+${yamlencode(agent_configuration)}
+%{endif}
 EOF
 
 cat <<EOF > /usr/local/bin/dd-secret-backend
@@ -95,7 +98,10 @@ hostname: $DD_HOSTNAME
 api_key: $DD_API_KEY
 site: $DD_SITE
 installation_mode: terraform
-installation_version: 0.11.10
+installation_version: 0.11.11
+%{if length(scanner_configuration) > 0}
+${yamlencode(scanner_configuration)}
+%{endif}
 EOF
 
 chown dd-agent: /etc/datadog-agent/agentless-scanner.yaml
