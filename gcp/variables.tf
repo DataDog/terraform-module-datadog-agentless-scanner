@@ -76,6 +76,34 @@ variable "scanner_repository" {
   }
 }
 
+variable "scanner_configuration" {
+  description = "Specifies a custom configuration for the scanner. The specified object is passed directly as a configuration input for the scanner. Warning: this is an advanced feature and can break the scanner if not used correctly."
+  type        = any
+  default     = {}
+  validation {
+    condition     = can(yamlencode(var.scanner_configuration))
+    error_message = "The scanner_configuration variable cannot be properly encoded to YAML."
+  }
+  validation {
+    condition     = !contains(keys(var.scanner_configuration), "api_key") && !contains(keys(var.scanner_configuration), "hostname") && !contains(keys(var.scanner_configuration), "site")
+    error_message = "The scanner_configuration cannot override the 'api_key', 'hostname', or 'site' fields."
+  }
+}
+
+variable "agent_configuration" {
+  description = "Specifies a custom configuration for the Datadog Agent. The specified object is passed directly as a configuration input for the Datadog Agent. For more details: https://docs.datadoghq.com/agent/configuration/agent-configuration-files/. Warning: this is an advanced feature and can break the Datadog Agent if not used correctly."
+  type        = any
+  default     = {}
+  validation {
+    condition     = can(yamlencode(var.agent_configuration))
+    error_message = "The agent_configuration variable cannot be properly encoded to YAML."
+  }
+  validation {
+    condition     = !contains(keys(var.agent_configuration), "api_key") && !contains(keys(var.agent_configuration), "hostname") && !contains(keys(var.agent_configuration), "site") && !contains(keys(var.agent_configuration), "logs_enabled") && !contains(keys(var.agent_configuration), "ec2_prefer_imdsv2")
+    error_message = "The agent_configuration cannot override the 'api_key', 'hostname', or 'site' fields."
+  }
+}
+
 variable "zones" {
   description = "List of zones to deploy resources across. If empty, up to 3 zones in the region are automatically selected."
   type        = list(string)
