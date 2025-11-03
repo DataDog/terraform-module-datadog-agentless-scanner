@@ -61,16 +61,18 @@ module "instance" {
   subnetwork_name       = module.vpc.subnet_name
   service_account_email = module.agentless_scanner_service_account.scanner_service_account_email
 
-  api_key            = var.api_key
-  api_key_secret_id  = var.api_key_secret_id
-  site               = var.site
-  ssh_public_key     = var.ssh_public_key
-  ssh_username       = var.ssh_username
-  instance_count     = var.instance_count
-  scanner_version    = var.scanner_version
-  scanner_channel    = var.scanner_channel
-  scanner_repository = var.scanner_repository
-  unique_suffix      = local.unique_suffix
+  api_key               = var.api_key
+  api_key_secret_id     = var.api_key_secret_id
+  site                  = var.site
+  ssh_public_key        = var.ssh_public_key
+  ssh_username          = var.ssh_username
+  instance_count        = var.instance_count
+  scanner_version       = var.scanner_version
+  scanner_channel       = var.scanner_channel
+  scanner_repository    = var.scanner_repository
+  scanner_configuration = var.scanner_configuration
+  agent_configuration   = var.agent_configuration
+  unique_suffix         = local.unique_suffix
 
   depends_on = [module.vpc]
 }
