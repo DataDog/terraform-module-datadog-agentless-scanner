@@ -67,6 +67,13 @@ resource "google_compute_region_instance_template" "agentless_scanner_template" 
     datadogagentlessscanner = "true"
   }
 
+  scheduling {
+    instance_termination_action = "DELETE"
+    max_run_duration {
+      seconds = 300
+    }
+  }
+
   lifecycle {
     create_before_destroy = true
   }
@@ -101,6 +108,8 @@ resource "google_compute_region_instance_group_manager" "agentless_scanner_mig" 
 
   # Distribution policy to spread instances across specified zones
   distribution_policy_zones = var.zones
+  # Set target shape to ANY to support max_run_duration
+  distribution_policy_target_shape = "ANY"
 
   version {
     instance_template = google_compute_region_instance_template.agentless_scanner_template.id
@@ -114,8 +123,9 @@ resource "google_compute_region_instance_group_manager" "agentless_scanner_mig" 
 
   # Update policy for rolling updates (enhanced for regional MIG)
   update_policy {
-    type           = "PROACTIVE"
-    minimal_action = "REPLACE"
+    type                         = "OPPORTUNISTIC"
+    minimal_action               = "REPLACE"
+    instance_redistribution_type = "NONE" # Required for max_run_duration support
 
     max_surge_fixed       = length(var.zones) # Allow one instance per zone during surge
     max_unavailable_fixed = 0                 # Must be 0 or >= number of zones for regional MIG

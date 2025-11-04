@@ -110,9 +110,5 @@ chmod 600 /etc/datadog-agent/agentless-scanner.yaml
 # Restart the agent
 systemctl restart datadog-agent
 
-# Schedule scanner stop after 24 hours to trigger automatic instance replacement.
-# This will cause the health probe to fail and trigger an automatic instance replacement.
-systemd-run --on-boot=24h systemctl stop datadog-agentless-scanner
-
 # Enable and start datadog-agentless-scanner.
 systemctl enable --now datadog-agentless-scanner
