@@ -21,7 +21,6 @@ module "datadog_agentless_scanner" {
   api_key  = var.datadog_api_key
   vpc_name = "datadog-agentless-scanner"
 
-  # The module automatically distributes instances across multiple zones in the configured region
   instance_count = 1
 }
 

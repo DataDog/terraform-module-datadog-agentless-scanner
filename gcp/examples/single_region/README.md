@@ -4,6 +4,8 @@ This folder shows an example of Terraform code that uses the [datadog-agentless-
 
 With this deployment, a single Agentless scanner is deployed in a single region with instances distributed across multiple zones for high availability. Datadog recommends this option for most use cases.
 
+**Note**: The region is configured via the Google provider. In this example, `us-central1` is used, but you can change it to any GCP region.
+
 ## Architecture
 
 The module deploys:
@@ -13,8 +15,6 @@ The module deploys:
 - Two service accounts:
   - Scanner service account (attached to instances)
   - Impersonated service account (for resource scanning)
-
-**Note**: The region is configured via the Google provider. In this example, `us-central1` is used, but you can change it to any GCP region.
 
 ## Quick start
 

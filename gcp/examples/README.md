@@ -9,10 +9,8 @@ This directory contains example Terraform configurations for deploying the Datad
 Deploy Agentless scanners in a single GCP region within a single project. Instances are distributed across multiple zones for high availability. This is the **recommended starting point** for most users.
 
 **Use this when:**
-- You're getting started with Agentless scanning
 - Your resources are in one project and primarily in one region
 - You want the simplest deployment model
-- You need a quick proof of concept
 
 **What it deploys:**
 - Single GCP project
@@ -20,8 +18,6 @@ Deploy Agentless scanners in a single GCP region within a single project. Instan
 - VPC network with multi-zone distribution
 - Managed Instance Group with scanner instances
 - Service accounts for scanning within the same project
-
-**Time to deploy:** ~5-10 minutes
 
 ---
 
@@ -41,8 +37,6 @@ Deploy Agentless scanners across **multiple regions** in one GCP project, while 
 - Cross-project service account impersonation setup
 - Ability to scan multiple other projects
 
-**Time to deploy:** ~15-20 minutes
-
 ---
 
 ## Quick Comparison
@@ -50,11 +44,10 @@ Deploy Agentless scanners across **multiple regions** in one GCP project, while 
 | Feature | Single Region | Cross Project |
 |---------|--------------|---------------|
 | **Complexity** | Simple | Advanced |
-| **Deployment Time** | 5-10 min | 15-20 min |
 | **Projects Scanned** | Single project | Multiple projects |
 | **Regions Covered** | Single region | Multiple regions |
 | **Cross-Region Costs** | Higher (if resources are multi-region) | Lower (regional scanners) |
-| **Use Case** | Getting started, PoC, single project | Production, multi-project orgs |
+| **Use Case** | Single project | multi-project orgs |
 | **Management** | Simple | Centralized |
 | **Redundancy** | Zone-level | Region-level |
 
@@ -272,23 +265,6 @@ gcloud compute ssh <INSTANCE_NAME> --tunnel-through-iap
 # Check scanner status on instance
 sudo systemctl status datadog-agentless-scanner
 ```
-
-## Monitoring Your Scanners
-
-After deployment, monitor in Datadog:
-
-1. **Go to Infrastructure → Host Map**
-2. **Filter by** `scanner:agentless-gcp` tag
-3. **Check metrics:**
-   - Scanner health
-   - Scanning throughput
-   - Resource discovery rate
-   - Error rates
-
-4. **Set up monitors** for:
-   - Scanner instance health
-   - Scanning failures
-   - High resource utilization
 
 ## Next Steps
 
