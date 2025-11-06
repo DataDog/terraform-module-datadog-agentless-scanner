@@ -23,7 +23,7 @@ Deploy Agentless scanners in a single GCP region within a single project. Instan
 
 ### [Cross Project](./cross_project/) - **Advanced Setup**
 
-Deploy Agentless scanners across **multiple regions** in one GCP project, while scanning resources in **other GCP projects**. This is the **advanced deployment model** for production environments with distributed infrastructure.
+Deploy Agentless scanners across **multiple regions** in one GCP project, while scanning resources in **other GCP projects**. This is the **recommended deployment model** for production environments with distributed infrastructure.
 
 **Use this when:**
 - You have multiple GCP projects to scan
@@ -196,12 +196,12 @@ Before using any example, ensure you have:
 
 ### Single Region
 - **Network Costs**: Minimal for local resources, higher for cross-region scanning
-- **Compute Costs**: 1 instance by default (`e2-standard-2`)
+- **Compute Costs**: 1 instance by default
 - **Best For**: Small to medium workloads in one region
 
 ### Cross Project
 - **Network Costs**: Minimized by scanning locally per region
-- **Compute Costs**: Multiple instances (1 per region by default, 2 total)
+- **Compute Costs**: Multiple instances (1 per region by default)
 - **Best For**: Large, distributed workloads across multiple projects/regions
 
 ### Cost Optimization Tips
