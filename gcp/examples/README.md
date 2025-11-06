@@ -13,10 +13,9 @@ Deploy Agentless scanners in a single GCP region within a single project. Instan
 - You want the simplest deployment model
 
 **What it deploys:**
-- Single GCP project
+- A scanner compute instance as part of a Managed Instance Group
 - Single region (configured via the Google provider)
 - VPC network with multi-zone distribution
-- Managed Instance Group with scanner instances
 - Service accounts for scanning within the same project
 
 ---
@@ -32,7 +31,6 @@ Deploy Agentless scanners across **multiple regions** in one GCP project, while 
 - You need centralized scanner management
 
 **What it deploys:**
-- Scanner project with multiple regional deployments (US and EU by default)
 - Each region has its own VPC and scanner instances
 - Cross-project service account impersonation setup
 - Ability to scan multiple other projects
