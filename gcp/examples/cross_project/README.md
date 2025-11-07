@@ -58,27 +58,43 @@ Use this **advanced** deployment model when:
 
 ### Step 1: Deploy the Multi-Region Scanner Infrastructure
 
-1. Go to the `scanner_project` folder.
-1. Run `terraform init`.
-1. Run `terraform apply`.
-1. Set your scanner project ID.
-1. Set your Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/).
-1. Set your Datadog site.
-1. Note the outputs for both US and EU scanner service account emails.
+1. **Configure your GCP project**:
+   ```sh
+   gcloud config set project my-scanner-project
+   ```
 
-Example:
-```sh
-cd scanner_project
-terraform init
-terraform apply \
-  -var="scanner_project_id=my-scanner-project" \
-  -var="datadog_api_key=$DD_API_KEY" \
-  -var="datadog_site=datadoghq.com"
+1. **Authenticate with GCP**:
+   ```sh
+   gcloud auth application-default login
+   ```
 
-# Save the outputs for the next step
-SCANNER_SA_US=$(terraform output -raw scanner_service_account_email_us)
-SCANNER_SA_EU=$(terraform output -raw scanner_service_account_email_eu)
-```
+1. **Navigate to the scanner_project folder**:
+   ```sh
+   cd scanner_project
+   ```
+
+1. **Initialize Terraform**:
+   ```sh
+   terraform init
+   ```
+
+1. **Deploy the scanner infrastructure**. You will need to:
+   - Set your scanner project ID
+   - Set your Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/)
+   - Set your Datadog site
+
+   ```sh
+   terraform apply \
+     -var="scanner_project_id=my-scanner-project" \
+     -var="datadog_api_key=$DD_API_KEY" \
+     -var="datadog_site=datadoghq.com"
+   ```
+
+1. **Save the outputs for the next step**:
+   ```sh
+   SCANNER_SA_US=$(terraform output -raw scanner_service_account_email_us)
+   SCANNER_SA_EU=$(terraform output -raw scanner_service_account_email_eu)
+   ```
 
 ### Step 2: Set up Other Projects for Scanning
 

@@ -100,28 +100,40 @@ Before using any example, ensure you have:
 
 1. **Choose your example** (start with `single_region` if unsure)
 
-2. **Navigate to the example directory:**
+2. **Configure your GCP project:**
+   ```bash
+   gcloud config set project YOUR_PROJECT_ID
+   ```
+
+3. **Authenticate with GCP:**
+   ```bash
+   gcloud auth application-default login
+   ```
+
+4. **Navigate to the example directory:**
    ```bash
    cd single_region  # or cross_project
    ```
 
-3. **Initialize Terraform:**
+5. **Initialize Terraform:**
    ```bash
    terraform init
    ```
 
-4. **Review the planned changes:**
+6. **Review the planned changes:**
    ```bash
    terraform plan \
      -var="project_id=YOUR_PROJECT_ID" \
-     -var="datadog_api_key=$DD_API_KEY"
+     -var="datadog_api_key=$DD_API_KEY" \
+     -var="datadog_site=datadoghq.com"
    ```
 
-5. **Apply the configuration:**
+7. **Apply the configuration:**
    ```bash
    terraform apply \
      -var="project_id=YOUR_PROJECT_ID" \
-     -var="datadog_api_key=$DD_API_KEY"
+     -var="datadog_api_key=$DD_API_KEY" \
+     -var="datadog_site=datadoghq.com"
    ```
 
 6. **Verify in Datadog** that your scanner is reporting

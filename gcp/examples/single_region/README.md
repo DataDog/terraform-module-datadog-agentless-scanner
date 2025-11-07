@@ -20,20 +20,32 @@ The module deploys:
 
 To deploy a Datadog agentless scanner:
 
-1. Run `terraform init`.
-1. Run `terraform apply`.
-1. Set your GCP project ID.
-1. Set your Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/).
-1. Set your Datadog site.
+1. **Configure your GCP project**:
+   ```sh
+   gcloud config set project <my-gcp-project>
+   ```
 
-Example:
-```sh
-terraform init
-terraform apply \
-  -var="project_id=my-gcp-project" \
-  -var="datadog_api_key=$DD_API_KEY" \
-  -var="datadog_site=datadoghq.com"
-```
+1. **Authenticate with GCP**:
+   ```sh
+   gcloud auth application-default login
+   ```
+
+1. **Initialize Terraform**:
+   ```sh
+   terraform init
+   ```
+
+1. **Deploy the scanner**. You will need to:
+   - Set your GCP project ID
+   - Set your Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/)
+   - Set your Datadog site
+
+   ```sh
+   terraform apply \
+     -var="project_id=my-gcp-project" \
+     -var="datadog_api_key=$DD_API_KEY" \
+     -var="datadog_site=datadoghq.com"
+   ```
 
 ## Prerequisites
 
