@@ -1,4 +1,4 @@
-# Terraform Module Datadog Agentless Scanner Module
+# Terraform Module Datadog Agentless Scanner for GCP
 
 This Terraform module provides a simple and reusable configuration for installing a Datadog Agentless Scanner on Google Cloud Platform (GCP).
 
@@ -6,9 +6,18 @@ This Terraform module provides a simple and reusable configuration for installin
 
 Before using this module, make sure you have the following:
 
-1. [Terraform](https://www.terraform.io/) installed on your local machine.
+1. [Terraform](https://www.terraform.io/) v1.0 or later installed on your local machine.
 2. The [Google Cloud CLI](https://cloud.google.com/sdk/docs/install) installed on your local machine.
-3. GCP credentials configured (`gcloud auth login`) with the necessary permissions.
+3. GCP credentials configured (`gcloud auth login`) with the necessary permissions to create:
+   - VPC networks and subnets
+   - Compute Engine instances and instance templates
+   - Service accounts and IAM bindings
+   - Secret Manager secrets (if using api_key parameter)
+4. A Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/) with Remote Configuration enabled.
+5. A GCP project with the following APIs enabled:
+   - Compute Engine API
+   - IAM Service Account Credentials API
+   - Secret Manager API (if using api_key parameter)
 
 ## Usage
 
