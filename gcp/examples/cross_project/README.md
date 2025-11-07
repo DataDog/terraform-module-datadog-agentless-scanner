@@ -78,6 +78,14 @@ Use this **advanced** deployment model when:
    terraform init
    ```
 
+1. **Review the deployment plan**:
+   ```sh
+   terraform plan \
+     -var="scanner_project_id=my-scanner-project" \
+     -var="datadog_api_key=$DD_API_KEY" \
+     -var="datadog_site=datadoghq.com"
+   ```
+
 1. **Deploy the scanner infrastructure**. You will need to:
    - Set your scanner project ID
    - Set your Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/)
@@ -100,7 +108,8 @@ Use this **advanced** deployment model when:
 
 1. Go to the `other_project` folder.
 1. Run `terraform init`.
-1. Run `terraform apply`.
+1. Run `terraform plan` to review the changes.
+1. Run `terraform apply` to deploy.
 1. Set the project ID to be scanned.
 1. Set both scanner service account emails from Step 1.
 
@@ -108,6 +117,10 @@ Example:
 ```sh
 cd ../other_project
 terraform init
+terraform plan \
+  -var="scanned_project_id=my-other-project" \
+  -var="scanner_service_account_email_us=$SCANNER_SA_US" \
+  -var="scanner_service_account_email_eu=$SCANNER_SA_EU"
 terraform apply \
   -var="scanned_project_id=my-other-project" \
   -var="scanner_service_account_email_us=$SCANNER_SA_US" \
@@ -153,7 +166,7 @@ Repeat Step 2 for each additional project you want to scan.
 
 You have two options for providing the Datadog API key:
 
-1. **Pass the API key directly** (shown in examples below):
+1. **Pass the API key directly** (shown in examples above):
    ```bash
    -var="datadog_api_key=$DD_API_KEY"
    ```
