@@ -2,7 +2,7 @@
 
 This folder shows an example of Terraform code that uses the [datadog-agentless-scanner module](https://github.com/Datadog/terraform-module-datadog-agentless-scanner/tree/main/gcp) to deploy a Datadog Agentless scanner in your [GCP](https://cloud.google.com/) project.
 
-With this deployment, a single Agentless scanner is deployed in a single region with instances distributed across multiple zones for high availability. Datadog recommends this option for most use cases.
+With this deployment, a single Agentless scanner is deployed in a single region with instances distributed across multiple zones for high availability.
 
 **Note**: The region is configured via the Google provider. In this example, `us-central1` is used, but you can change it to any GCP region.
 

@@ -12,9 +12,3 @@ variable "scanner_service_account_email_eu" {
   description = "Email of the EU scanner service account from the scanner project (output from scanner_project deployment)"
   type        = string
 }
-
-variable "unique_suffix" {
-  description = "Unique suffix to append to resource names. Must be alphanumeric only and maximum 6 characters (will be appended with region suffix)."
-  type        = string
-  default     = ""
-}

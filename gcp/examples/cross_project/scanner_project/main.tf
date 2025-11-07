@@ -29,10 +29,9 @@ module "datadog_agentless_scanner_us" {
     google = google.us
   }
 
-  site          = var.datadog_site
-  api_key       = var.datadog_api_key
-  vpc_name      = "datadog-agentless-scanner-us"
-  unique_suffix = ""
+  site     = var.datadog_site
+  api_key  = var.datadog_api_key
+  vpc_name = "datadog-agentless-scanner-us"
 }
 
 # Deploy the scanner infrastructure in EU region
@@ -43,8 +42,7 @@ module "datadog_agentless_scanner_eu" {
     google = google.eu
   }
 
-  site          = var.datadog_site
-  api_key       = var.datadog_api_key
-  vpc_name      = "datadog-agentless-scanner-eu"
-  unique_suffix = ""
+  site     = var.datadog_site
+  api_key  = var.datadog_api_key
+  vpc_name = "datadog-agentless-scanner-eu"
 }
