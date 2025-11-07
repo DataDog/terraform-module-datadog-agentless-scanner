@@ -32,8 +32,6 @@ module "datadog_agentless_scanner_us" {
   site     = var.datadog_site
   api_key  = var.datadog_api_key
   vpc_name = "datadog-agentless-scanner-us"
-
-  instance_count = 1
 }
 
 # Deploy the scanner infrastructure in EU region
@@ -47,6 +45,4 @@ module "datadog_agentless_scanner_eu" {
   site     = var.datadog_site
   api_key  = var.datadog_api_key
   vpc_name = "datadog-agentless-scanner-eu"
-
-  instance_count = 1
 }

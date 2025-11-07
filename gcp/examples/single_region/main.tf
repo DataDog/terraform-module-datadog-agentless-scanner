@@ -20,7 +20,5 @@ module "datadog_agentless_scanner" {
   site     = var.datadog_site
   api_key  = var.datadog_api_key
   vpc_name = "datadog-agentless-scanner"
-
-  instance_count = 1
 }
 
