@@ -3,13 +3,12 @@ data "google_client_config" "current" {}
 # Random ID for unique resource naming when unique_suffix is empty
 resource "random_id" "deployment_suffix" {
   byte_length = 4
-  count       = var.unique_suffix == "" ? 1 : 0
 }
 
 locals {
   project_id = data.google_client_config.current.project
   # Use provided unique_suffix or generate random one
-  effective_suffix = var.unique_suffix != "" ? var.unique_suffix : random_id.deployment_suffix[0].hex
+  effective_suffix = var.unique_suffix != "" ? var.unique_suffix : random_id.deployment_suffix.hex
   # Extract secret name from full path (projects/PROJECT_ID/secrets/SECRET_NAME -> SECRET_NAME)
   secret_name = regex("^projects/[a-zA-Z0-9-]+/secrets/([a-zA-Z0-9-]+)$", var.api_key_secret_id)[0]
 }
