@@ -9,9 +9,9 @@ With this deployment, a single Agentless scanner is deployed in a single region 
 ## Architecture
 
 The module deploys:
+- Managed Instance Group (MIG) with scanner instances distributed across zones
 - VPC network with private subnet in the configured region
 - Cloud Router and Cloud NAT for outbound connectivity
-- Managed Instance Group (MIG) with scanner instances distributed across zones
 - Two service accounts:
   - Scanner service account (attached to instances)
   - Impersonated service account (for resource scanning)
