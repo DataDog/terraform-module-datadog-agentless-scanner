@@ -15,7 +15,7 @@ provider "google" {
 }
 
 module "datadog_agentless_scanner" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp?ref=7993939f19df2a39c981cbffbcd48a91c9fba214"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp?ref=0.11.12"
 
   site     = var.datadog_site
   api_key  = var.datadog_api_key

@@ -14,24 +14,24 @@ provider "aws" {
 }
 
 module "agentless_scanner_role" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanner-role?ref=0.11.11"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanner-role?ref=0.11.12"
 }
 
 module "delegate_role" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/scanning-delegate-role?ref=0.11.11"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/scanning-delegate-role?ref=0.11.12"
 
   scanner_roles = [module.agentless_scanner_role.role.arn]
 }
 
 module "user_data" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/user_data?ref=0.11.11"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/user_data?ref=0.11.12"
 
   hostname = "agentless-scanning-us-east-1"
   api_key  = var.api_key
 }
 
 module "instance" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/instance?ref=0.11.11"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/instance?ref=0.11.12"
 
   user_data            = module.user_data.install_sh
   iam_instance_profile = module.agentless_scanner_role.profile.name
@@ -40,6 +40,6 @@ module "instance" {
 }
 
 module "autoscaling_scanners" {
-  source                   = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanners-autoscaling?ref=0.11.11"
+  source                   = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanners-autoscaling?ref=0.11.12"
   datadog_integration_role = var.datadog_integration_role
 }

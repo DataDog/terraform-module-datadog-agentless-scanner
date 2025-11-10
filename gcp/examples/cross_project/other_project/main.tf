@@ -17,13 +17,13 @@ provider "google" {
 # This allows both the US and EU scanners to scan resources in this project
 
 module "agentless_impersonated_service_account_us" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp/modules/agentless-impersonated-service-account?ref=7993939f19df2a39c981cbffbcd48a91c9fba214"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp/modules/agentless-impersonated-service-account?ref=0.11.12"
 
   scanner_service_account_email = var.scanner_service_account_email_us
 }
 
 module "agentless_impersonated_service_account_eu" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp/modules/agentless-impersonated-service-account?ref=7993939f19df2a39c981cbffbcd48a91c9fba214"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp/modules/agentless-impersonated-service-account?ref=0.11.12"
 
   scanner_service_account_email = var.scanner_service_account_email_eu
 }

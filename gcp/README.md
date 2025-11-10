@@ -46,7 +46,7 @@ provider "google" {
 }
 
 module "datadog_agentless_scanner" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp?ref=<COMMIT_HASH>"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp?ref=0.11.12"
 
   site     = var.datadog_site
   vpc_name = "datadog-agentless-scanner"
