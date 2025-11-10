@@ -1,5 +1,14 @@
 # Changelog
 
+## Version 0.11.12 - 2025-11-10
+
+- Add initial GCP support with Terraform modules and examples (`single_region` and `cross_project`)
+- Add permissions for scanning GCE and Artifact Registry images
+- Support custom scanner and agent configuration
+- Improve S3 lifecycle rules and enable KMS key rotation on RDS exports
+- Fix API call Content-Type in ARM template
+- Use scanner health check endpoint instead of custom service
+
 ## Version 0.11.11 - 2025-06-16
 
 - Adapt CopySnapshot policy to latest IAM changes requiring both source and destination statements

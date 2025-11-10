@@ -5,8 +5,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.36.177.2456",
-      "templateHash": "4312948444920496734"
+      "version": "0.38.33.27573",
+      "templateHash": "6445791290908331505"
     }
   },
   "functions": [
@@ -569,7 +569,7 @@
         "count": "[length(map(filter(parameters('scanScopes'), lambda('s', startsWith(lambdaVariables('s'), '/subscriptions/'))), lambda('s', skip(lambdaVariables('s'), length('/subscriptions/')))))]"
       },
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2022-09-01",
+      "apiVersion": "2025-04-01",
       "name": "[format('delegateRoleAssignment-{0}', guid(resourceId('Microsoft.Authorization/roleDefinitions', guid(variables('name'), 'delegateRole', resourceGroup().id, subscription().id)), resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('identityName')), map(filter(parameters('scanScopes'), lambda('s', startsWith(lambdaVariables('s'), '/subscriptions/'))), lambda('s', skip(lambdaVariables('s'), length('/subscriptions/'))))[copyIndex()]))]",
       "subscriptionId": "[map(filter(parameters('scanScopes'), lambda('s', startsWith(lambdaVariables('s'), '/subscriptions/'))), lambda('s', skip(lambdaVariables('s'), length('/subscriptions/'))))[copyIndex()]]",
       "location": "[resourceGroup().location]",
@@ -595,8 +595,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.36.177.2456",
-              "templateHash": "3116385340016775396"
+              "version": "0.38.33.27573",
+              "templateHash": "4400777875424963630"
             }
           },
           "parameters": {
