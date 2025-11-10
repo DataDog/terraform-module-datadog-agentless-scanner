@@ -118,38 +118,6 @@ The main module provided in this directory is a wrapper around these modules wit
 
 ![GCP Agentless Scanner Architecture](./agentless_gcp_architecture.svg)
 
-The diagram above shows a typical deployment where:
-- The scanner infrastructure runs in a dedicated VPC with private instances
-- Scanner instances are distributed across multiple zones in a Managed Instance Group
-- Service account impersonation enables scanning of resources in the same project and cross-project
-- All scanner communication goes through Cloud NAT for outbound connectivity to Datadog
-
-### Module Relationships
-
-```mermaid
-flowchart TD
-    subgraph "GCP Project A - Scanner Project"
-        subgraph "Main Module"
-            VPC[VPC Module]
-            INST[Instance Module]
-            VPC --> INST
-        end
-        
-        SSA[Scanner Service Account]
-        SSA --> INST
-        
-        ISA_A[Impersonated Service Account A]
-        SSA -.impersonates.-> ISA_A
-        ISA_A -.scans.-> RES_A[Compute Resources A]
-    end
-    
-    subgraph "GCP Project B - Other Project"
-        ISA_B[Impersonated Service Account B]
-        SSA -.impersonates.-> ISA_B
-        ISA_B -.scans.-> RES_B[Compute Resources B]
-    end
-```
-
 ### How It Works
 
 1. **Network Isolation**: The scanner runs in a dedicated VPC with private instances that have no external IP addresses. Outbound connectivity is provided through Cloud NAT.
