@@ -8,7 +8,7 @@ Before using this module, make sure you have the following:
 
 1. [Terraform](https://www.terraform.io/) v1.0 or later installed on your local machine.
 2. The [Google Cloud CLI](https://cloud.google.com/sdk/docs/install) installed on your local machine.
-3. GCP credentials configured (`gcloud auth login`) with the necessary permissions to create:
+3. GCP credentials configured with the necessary permissions to create:
    - VPC networks and subnets
    - Compute Engine instances and instance templates
    - Service accounts and IAM bindings
@@ -21,36 +21,115 @@ Before using this module, make sure you have the following:
 
 ## Usage
 
-To use this module in your Terraform configuration, add the following code in your existing Terraform code:
+This is a quick example showing how to use this module. For more detailed examples with different deployment scenarios, refer to the [examples](./examples/) directory.
 
 ```hcl
-variable "datadog-api-key" {}
+variable "project_id" {
+  description = "GCP project ID"
+  type        = string
+}
 
-module "datadog-agentless-scanner" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp"
+variable "datadog_api_key" {
+  description = "Datadog API key with Remote Configuration enabled"
+  type        = string
+  sensitive   = true
+}
 
-  site           = "datadoghq.com"
-  vpc_name       = "datadog-agentless-scanner"
-  api_key        = var.datadog-api-key
+variable "datadog_site" {
+  description = "Datadog site (e.g., datadoghq.com, datadoghq.eu, us3.datadoghq.com, us5.datadoghq.com, ap1.datadoghq.com, ap2.datadoghq.com, ddog-gov.com)"
+  type        = string
+}
+
+provider "google" {
+  project = var.project_id
+  region  = "us-central1"
+}
+
+module "datadog_agentless_scanner" {
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp?ref=0.11.12"
+
+  site     = var.datadog_site
+  vpc_name = "datadog-agentless-scanner"
+  api_key  = var.datadog_api_key
 }
 ```
 
 And run:
 ```sh
 terraform init
-export GOOGLE_PROJECT="your-project-id"
-export GOOGLE_REGION="us-central1"
-terraform apply -var="datadog-api-key=$DD_API_KEY"
+terraform apply \
+  -var="project_id=<your-project-id>" \
+  -var="datadog_api_key=$DD_API_KEY" \
+  -var="datadog_site=<your-datadog-site>"
 ```
 
-### Notes
+> [!IMPORTANT]
+> Datadog strongly recommends [pinning](https://developer.hashicorp.com/terraform/language/modules/sources#selecting-a-revision) the version of the module to keep repeatable deployment and to avoid unexpected changes. Use a specific tag instead of a branch name.
 
-- `site` must match the Datadog site parameter of your account (see [this table](https://docs.datadoghq.com/getting_started/site/#access-the-datadog-site)).
-- `vpc_name` is the name prefix for the VPC resources where the Agentless scanner
-  is created. For security reasons, this VPC should be reserved for
-  the exclusive use of the scanner.
-- The scanner requires a service account with appropriate permissions to scan disks
-  in your GCP project. This module creates the necessary service accounts and IAM roles.
+### Configuration Notes
+
+- **`site`**: Must match the Datadog site parameter of your account (see [Datadog site documentation](https://docs.datadoghq.com/getting_started/site/#access-the-datadog-site)). Common values: `datadoghq.com`, `datadoghq.eu`, `us3.datadoghq.com`, `us5.datadoghq.com`, `ap1.datadoghq.com`, `ap2.datadoghq.com`, `ddog-gov.com`.
+- **`vpc_name`**: Name prefix for the VPC resources where the Agentless scanner is created. For security reasons, this VPC should be reserved for the exclusive use of the scanner.
+- **`api_key`**: The Datadog API key is stored in Google Secret Manager and accessed by the scanner instances. Alternatively, you can use `api_key_secret_id` to reference an existing secret.
+- **Service Accounts**: The module automatically creates two service accounts:
+  - **Scanner Service Account**: Attached to the compute instances, with permissions to read secrets and impersonate the target service account.
+  - **Impersonated Service Account**: Used for scanning resources, with read permissions on compute disks and snapshots.
+
+## Examples
+
+For complete examples, refer to the [examples](./examples/) directory:
+
+### [Single Region](./examples/single_region/) - Simple Setup
+Deploy scanners in a single GCP region and project. **Ideal for single-project setups.**
+
+- ✅ Simple deployment model
+- ✅ Single project, single region
+- ✅ Multi-zone high availability
+
+### [Cross Project](./examples/cross_project/) - Advanced Setup
+Deploy scanners across multiple regions and scan multiple projects. **For enterprise deployments.**
+
+- ✅ Multi-region deployment (US + EU by default, customizable)
+- ✅ Cross-project scanning capability
+- ✅ Minimized cross-region costs
+- ✅ Centralized management
+
+Each example includes detailed README instructions and complete Terraform code. **Start with single_region** if you're new to Agentless scanning.
+
+## Uninstall
+
+To uninstall, remove the Agentless scanner module from your Terraform code. Removing this module deletes all resources associated with the Agentless scanner. Alternatively, if you used a separate Terraform state for this setup, you can uninstall the Agentless scanner by executing `terraform destroy`.
+
+> [!WARNING]
+> Exercise caution when deleting Terraform resources. Review the plan carefully to ensure everything is in order. Note that some resources like Secret Manager secrets may have deletion protection enabled.
+
+## Architecture
+
+The Agentless Scanner deployment on GCP is split into different modules to allow for more flexibility and customization. The following modules are available:
+
+- **[agentless-scanner-service-account](./modules/agentless-scanner-service-account/)**: Creates the service account that runs on the scanner compute instances. This service account has permissions to read the Datadog API key from Secret Manager and to impersonate the target service account.
+- **[agentless-impersonated-service-account](./modules/agentless-impersonated-service-account/)**: Creates the target service account that is impersonated by the scanner for accessing and scanning GCP resources. This service account has read permissions on compute disks and snapshots.
+- **[instance](./modules/instance/)**: Creates the Managed Instance Group (MIG) with compute instances that run the agentless scanner. The MIG provides auto-healing and distributes instances across multiple zones for high availability.
+- **[vpc](./modules/vpc/)**: Creates the VPC network, subnet, Cloud Router, Cloud NAT, and firewall rules required for the agentless scanner. The scanner runs in a private subnet with outbound internet access through Cloud NAT.
+
+The main module provided in this directory is a wrapper around these modules with simplified inputs. It creates a complete, production-ready deployment of the Agentless scanner.
+
+### Architecture Diagram
+
+![GCP Agentless Scanner Architecture](./agentless_gcp_architecture.svg)
+
+### How It Works
+
+1. **Network Isolation**: The scanner runs in a dedicated VPC with private instances that have no external IP addresses. Outbound connectivity is provided through Cloud NAT.
+
+2. **Service Account Impersonation**: The scanner uses GCP's service account impersonation feature:
+   - The scanner service account (attached to instances) impersonates the target service account
+   - The target service account has the necessary permissions to read and scan compute resources
+   - This allows for fine-grained access control and cross-project scanning
+
+3. **High Availability**: Instances are deployed in a regional Managed Instance Group distributed across multiple zones, with auto-healing enabled.
+
+4. **Secure Credential Management**: The Datadog API key is stored in Google Secret Manager and accessed securely by the scanner instances.
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements

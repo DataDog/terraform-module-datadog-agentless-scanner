@@ -35,7 +35,11 @@ To deploy a Datadog agentless scanner:
    terraform init
    ```
 
-1. **Review the deployment plan**:
+1. **Review the deployment plan**. You will need to:
+   - Set your GCP project ID
+   - Set your Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/)
+   - Set your Datadog site
+
    ```sh
    terraform plan \
      -var="project_id=my-gcp-project" \
@@ -43,11 +47,7 @@ To deploy a Datadog agentless scanner:
      -var="datadog_site=datadoghq.com"
    ```
 
-1. **Deploy the scanner**. You will need to:
-   - Set your GCP project ID
-   - Set your Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/)
-   - Set your Datadog site
-
+1. **Deploy the scanner**:
    ```sh
    terraform apply \
      -var="project_id=my-gcp-project" \

@@ -14,7 +14,7 @@ provider "aws" {
 }
 
 module "scanner_role" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanner-role?ref=0.11.11"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanner-role?ref=0.11.12"
 
   ## By default the scanner can assume any role with the default naming
   ## convention from any account.
@@ -40,13 +40,13 @@ module "scanner_role" {
 }
 
 module "self_delegate_role" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/scanning-delegate-role?ref=0.11.11"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/scanning-delegate-role?ref=0.11.12"
 
   scanner_roles = [module.scanner_role.role.arn]
 }
 
 module "agentless_scanner" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner?ref=0.11.11"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner?ref=0.11.12"
 
   api_key               = var.datadog_api_key
   site                  = var.datadog_site
@@ -54,6 +54,6 @@ module "agentless_scanner" {
 }
 
 module "autoscaling_scanners" {
-  source                   = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanners-autoscaling?ref=0.11.11"
+  source                   = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanners-autoscaling?ref=0.11.12"
   datadog_integration_role = var.datadog_integration_role
 }

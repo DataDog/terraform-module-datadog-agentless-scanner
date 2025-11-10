@@ -23,7 +23,7 @@ provider "google" {
 
 # Deploy the scanner infrastructure in US region
 module "datadog_agentless_scanner_us" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp?ref=7993939f19df2a39c981cbffbcd48a91c9fba214"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp?ref=0.11.12"
 
   providers = {
     google = google.us
@@ -36,7 +36,7 @@ module "datadog_agentless_scanner_us" {
 
 # Deploy the scanner infrastructure in EU region
 module "datadog_agentless_scanner_eu" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp?ref=7993939f19df2a39c981cbffbcd48a91c9fba214"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp?ref=0.11.12"
 
   providers = {
     google = google.eu
