@@ -78,7 +78,11 @@ Use this **advanced** deployment model when:
    terraform init
    ```
 
-1. **Review the deployment plan**:
+1. **Review the deployment plan**. You will need to:
+   - Set the project ID where the scanner will be deployed
+   - Set your Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/)
+   - Set your Datadog site
+
    ```sh
    terraform plan \
      -var="scanner_project_id=my-scanner-project" \
@@ -86,11 +90,7 @@ Use this **advanced** deployment model when:
      -var="datadog_site=datadoghq.com"
    ```
 
-1. **Deploy the scanner infrastructure**. You will need to:
-   - Set your scanner project ID
-   - Set your Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/)
-   - Set your Datadog site
-
+1. **Deploy the scanner infrastructure**:
    ```sh
    terraform apply \
      -var="scanner_project_id=my-scanner-project" \
@@ -107,6 +107,7 @@ Use this **advanced** deployment model when:
 ### Step 2: Set up Other Projects for Scanning
 
 1. Go to the `other_project` folder.
+1. Configure your other gcp project `gcloud config set project my-other-project`.
 1. Run `terraform init`.
 1. Run `terraform plan` to review the changes.
 1. Run `terraform apply` to deploy.
@@ -116,6 +117,7 @@ Use this **advanced** deployment model when:
 Example:
 ```sh
 cd ../other_project
+gcloud config set project my-other-project
 terraform init
 terraform plan \
   -var="scanned_project_id=my-other-project" \
