@@ -5,7 +5,6 @@ data "google_client_config" "current" {}
 # Random ID for unique resource naming when unique_suffix is empty
 resource "random_id" "deployment_suffix" {
   byte_length = 4
-  count       = var.unique_suffix == "" ? 1 : 0
 }
 
 locals {
@@ -13,7 +12,7 @@ locals {
   region            = data.google_client_config.current.region
   api_key_secret_id = var.api_key_secret_id != null ? var.api_key_secret_id : google_secret_manager_secret.api_key_secret[0].id
   # Use provided unique_suffix or generate random one
-  effective_suffix = var.unique_suffix != "" ? var.unique_suffix : random_id.deployment_suffix[0].hex
+  effective_suffix = var.unique_suffix != "" ? var.unique_suffix : random_id.deployment_suffix.hex
   # Validation for api_key XOR api_key_secret_id
   api_key_validation = (var.api_key != null && var.api_key_secret_id == null) || (var.api_key == null && var.api_key_secret_id != null)
   # Validation to ensure both SSH variables are provided or neither
