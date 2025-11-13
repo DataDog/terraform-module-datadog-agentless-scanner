@@ -103,6 +103,7 @@ logs:
     service: "agentless-scanner"
     source: go
     sourcecategory: sourcecode
+    start_position: beginning
 EOF
 
 chown -R dd-agent: /etc/datadog-agent/conf.d/agentless-scanner.d
