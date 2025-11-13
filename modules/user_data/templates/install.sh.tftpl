@@ -17,8 +17,8 @@ echo "nbd" > /etc/modules-load.d/nbd.conf
 echo "options nbd nbds_max=128" > /etc/modprobe.d/nbd.conf
 
 # Install requirements
-apt update
-apt install -y curl
+apt-get update
+apt-get install -o Acquire::Retries="5" -y curl
 
 # Remove uneeded packages
 apt remove -y libx11-6
@@ -51,7 +51,7 @@ DD_INSTALL_ONLY=true \
 
 # Install the agentless-scanner
 echo "deb [signed-by=/usr/share/keyrings/datadog-archive-keyring.gpg] $DD_AGENTLESS_REPOSITORY $DD_AGENTLESS_CHANNEL agentless-scanner" >> /etc/apt/sources.list.d/datadog.list
-apt update
+apt-get update
 agentless_pkg_pattern="([[:digit:]]:)?$DD_AGENTLESS_VERSION(\.[[:digit:]]+){0,1}(~rc\.[[:digit:]]+)?(-[[:digit:]])?"
 agentless_version_custom="$(apt-cache madison datadog-agentless-scanner | grep -E "$agentless_pkg_pattern" -om1)" || true
 if [ -z "$agentless_version_custom" ]; then
@@ -61,7 +61,7 @@ fi
 # We mask/unmask because apt auto-starts the service, and we do
 # not want to start it before the configuration is in place.
 systemctl mask datadog-agentless-scanner.service
-apt install -y "datadog-agentless-scanner=$agentless_version_custom"
+apt-get install -o Acquire::Retries="5" -y "datadog-agentless-scanner=$agentless_version_custom"
 systemctl unmask datadog-agentless-scanner.service
 
 # Adding automatic reboot on kernel updates
