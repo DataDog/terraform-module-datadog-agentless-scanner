@@ -6,12 +6,28 @@ terraform {
       source  = "hashicorp/google"
       version = ">= 5.0"
     }
+    datadog = {
+      source  = "DataDog/datadog"
+      version = ">= 3.80.0"
+    }
   }
 }
 
 provider "google" {
   project = var.project_id
   region  = "us-central1"
+}
+
+provider "datadog" {
+  api_key = var.datadog_api_key
+  app_key = var.datadog_app_key
+  api_url = "https://api.${var.datadog_site}/"
+}
+
+resource "datadog_agentless_scanning_gcp_scan_options" "scan_options" {
+  gcp_project_id     = var.project_id
+  vuln_host_os       = true
+  vuln_containers_os = true
 }
 
 module "datadog_agentless_scanner" {

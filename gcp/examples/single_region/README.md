@@ -38,12 +38,14 @@ To deploy a Datadog agentless scanner:
 1. **Review the deployment plan**. You will need to:
    - Set your GCP project ID
    - Set your Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/)
+   - Set your Datadog [APP key](https://docs.datadoghq.com/account_management/api-app-keys/)
    - Set your Datadog site
 
    ```sh
    terraform plan \
      -var="project_id=my-gcp-project" \
      -var="datadog_api_key=$DD_API_KEY" \
+     -var="datadog_app_key=$DD_APP_KEY" \
      -var="datadog_site=datadoghq.com"
    ```
 
@@ -52,6 +54,7 @@ To deploy a Datadog agentless scanner:
    terraform apply \
      -var="project_id=my-gcp-project" \
      -var="datadog_api_key=$DD_API_KEY" \
+     -var="datadog_app_key=$DD_APP_KEY" \
      -var="datadog_site=datadoghq.com"
    ```
 

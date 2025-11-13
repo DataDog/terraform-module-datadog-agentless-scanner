@@ -6,11 +6,28 @@ terraform {
       source  = "hashicorp/google"
       version = ">= 5.0"
     }
+    datadog = {
+      source  = "DataDog/datadog"
+      version = ">= 3.80.0"
+    }
   }
 }
 
 provider "google" {
   project = var.scanned_project_id
+}
+
+provider "datadog" {
+  api_key = var.datadog_api_key
+  app_key = var.datadog_app_key
+  api_url = "https://api.${var.datadog_site}/"
+}
+
+# Enable agentless scanning for this project
+resource "datadog_agentless_scanning_gcp_scan_options" "scanned_project" {
+  gcp_project_id     = var.scanned_project_id
+  vuln_host_os       = true
+  vuln_containers_os = true
 }
 
 # Create impersonated service accounts for each scanner service account (US and EU)
