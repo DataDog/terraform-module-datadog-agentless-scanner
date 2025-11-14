@@ -81,12 +81,14 @@ Use this **advanced** deployment model when:
 1. **Review the deployment plan**. You will need to:
    - Set the project ID where the scanner will be deployed
    - Set your Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/)
+   - Set your Datadog [APP key](https://docs.datadoghq.com/account_management/api-app-keys/)
    - Set your Datadog site
 
    ```sh
    terraform plan \
      -var="scanner_project_id=my-scanner-project" \
      -var="datadog_api_key=$DD_API_KEY" \
+     -var="datadog_app_key=$DD_APP_KEY" \
      -var="datadog_site=datadoghq.com"
    ```
 
@@ -95,6 +97,7 @@ Use this **advanced** deployment model when:
    terraform apply \
      -var="scanner_project_id=my-scanner-project" \
      -var="datadog_api_key=$DD_API_KEY" \
+     -var="datadog_app_key=$DD_APP_KEY" \
      -var="datadog_site=datadoghq.com"
    ```
 
@@ -122,11 +125,17 @@ terraform init
 terraform plan \
   -var="scanned_project_id=my-other-project" \
   -var="scanner_service_account_email_us=$SCANNER_SA_US" \
-  -var="scanner_service_account_email_eu=$SCANNER_SA_EU"
+  -var="scanner_service_account_email_eu=$SCANNER_SA_EU" \
+  -var="datadog_api_key=$DD_API_KEY" \
+  -var="datadog_app_key=$DD_APP_KEY" \
+  -var="datadog_site=datadoghq.com"
 terraform apply \
   -var="scanned_project_id=my-other-project" \
   -var="scanner_service_account_email_us=$SCANNER_SA_US" \
-  -var="scanner_service_account_email_eu=$SCANNER_SA_EU"
+  -var="scanner_service_account_email_eu=$SCANNER_SA_EU" \
+  -var="datadog_api_key=$DD_API_KEY" \
+  -var="datadog_app_key=$DD_APP_KEY" \
+  -var="datadog_site=datadoghq.com"
 ```
 
 Repeat Step 2 for each additional project you want to scan.

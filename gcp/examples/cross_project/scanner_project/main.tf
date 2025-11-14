@@ -6,6 +6,10 @@ terraform {
       source  = "hashicorp/google"
       version = ">= 5.0"
     }
+    datadog = {
+      source  = "DataDog/datadog"
+      version = ">= 3.80.0"
+    }
   }
 }
 
@@ -19,6 +23,19 @@ provider "google" {
   project = var.scanner_project_id
   region  = "europe-west1"
   alias   = "eu"
+}
+
+provider "datadog" {
+  api_key = var.datadog_api_key
+  app_key = var.datadog_app_key
+  api_url = "https://api.${var.datadog_site}/"
+}
+
+# Enable agentless scanning for the scanner project
+resource "datadog_agentless_scanning_gcp_scan_options" "scanner_project" {
+  gcp_project_id     = var.scanner_project_id
+  vuln_host_os       = true
+  vuln_containers_os = true
 }
 
 # Deploy the scanner infrastructure in US region
