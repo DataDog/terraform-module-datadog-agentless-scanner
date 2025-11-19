@@ -44,6 +44,7 @@ Once the export completes, the scanner automatically proceeds to scan the export
 5. **Exported files are automatically deleted**
 
 ### Architecture
+![RDS Agentless Scanning Architecture](./agentless_rds_scanning.svg)
 
 ### Key Components
 
