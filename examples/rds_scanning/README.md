@@ -58,7 +58,7 @@ Once the export completes, the scanner automatically proceeds to scan the export
 ### Security Features
 
 - **No Direct Database Access**: Scanners never connect to live RDS databases
-- **Backend-Controlled**: All scanning operations are orchestrated by Datadog backend, not manually triggered
+- **No Datadog Access to Database or Snapshots**: Datadog never has direct access to your RDS databases or the exported snapshots. Everything is processed within the agentless scanner, which runs entirely in your AWS account and infrastructure.
 - **Encryption**: All exports are encrypted with KMS at rest and in transit
 - **Automatic Cleanup**: Exported files are automatically deleted
 - **Least Privilege**: Separate IAM roles with minimal required permissions
