@@ -11,6 +11,7 @@ It is then used to create the launch template for the agentless scanner instance
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.0 |
+| <a name="requirement_http"></a> [http](#requirement\_http) | >= 3.0 |
 
 ## Providers
 

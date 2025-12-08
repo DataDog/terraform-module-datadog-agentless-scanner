@@ -6,11 +6,10 @@ check "health_check" {
     request_headers = {
       Accept     = "application/json"
       DD-API-KEY = var.api_key
-
     }
   }
   assert {
-    condition     = var.api_key == "" || data.http.terraform_io.status_code != 403
+    condition     = var.api_key == "" || data.http.terraform_io.status_code == 200
     error_message = "The Datadog site or API key is incorrect. Please verify your configuration."
   }
 }
