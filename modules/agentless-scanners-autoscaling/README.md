@@ -1,4 +1,4 @@
-This module attaches the required autoscaling policy to the Datadog Integration IAM role used by Agentless Scanning to dynamically scale scanners up or down based on load. It attaches the necessary IAM policy to the Datadog Integration role so that the autoscaling scheduler can operate correctly.
+This module attaches the required autoscaling policy to the Datadog Integration IAM role used by Agentless Scanning to dynamically scale scanners up or down based on load.
 
 ## How to use this module
 
