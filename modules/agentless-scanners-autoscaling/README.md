@@ -1,3 +1,5 @@
+This module attaches the required autoscaling policy to the Datadog Integration IAM role used by Agentless Scanning to dynamically scale scanners up or down based on load. It attaches the necessary IAM policy to the Datadog Integration role so that the autoscaling scheduler can operate correctly.
+
 ## Requirements
 
 | Name | Version |
@@ -32,3 +34,14 @@ No modules.
 ## Outputs
 
 No outputs.
+
+## How to use this module
+
+Add the module to your Terraform configuration and provide the name of the Datadog Integration IAM role used when connecting your AWS account to Datadog:
+
+```hcl
+module "autoscaling_scanners" {
+  source                   = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanners-autoscaling?ref=0.11.12"
+  datadog_integration_role = var.datadog_integration_role
+}
+```
