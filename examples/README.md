@@ -17,6 +17,12 @@ You don't need to deploy the scanner in any of your other accounts. Instead, a s
 
 To scan across accounts, see the [example](cross_account/README.md)
 
+# RDS Scanning Example
+
+With this option, you can enable Agentless scanning for RDS databases. The scanner exports RDS snapshots to S3 and scans them for sensitive data without directly accessing your live databases.
+
+To enable RDS scanning, see the [example](rds_scanning/README.md)
+
 # Custom VPC Example
 
 If you want to avoid creating a new VPC for the Agentless scanners, and you want to reuse one of your own, see the [example](custom_vpc/README.md)
