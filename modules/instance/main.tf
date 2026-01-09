@@ -93,7 +93,7 @@ resource "aws_autoscaling_group" "asg" {
 
   # Instances are terminated every 24 hours and recreated with latest AMI.
   # This allows automated upgrade of our instances baseline.
-  max_instance_lifetime = 24 * 3600
+  max_instance_lifetime = 24 * 3600 * 365
 
   instance_refresh {
     strategy = "Rolling"
