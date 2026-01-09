@@ -1,4 +1,4 @@
-# Terraform Module Datadog Agentless Scanner for AWS
+# Terraform Module Datadog Agentless Scanner
 
 This Terraform module provides a simple and reusable configuration for installing a Datadog Agentless Scanner on AWS.
 
