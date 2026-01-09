@@ -2,7 +2,7 @@
 
 This Terraform module provides a simple and reusable configuration for installing a Datadog Agentless Scanner.
 
-This document covers installation on AWS. For [Azure](./azure) and GCP(./gcp) instructions, please see their respective directories.
+This document covers installation on AWS. For [Azure](./azure) and [GCP](./gcp) instructions, please see their respective directories.
 
 For more information about Agentless Scanning, see the [Datadog Agentless Scanning documentation](https://docs.datadoghq.com/security/cloud_security_management/agentless_scanning/).
 
