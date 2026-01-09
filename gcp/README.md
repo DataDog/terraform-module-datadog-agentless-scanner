@@ -2,6 +2,8 @@
 
 This Terraform module provides a simple and reusable configuration for installing a Datadog Agentless Scanner on Google Cloud Platform (GCP).
 
+For more information about Agentless Scanning, see the [Datadog Agentless Scanning documentation](https://docs.datadoghq.com/security/cloud_security_management/agentless_scanning/).
+
 ## Prerequisites
 
 Before using this module, make sure you have the following:

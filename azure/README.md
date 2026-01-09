@@ -1,6 +1,8 @@
-# Terraform Module Datadog Agentless Scanner Module
+# Terraform Module Datadog Agentless Scanner for Azure
 
 This Terraform module provides a simple and reusable configuration for installing a Datadog Agentless Scanner on Azure.
+
+For more information about Agentless Scanning, see the [Datadog Agentless Scanning documentation](https://docs.datadoghq.com/security/cloud_security_management/agentless_scanning/).
 
 ## Prerequisites
 
