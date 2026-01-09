@@ -1,6 +1,8 @@
-# Terraform Module Datadog Agentless Scanner Module
+# Terraform Module Datadog Agentless Scanner for Azure
 
 This Terraform module provides a simple and reusable configuration for installing a Datadog Agentless Scanner on Azure.
+
+For more information about Agentless Scanning, see the [Datadog Agentless Scanning documentation](https://docs.datadoghq.com/security/cloud_security_management/agentless_scanning/).
 
 ## Prerequisites
 
@@ -9,6 +11,7 @@ Before using this module, make sure you have the following:
 1. [Terraform](https://www.terraform.io/) installed on your local machine.
 2. The [Azure CLI](https://learn.microsoft.com/cli/azure/) installed on your local machine.
 3. Azure credentials configured (`az login`) with the necessary permissions.
+4. A Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/) with Remote Configuration enabled.
 
 ## Usage
 
@@ -38,18 +41,72 @@ export ARM_SUBSCRIPTION_ID="00000000-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
 terraform apply -var="datadog-api-key=$DD_API_KEY"
 ```
 
-### Notes
+### Configuration Notes
 
-- `site` must match the Datadog site parameter of your account (see [this table](https://docs.datadoghq.com/getting_started/site/#access-the-datadog-site)).
-- `location` must be an Azure region. To avoid inter-region bandwidth charges,
-  the scanner should be deployed in the same region as the resources to be scanned.
-- `resource_group_name` is the name of the resource group where the Agentless scanner
-  is created. For security reasons, this resource group should be reserved for
-  the exclusive use of the scanner.
-- `scan_scopes` is a list of [scopes](https://learn.microsoft.com/azure/role-based-access-control/scope-overview)
-  that the Agentless scanner should scan. The scanner is given read access to managed
-  disks in these scopes. Only subscription scopes are supported.
+- **`site`**: Must match the Datadog site parameter of your account. Common values: `datadoghq.com`, `datadoghq.eu`, `us3.datadoghq.com`, `us5.datadoghq.com`, `ap1.datadoghq.com`. See [Datadog site documentation](https://docs.datadoghq.com/getting_started/site/#access-the-datadog-site).
+- **`location`**: Must be an Azure region. To avoid inter-region bandwidth charges, the scanner should be deployed in the same region as the resources to be scanned.
+- **`resource_group_name`**: The name of the resource group where the Agentless scanner is created. For security reasons, this resource group should be reserved for the exclusive use of the scanner.
+- **`scan_scopes`**: A list of [scopes](https://learn.microsoft.com/azure/role-based-access-control/scope-overview) that the Agentless scanner should scan. The scanner is given read access to managed disks in these scopes. Only subscription scopes are supported.
 
+> [!IMPORTANT]
+> Datadog strongly recommends [pinning](https://developer.hashicorp.com/terraform/language/modules/sources#selecting-a-revision) the version of the module to keep repeatable deployment and to avoid unexpected changes. Use a specific tag instead of a branch name.
+
+### API Key Configuration
+
+You have two options for providing the Datadog API key:
+
+1. **Pass the API key directly** (shown in examples above):
+   ```hcl
+   api_key = var.datadog-api-key
+   ```
+
+2. **Use Azure Key Vault** (recommended for production):
+   - Create a secret in Azure Key Vault containing your Datadog API key
+   - Use the secret ID instead:
+   ```hcl
+   api_key_secret_id = "/subscriptions/00000000-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/my-rg/providers/Microsoft.KeyVault/vaults/my-vault/secrets/datadog-api-key"
+   ```
+   - Note: When using `api_key_secret_id`, omit the `api_key` variable
+
+### Cross-Subscription Scanning
+
+To scan multiple subscriptions from a single scanner deployment:
+
+```hcl
+module "datadog-agentless-scanner" {
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//azure?ref=0.11.12"
+
+  # ... other configuration ...
+
+  scan_scopes = [
+    "/subscriptions/00000000-xxxx-xxxx-xxxx-xxxxxxxxxxxx",  # Subscription A
+    "/subscriptions/11111111-xxxx-xxxx-xxxx-xxxxxxxxxxxx",  # Subscription B
+    "/subscriptions/22222222-xxxx-xxxx-xxxx-xxxxxxxxxxxx",  # Subscription C
+  ]
+}
+```
+
+The scanner will be granted the necessary role assignments in each subscription to read and scan managed disks.
+
+## Architecture
+
+The Agentless Scanner deployment on Azure is split into different modules to allow for more flexibility and customization:
+
+- **[resource-group](./modules/resource-group/)**: Creates the resource group where all scanner resources are deployed.
+- **[managed-identity](./modules/managed-identity/)**: Creates the user-assigned managed identity for the scanner VM.
+- **[roles](./modules/roles/)**: Creates the custom role definitions and role assignments required for scanning.
+- **[virtual-network](./modules/virtual-network/)**: Creates the VNet, subnet, NAT gateway, and network security group.
+- **[virtual-machine](./modules/virtual-machine/)**: Creates the Virtual Machine Scale Set (VMSS) that runs the scanner.
+- **[custom-data](./modules/custom-data/)**: Generates the cloud-init script that installs and configures the scanner.
+
+The main module provided in this directory is a wrapper around these modules with simplified inputs.
+
+## Uninstall
+
+To uninstall, remove the Agentless scanner module from your Terraform code. Removing this module deletes all resources associated with the Agentless scanner. Alternatively, if you used a separate Terraform state for this setup, you can uninstall the Agentless scanner by executing `terraform destroy`.
+
+> [!WARNING]
+> Exercise caution when deleting Terraform resources. Review the plan carefully to ensure everything is in order.
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements
