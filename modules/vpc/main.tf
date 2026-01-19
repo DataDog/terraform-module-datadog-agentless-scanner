@@ -142,22 +142,6 @@ resource "aws_security_group" "endpoint_sg" {
   }
 }
 
-data "aws_vpc_endpoint_service" "lambda" {
-  service      = "lambda"
-  service_type = "Interface"
-}
-
-resource "aws_vpc_endpoint" "lambda" {
-  service_name        = data.aws_vpc_endpoint_service.lambda.service_name
-  vpc_endpoint_type   = data.aws_vpc_endpoint_service.lambda.service_type
-  vpc_id              = aws_vpc.vpc.id
-  subnet_ids          = [for s in aws_subnet.private : s.id]
-  security_group_ids  = [aws_security_group.endpoint_sg.id]
-  private_dns_enabled = true
-
-  tags = merge(var.tags, local.dd_tags)
-}
-
 data "aws_vpc_endpoint_service" "ebs" {
   service      = "ebs"
   service_type = "Interface"
