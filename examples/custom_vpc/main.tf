@@ -13,21 +13,22 @@ provider "aws" {
   region = "us-east-1"
 }
 
+module "user_data" {
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/user_data?ref=0.11.12"
+
+  api_key = var.api_key
+}
+
 module "agentless_scanner_role" {
   source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanner-role?ref=0.11.12"
+
+  api_key_secret_arns = [module.user_data.api_key_secret_arn]
 }
 
 module "delegate_role" {
   source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/scanning-delegate-role?ref=0.11.12"
 
   scanner_roles = [module.agentless_scanner_role.role.arn]
-}
-
-module "user_data" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/user_data?ref=0.11.12"
-
-  hostname = "agentless-scanning-us-east-1"
-  api_key  = var.api_key
 }
 
 module "instance" {
