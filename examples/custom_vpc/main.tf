@@ -36,7 +36,7 @@ module "instance" {
   user_data            = module.user_data.install_sh
   iam_instance_profile = module.agentless_scanner_role.profile.name
   vpc_id               = var.vpc_id
-  subnet_id            = var.subnet_id
+  subnet_ids           = var.subnet_ids
 }
 
 module "autoscaling_scanners" {
