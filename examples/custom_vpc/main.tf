@@ -35,7 +35,7 @@ module "instance" {
   source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/instance?ref=0.11.12"
 
   user_data            = module.user_data.install_sh
-  iam_instance_profile = module.agentless_scanner_role.profile.name
+  iam_instance_profile = module.agentless_scanner_role.instance_profile.name
   vpc_id               = var.vpc_id
   subnet_ids           = var.subnet_ids
 }
