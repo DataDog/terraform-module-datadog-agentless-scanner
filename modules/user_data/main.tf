@@ -50,6 +50,6 @@ resource "terraform_data" "template" {
     scanner_repository    = var.scanner_repository,
     scanner_configuration = var.scanner_configuration,
     agent_configuration   = local.custom_agent_configuration,
-    region                = data.aws_region.current.name,
+    region                = data.aws_region.current.region,
   })
 }
