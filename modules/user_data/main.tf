@@ -50,6 +50,8 @@ resource "terraform_data" "template" {
     scanner_repository    = var.scanner_repository,
     scanner_configuration = var.scanner_configuration,
     agent_configuration   = local.custom_agent_configuration,
-    region                = data.aws_region.current.name,
+    # Use try() for AWS Provider compatibility: .region (v6+) falls back to .name (v5)
+    # This ensures compatibility with AWS Provider v5, v6, and v7
+    region = try(data.aws_region.current.region, data.aws_region.current.name),
   })
 }
