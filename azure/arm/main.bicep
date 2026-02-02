@@ -33,6 +33,9 @@ param instanceSize string = 'Standard_B2ps_v2'
 @description('The name of the user-assigned managed identity to be used by the Datadog Agentless Scanner virtual machine instances.')
 param identityName string = 'DatatogAgentlessScannerIdentity'
 
+@description('Prefix to use for custom role names. Used to create role definitions.')
+param roleNamePrefix string = 'Datadog Agentless Scanner'
+
 @description('The set of scopes that the Datadog Agentless Scanner is allowed to scan')
 param scanScopes string[] = [subscription().id]
 
@@ -260,7 +263,7 @@ resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-
 resource scannerRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' = {
   name: guid(name, 'scannerRole', resourceGroup().id, subscription().id)
   properties: {
-    roleName: 'Datadog Agentless Scanner Role'
+    roleName: '${roleNamePrefix} Orchestrator Role'
     description: 'Role used by the Datadog Agentless Scanner to manage resources in its own resource group.'
     type: 'customRole'
     permissions: [
@@ -301,7 +304,7 @@ resource scannerRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' = {
 resource delegateRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' = {
   name: guid(name, 'delegateRole', resourceGroup().id, subscription().id)
   properties: {
-    roleName: 'Datadog Agentless Scanner Delegate Role'
+    roleName: '${roleNamePrefix} Worker Role'
     description: 'Role used by the Datadog Agentless Scanner to scan resources.'
     type: 'customRole'
     permissions: [

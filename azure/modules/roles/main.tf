@@ -1,5 +1,5 @@
 resource "azurerm_role_definition" "orchestrator_role" {
-  name        = "Datadog Agentless Scanner Orchestrator Role"
+  name        = "${var.role_name_prefix} Orchestrator Role"
   description = "Role used by the Datadog Agentless Scanner to manage resources in its own resource group."
   scope       = var.resource_group_id
 
@@ -35,7 +35,7 @@ resource "azurerm_role_definition" "orchestrator_role" {
 }
 
 resource "azurerm_role_definition" "worker_role" {
-  name              = "Datadog Agentless Scanner Worker Role"
+  name              = "${var.role_name_prefix} Worker Role"
   description       = "Role used by the Datadog Agentless Scanner to scan resources."
   scope             = var.scan_scopes[0]
   assignable_scopes = var.scan_scopes
