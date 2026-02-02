@@ -33,6 +33,7 @@ No modules.
 | <a name="input_api_key_secret_id"></a> [api\_key\_secret\_id](#input\_api\_key\_secret\_id) | The resource ID of the Key Vault secret holding the Datadog API key. | `string` | `null` | no |
 | <a name="input_principal_id"></a> [principal\_id](#input\_principal\_id) | The object (principal) ID of the user-assigned identity used by the Datadog Agentless Scanner. | `string` | n/a | yes |
 | <a name="input_resource_group_id"></a> [resource\_group\_id](#input\_resource\_group\_id) | The ID of the resource group where the Datadog Agentless Scanner exists. | `string` | n/a | yes |
+| <a name="input_role_name_prefix"></a> [role\_name\_prefix](#input\_role\_name\_prefix) | Prefix to use for custom role names. Used to create 'Orchestrator Role' and 'Worker Role'. | `string` | `"Datadog Agentless Scanner"` | no |
 | <a name="input_scan_scopes"></a> [scan\_scopes](#input\_scan\_scopes) | The set of scopes that the Datadog Agentless Scanner is allowed to scan. | `list(string)` | n/a | yes |
 
 ## Outputs

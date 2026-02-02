@@ -41,6 +41,13 @@ variable "create_roles" {
   default     = true
 }
 
+variable "role_name_prefix" {
+  description = "Prefix to use for custom role names. Used to create 'Orchestrator Role' and 'Worker Role'."
+  type        = string
+  default     = "Datadog Agentless Scanner"
+  nullable    = false
+}
+
 variable "scan_scopes" {
   description = "The set of scopes that the Datadog Agentless Scanner is allowed to scan. Defaults to the current subscription."
   type        = list(string)

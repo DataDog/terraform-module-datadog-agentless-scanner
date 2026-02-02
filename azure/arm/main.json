@@ -5,8 +5,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.38.33.27573",
-      "templateHash": "11763594633116394451"
+      "version": "0.36.177.2456",
+      "templateHash": "5493073991560287516"
     }
   },
   "functions": [
@@ -85,6 +85,13 @@
       "defaultValue": "DatatogAgentlessScannerIdentity",
       "metadata": {
         "description": "The name of the user-assigned managed identity to be used by the Datadog Agentless Scanner virtual machine instances."
+      }
+    },
+    "roleNamePrefix": {
+      "type": "string",
+      "defaultValue": "Datadog Agentless Scanner",
+      "metadata": {
+        "description": "Prefix to use for custom role names. Used to create role definitions."
       }
     },
     "scanScopes": {
@@ -367,7 +374,7 @@
       "apiVersion": "2022-04-01",
       "name": "[guid(variables('name'), 'scannerRole', resourceGroup().id, subscription().id)]",
       "properties": {
-        "roleName": "Datadog Agentless Scanner Role",
+        "roleName": "[format('{0} Orchestrator Role', parameters('roleNamePrefix'))]",
         "description": "Role used by the Datadog Agentless Scanner to manage resources in its own resource group.",
         "type": "customRole",
         "permissions": [
@@ -407,7 +414,7 @@
       "apiVersion": "2022-04-01",
       "name": "[guid(variables('name'), 'delegateRole', resourceGroup().id, subscription().id)]",
       "properties": {
-        "roleName": "Datadog Agentless Scanner Delegate Role",
+        "roleName": "[format('{0} Worker Role', parameters('roleNamePrefix'))]",
         "description": "Role used by the Datadog Agentless Scanner to scan resources.",
         "type": "customRole",
         "permissions": [
@@ -570,7 +577,7 @@
         "count": "[length(map(filter(parameters('scanScopes'), lambda('s', startsWith(lambdaVariables('s'), '/subscriptions/'))), lambda('s', skip(lambdaVariables('s'), length('/subscriptions/')))))]"
       },
       "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2025-04-01",
+      "apiVersion": "2022-09-01",
       "name": "[format('delegateRoleAssignment-{0}', guid(resourceId('Microsoft.Authorization/roleDefinitions', guid(variables('name'), 'delegateRole', resourceGroup().id, subscription().id)), resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('identityName')), map(filter(parameters('scanScopes'), lambda('s', startsWith(lambdaVariables('s'), '/subscriptions/'))), lambda('s', skip(lambdaVariables('s'), length('/subscriptions/'))))[copyIndex()]))]",
       "subscriptionId": "[map(filter(parameters('scanScopes'), lambda('s', startsWith(lambdaVariables('s'), '/subscriptions/'))), lambda('s', skip(lambdaVariables('s'), length('/subscriptions/'))))[copyIndex()]]",
       "location": "[resourceGroup().location]",
@@ -596,8 +603,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.38.33.27573",
-              "templateHash": "4400777875424963630"
+              "version": "0.36.177.2456",
+              "templateHash": "3116385340016775396"
             }
           },
           "parameters": {
