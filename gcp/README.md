@@ -15,8 +15,9 @@ Before using this module, make sure you have the following:
    - Compute Engine instances and instance templates
    - Service accounts and IAM bindings
    - Secret Manager secrets (if using api_key parameter)
-4. A Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/) with Remote Configuration enabled.
-5. A GCP project with the following APIs enabled:
+4. Your GCP account must be added and integrated with [Datadog Cloud Security](https://docs.datadoghq.com/security/cloud_security_management/setup/agentless_scanning/?tab=googlecloudplatform). Ensure the GCP project is onboarded in your Datadog organization before deploying this module.
+5. A Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/) with Remote Configuration enabled.
+6. A GCP project with the following APIs enabled:
    - Compute Engine API
    - IAM Service Account Credentials API
    - Secret Manager API (if using api_key parameter)
