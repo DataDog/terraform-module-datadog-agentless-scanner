@@ -74,7 +74,12 @@ module "datadog_agentless_scanner" {
 }
 ```
 
-And run:
+First, authenticate with Google Cloud:
+```sh
+gcloud auth application-default login
+```
+
+Then run:
 ```sh
 terraform init
 terraform apply \
