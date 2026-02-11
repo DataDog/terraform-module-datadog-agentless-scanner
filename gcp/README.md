@@ -37,6 +37,12 @@ variable "datadog_api_key" {
   sensitive   = true
 }
 
+variable "datadog_app_key" {
+  description = "Datadog APP key needed to enable the product"
+  type        = string
+  sensitive   = true
+}
+
 variable "datadog_site" {
   description = "Datadog site (e.g., datadoghq.com, datadoghq.eu, us3.datadoghq.com, us5.datadoghq.com, ap1.datadoghq.com, ap2.datadoghq.com, ddog-gov.com)"
   type        = string
@@ -45,6 +51,18 @@ variable "datadog_site" {
 provider "google" {
   project = var.project_id
   region  = "us-central1"
+}
+
+provider "datadog" {
+  api_key = var.datadog_api_key
+  app_key = var.datadog_app_key
+  api_url = "https://api.${var.datadog_site}/"
+}
+
+resource "datadog_agentless_scanning_gcp_scan_options" "scan_options" {
+  gcp_project_id     = var.project_id
+  vuln_host_os       = true
+  vuln_containers_os = true
 }
 
 module "datadog_agentless_scanner" {
@@ -62,6 +80,7 @@ terraform init
 terraform apply \
   -var="project_id=<your-project-id>" \
   -var="datadog_api_key=$DD_API_KEY" \
+  -var="datadog_app_key=$DD_APP_KEY" \
   -var="datadog_site=<your-datadog-site>"
 ```
 
