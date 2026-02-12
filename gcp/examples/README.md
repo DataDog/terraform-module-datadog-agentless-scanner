@@ -2,11 +2,20 @@
 
 This directory contains example Terraform configurations for deploying the Datadog Agentless Scanner on Google Cloud Platform (GCP).
 
-## Available Examples
+## Deployment Playbooks
 
-### [Single Region](./single_region/) - **Simple Setup**
+Pick the playbook that matches your setup. Datadog recommends **multi-project, multi-region** for production environments.
 
-Deploy Agentless scanners in a single GCP region within a single project. Instances are distributed across multiple zones for high availability. This is the **recommended starting point** for most users.
+| | **Single Region** | **Multiple Regions** |
+|---|---|---|
+| **Single Project** | [single_project_single_region](./single_project_single_region/) | [single_project_multi_region](./single_project_multi_region/) |
+| **Multiple Projects** | [multi_project_single_region](./multi_project_single_region/) | [multi_project_multi_region](./multi_project_multi_region/) (recommended) |
+
+---
+
+### [single_project_single_region](./single_project_single_region/) - Getting Started
+
+Deploy a scanner in a single GCP region within a single project. Instances are distributed across multiple zones for high availability. **Best for evaluation or single-project setups.**
 
 **Use this when:**
 - Your resources are in one project and primarily in one region
@@ -14,15 +23,45 @@ Deploy Agentless scanners in a single GCP region within a single project. Instan
 
 **What it deploys:**
 - A scanner compute instance as part of a Managed Instance Group
-- Single region (configured via the Google provider)
 - VPC network with multi-zone distribution
 - Service accounts for scanning within the same project
 
 ---
 
-### [Cross Project](./cross_project/) - **Advanced Setup**
+### [single_project_multi_region](./single_project_multi_region/) - Single Project, Multiple Regions
 
-Deploy Agentless scanners across **multiple regions** in one GCP project, while scanning resources in **other GCP projects**. This is the **recommended deployment model** for production environments with distributed infrastructure.
+Deploy scanners in **multiple regions** within a single GCP project to minimize cross-region data transfer costs.
+
+**Use this when:**
+- Your resources are in one project but spread across multiple regions
+- You want to reduce cross-region egress charges
+
+**What it deploys:**
+- A scanner instance per region (US and EU by default)
+- Separate VPC network per region
+- Shared service accounts within the project
+
+---
+
+### [multi_project_single_region](./multi_project_single_region/) - Multiple Projects, Single Region
+
+Deploy a scanner in a dedicated project and scan resources across **other GCP projects**, all within a single region.
+
+**Use this when:**
+- You have multiple GCP projects to scan
+- Your resources are primarily in one region
+- You want centralized scanner management
+
+**What it deploys:**
+- Scanner infrastructure in a dedicated project (single region)
+- Cross-project service account impersonation setup
+- Repeatable configuration for each scanned project
+
+---
+
+### [multi_project_multi_region](./multi_project_multi_region/) - Production (Recommended)
+
+Deploy scanners across **multiple regions** in a dedicated project, while scanning resources in **other GCP projects**. This is the **recommended deployment model** for production environments.
 
 **Use this when:**
 - You have multiple GCP projects to scan
@@ -31,49 +70,52 @@ Deploy Agentless scanners across **multiple regions** in one GCP project, while 
 - You need centralized scanner management
 
 **What it deploys:**
-- Each region has its own VPC and scanner instances
+- Regional scanner infrastructure (US and EU by default) in a dedicated project
 - Cross-project service account impersonation setup
-- Ability to scan multiple other projects
+- Repeatable configuration for each scanned project
 
 ---
 
 ## Quick Comparison
 
-| Feature | Single Region | Cross Project |
-|---------|--------------|---------------|
-| **Complexity** | Simple | Advanced |
-| **Projects Scanned** | Single project | Multiple projects |
-| **Regions Covered** | Single region | Multiple regions |
-| **Cross-Region Costs** | Higher (if resources are multi-region) | Lower (regional scanners) |
-| **Use Case** | Single project | multi-project orgs |
-| **Management** | Simple | Centralized |
-| **Redundancy** | Zone-level | Region-level |
+| Feature | single_project_single_region | single_project_multi_region | multi_project_single_region | multi_project_multi_region |
+|---------|-----|-----|-----|-----|
+| **Complexity** | Simple | Moderate | Moderate | Advanced |
+| **Projects scanned** | 1 | 1 | Many | Many |
+| **Regions covered** | 1 | Many | 1 | Many |
+| **Cross-region costs** | Higher (if multi-region) | Lower | N/A | Lower |
+| **Cross-project scanning** | No | No | Yes | Yes |
+| **Best for** | Evaluation | Single project, multi-region | Multi-project, single region | Production |
 
 ## Decision Tree
 
 ```
-Start here ──┐
-             │
-             ▼
-   ┌─────────────────────────┐
-   │ Do you have multiple    │
-   │ GCP projects to scan?   │
-   └─────────┬───────────────┘
-             │
-      ┌──────┴──────┐
-      │             │
-     NO            YES
-      │             │
-      ▼             ▼
-   [single_region]  [cross_project]
-   Simple Setup     Advanced Setup
+Start here
+    |
+    v
+Do you have multiple GCP projects to scan?
+    |                   |
+   NO                  YES
+    |                   |
+    v                   v
+Single project      Multiple projects
+    |                   |
+    v                   v
+Are resources in      Are resources in
+multiple regions?     multiple regions?
+  |         |           |         |
+ NO        YES         NO        YES
+  |         |           |         |
+  v         v           v         v
+single_   single_     multi_    multi_
+project_  project_    project_  project_
+single_   multi_      single_   multi_
+region    region      region    region
 ```
 
-**Recommendation:** Start with `single_region` to understand the basics, then migrate to `cross_project` if you need to scan multiple projects or want multi-region deployment.
+**Recommendation:** Start with `single_project_single_region` to understand the basics, then migrate to a multi-project playbook when ready for production.
 
-## Getting Started
-
-### Prerequisites
+## Prerequisites
 
 Before using any example, ensure you have:
 
@@ -89,137 +131,12 @@ Before using any example, ensure you have:
    gcloud services enable iamcredentials.googleapis.com
    gcloud services enable secretmanager.googleapis.com
    ```
-5. **Datadog API Key** with Remote Configuration enabled ([Get your API key](https://docs.datadoghq.com/account_management/api-app-keys/))
+5. **Datadog API Key**, **APP Key**, and **Site** — in the [Cloud Security Setup page](https://app.datadoghq.com/security/configuration/csm/setup?active_steps=cloud-accounts&active_sub_step=gcp), select your GCP project, click **Enable**, choose **Terraform**, then copy from steps 2-4
 6. **GCP Permissions** to create:
    - VPC networks and subnets
    - Compute Engine instances and templates
    - Service accounts and IAM bindings
    - Secret Manager secrets
-
-### Basic Deployment Steps
-
-1. **Choose your example** (start with `single_region` if unsure)
-
-2. **Configure your GCP project:**
-   ```bash
-   gcloud config set project YOUR_PROJECT_ID
-   ```
-
-3. **Authenticate with GCP:**
-   ```bash
-   gcloud auth application-default login
-   ```
-
-4. **Navigate to the example directory:**
-   ```bash
-   cd single_region  # or cross_project
-   ```
-
-5. **Initialize Terraform:**
-   ```bash
-   terraform init
-   ```
-
-6. **Review the planned changes:**
-   ```bash
-   terraform plan \
-     -var="project_id=YOUR_PROJECT_ID" \
-     -var="datadog_api_key=$DD_API_KEY" \
-     -var="datadog_site=datadoghq.com"
-   ```
-
-7. **Apply the configuration:**
-   ```bash
-   terraform apply \
-     -var="project_id=YOUR_PROJECT_ID" \
-     -var="datadog_api_key=$DD_API_KEY" \
-     -var="datadog_site=datadoghq.com"
-   ```
-
-6. **Verify in Datadog** that your scanner is reporting
-
-## Architecture Overview
-
-### Single Region Architecture
-
-```
-┌─────────────────────────────────────────┐
-│ GCP Project                             │
-│                                         │
-│  ┌────────────────────────────────┐    │
-│  │ VPC Network (us-central1)      │    │
-│  │  - Private Subnet              │    │
-│  │  - Cloud Router & NAT          │    │
-│  └────────────────────────────────┘    │
-│                                         │
-│  ┌────────────────────────────────┐    │
-│  │ MIG (Multi-zone)               │    │
-│  │  - Zone A: Scanner Instance    │    │
-│  │  - Zone B: Scanner Instance    │    │
-│  │  - Zone C: Scanner Instance    │    │
-│  └────────────────────────────────┘    │
-│                                         │
-│  ┌────────────────────────────────┐    │
-│  │ Service Accounts               │    │
-│  │  - Scanner SA                  │    │
-│  │  - Impersonated SA             │    │
-│  └────────────────────────────────┘    │
-└─────────────────────────────────────────┘
-```
-
-### Cross Project Architecture
-
-```
-┌─────────────────────────────────────────┐
-│   Scanner Project                       │
-│                                         │
-│  ┌─────────────────────────────────┐   │
-│  │ US Region (us-central1)         │   │
-│  │  - VPC & Scanner Instances      │   │
-│  │  - Scanner SA US                │   │
-│  └─────────────────────────────────┘   │
-│                                         │
-│  ┌─────────────────────────────────┐   │
-│  │ EU Region (europe-west1)        │   │
-│  │  - VPC & Scanner Instances      │   │
-│  │  - Scanner SA EU                │   │
-│  └─────────────────────────────────┘   │
-└────────────┬────────────┬───────────────┘
-             │            │
-             │ impersonate│
-             │            │
-┌────────────▼────────────▼───────────────┐
-│   Other Projects (repeatable)           │
-│                                         │
-│  ┌──────────────────────────────────┐  │
-│  │ Impersonated SA (US)             │  │
-│  │ Impersonated SA (EU)             │  │
-│  └───────────┬──────────────────────┘  │
-│              │ scan                     │
-│  ┌───────────▼──────────────────────┐  │
-│  │ Compute Resources                │  │
-│  └──────────────────────────────────┘  │
-└─────────────────────────────────────────┘
-```
-
-## Cost Considerations
-
-### Single Region
-- **Network Costs**: Minimal for local resources, higher for cross-region scanning
-- **Compute Costs**: 1 instance by default
-- **Best For**: Small to medium workloads in one region
-
-### Cross Project
-- **Network Costs**: Minimized by scanning locally per region
-- **Compute Costs**: Multiple instances (1 per region by default)
-- **Best For**: Large, distributed workloads across multiple projects/regions
-
-### Cost Optimization Tips
-1. Start with single region to understand scanning patterns
-2. Use committed use discounts for long-term deployments
-3. Adjust instance counts based on actual scanning needs
-4. Monitor usage in Datadog to identify optimization opportunities
-5. Use regional scanners to avoid cross-region egress charges
 
 ## Security Best Practices
 
@@ -245,6 +162,13 @@ Before using any example, ensure you have:
 - **Check**: Cloud NAT is configured and working
 - **Solution**: Verify network configuration in GCP Console
 
+**Issue**: Instances running in GCP but no scan results in Datadog
+- **Note**: First scan results can take 15-30 minutes after instances become healthy. Do not troubleshoot prematurely.
+- **Check**: Cloud NAT is provisioned and has an active NAT IP (`gcloud compute routers nats list --router=<ROUTER_NAME> --region=<REGION>`)
+- **Check**: The Datadog API key stored in Secret Manager is valid and has Remote Configuration enabled
+- **Check**: The instance startup script completed (`gcloud compute instances get-serial-port-output <INSTANCE_NAME> --zone=<ZONE>`)
+- **Solution**: If results have not appeared after 30 minutes, SSH into the instance via IAP and check `sudo systemctl status datadog-agentless-scanner` and `sudo journalctl -u datadog-agentless-scanner --no-pager -n 100`
+
 **Issue**: Permission errors during deployment
 - **Required Roles**:
   - `roles/compute.admin` or equivalent
@@ -252,8 +176,8 @@ Before using any example, ensure you have:
   - `roles/secretmanager.admin`
 - **Solution**: Request necessary permissions from project admin
 
-**Issue**: Cross-project scanning failing (cross_project example)
-- **Check**: Impersonated service accounts exist in target project for both regions
+**Issue**: Cross-project scanning failing
+- **Check**: Impersonated service accounts exist in target project
 - **Check**: Scanner service accounts have impersonation permissions
 - **Solution**: Verify IAM bindings in other_project deployment
 
@@ -276,29 +200,9 @@ gcloud compute ssh <INSTANCE_NAME> --tunnel-through-iap
 sudo systemctl status datadog-agentless-scanner
 ```
 
-## Next Steps
-
-After successful deployment:
-
-1. ✅ Verify scanners appear in Datadog Infrastructure
-2. ✅ Check that resources are being discovered
-3. ✅ Review initial vulnerability findings
-4. ✅ Set up alerting for scanner health
-5. ✅ Document your deployment for your team
-6. ✅ Consider scaling to cross_project if needed
-
 ## Additional Resources
 
 - [GCP Module Documentation](../README.md)
 - [Datadog Agentless Scanning Documentation](https://docs.datadoghq.com/security/cloud_security_management/agentless_scanning/)
 - [Terraform GCP Provider Documentation](https://registry.terraform.io/providers/hashicorp/google/latest/docs)
 - [GCP Service Account Impersonation](https://cloud.google.com/iam/docs/impersonating-service-accounts)
-- [GCP Compute Engine Best Practices](https://cloud.google.com/compute/docs/best-practices)
-
-## Support
-
-For issues or questions:
-- 📖 [Datadog Documentation](https://docs.datadoghq.com/)
-- 💬 [Datadog Support](https://www.datadoghq.com/support/)
-- 🐛 [GitHub Issues](https://github.com/DataDog/terraform-module-datadog-agentless-scanner/issues)
-- 📧 Contact your Datadog account team
