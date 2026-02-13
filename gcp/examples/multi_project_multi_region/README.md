@@ -99,25 +99,16 @@ Use this deployment model when:
    terraform init
    ```
 
-1. **Review the deployment plan**:
-
-   > **Note**: Replace `datadoghq.com` with your [Datadog site](https://docs.datadoghq.com/getting_started/site/) if you use a different one (e.g., `datadoghq.eu`, `us5.datadoghq.com`). You can determine your site from the URL you use to log in to Datadog.
-
-   ```sh
-   terraform plan \
-     -var="scanner_project_id=<my-scanner-project>" \
-     -var="datadog_api_key=$DD_API_KEY" \
-     -var="datadog_app_key=$DD_APP_KEY" \
-     -var="datadog_site=datadoghq.com"
-   ```
-
 1. **Deploy the scanner infrastructure**:
+
+   > **Note**: Use the [Datadog site](https://docs.datadoghq.com/getting_started/site/) value from step 4 of the installation modal (e.g., `datadoghq.com`, `datadoghq.eu`, `us5.datadoghq.com`).
+
    ```sh
    terraform apply \
      -var="scanner_project_id=<my-scanner-project>" \
      -var="datadog_api_key=$DD_API_KEY" \
      -var="datadog_app_key=$DD_APP_KEY" \
-     -var="datadog_site=datadoghq.com"
+     -var="datadog_site=<datadog-site>"
    ```
 
 1. **Verify scanner instances are running in both regions**:
@@ -149,7 +140,7 @@ terraform apply \
   -var="scanner_service_account_email_eu=$SCANNER_SA_EU" \
   -var="datadog_api_key=$DD_API_KEY" \
   -var="datadog_app_key=$DD_APP_KEY" \
-  -var="datadog_site=datadoghq.com"
+  -var="datadog_site=<datadog-site>"
 ```
 
 1. **Verify scanning in Datadog (allow 15-30 minutes)**:
@@ -227,7 +218,7 @@ terraform destroy \
   -var="scanner_service_account_email_eu=$SCANNER_SA_EU" \
   -var="datadog_api_key=$DD_API_KEY" \
   -var="datadog_app_key=$DD_APP_KEY" \
-  -var="datadog_site=datadoghq.com"
+  -var="datadog_site=<datadog-site>"
 
 # 2. In the scanner project (after all other_project deployments are destroyed)
 cd ../scanner_project
@@ -235,7 +226,7 @@ terraform destroy \
   -var="scanner_project_id=<my-scanner-project>" \
   -var="datadog_api_key=$DD_API_KEY" \
   -var="datadog_app_key=$DD_APP_KEY" \
-  -var="datadog_site=datadoghq.com"
+  -var="datadog_site=<datadog-site>"
 ```
 
 > **Note**: To remove a single scanned project while keeping others, only run `terraform destroy` in that project's directory (e.g., `other_project_teamA`). Each directory has independent Terraform state, so destroying one does not affect others.

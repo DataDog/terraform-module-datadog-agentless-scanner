@@ -53,25 +53,16 @@ To deploy a Datadog Agentless scanner:
    terraform init
    ```
 
-1. **Review the deployment plan**:
-
-   > **Note**: Replace `datadoghq.com` with your [Datadog site](https://docs.datadoghq.com/getting_started/site/) if you use a different one (e.g., `datadoghq.eu`, `us5.datadoghq.com`). You can determine your site from the URL you use to log in to Datadog.
-
-   ```sh
-   terraform plan \
-     -var="project_id=<my-gcp-project>" \
-     -var="datadog_api_key=$DD_API_KEY" \
-     -var="datadog_app_key=$DD_APP_KEY" \
-     -var="datadog_site=datadoghq.com"
-   ```
-
 1. **Deploy the scanner**:
+
+   > **Note**: Use the [Datadog site](https://docs.datadoghq.com/getting_started/site/) value from step 4 of the installation modal (e.g., `datadoghq.com`, `datadoghq.eu`, `us5.datadoghq.com`).
+
    ```sh
    terraform apply \
      -var="project_id=<my-gcp-project>" \
      -var="datadog_api_key=$DD_API_KEY" \
      -var="datadog_app_key=$DD_APP_KEY" \
-     -var="datadog_site=datadoghq.com"
+     -var="datadog_site=<datadog-site>"
    ```
 
 1. **Verify the deployment**:
@@ -113,7 +104,7 @@ terraform destroy \
   -var="project_id=<my-gcp-project>" \
   -var="datadog_api_key=$DD_API_KEY" \
   -var="datadog_app_key=$DD_APP_KEY" \
-  -var="datadog_site=datadoghq.com"
+  -var="datadog_site=<datadog-site>"
 ```
 
 ## Troubleshooting
