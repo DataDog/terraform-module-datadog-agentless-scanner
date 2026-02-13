@@ -16,79 +16,31 @@ Before using this module, make sure you have the following:
    - Service accounts and IAM bindings
    - Secret Manager secrets (if using api_key parameter)
 4. Ensure the GCP project is onboarded in your Datadog organization before deploying this module. You can verify your project is listed in the [Cloud Security Setup page](https://app.datadoghq.com/security/configuration/csm/setup?active_steps=cloud-accounts&active_sub_step=gcp).
-5. A Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/) with Remote Configuration enabled.
+5. A Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/) with Remote Configuration enabled and a Datadog [APP key](https://docs.datadoghq.com/account_management/api-app-keys/). All three are available in the [Cloud Security Setup page](https://app.datadoghq.com/security/configuration/csm/setup?active_steps=cloud-accounts&active_sub_step=gcp) — select your GCP project, click **Enable**, choose **Terraform**, then copy from steps 2-4.
 6. A GCP project with the following APIs enabled:
    - Compute Engine API
    - IAM Service Account Credentials API
    - Secret Manager API (if using api_key parameter)
 
-## Usage
+## Choosing a Deployment Model
 
-This is a quick example showing how to use this module. For more detailed examples with different deployment scenarios, refer to the [examples](./examples/) directory.
+Datadog recommends **cross-project scanning** (multi-project) for production environments. This centralizes scanner infrastructure in a dedicated project while scanning resources across your organization.
 
-```hcl
-variable "project_id" {
-  description = "GCP project ID"
-  type        = string
-}
+Pick the playbook that matches your setup:
 
-variable "datadog_api_key" {
-  description = "Datadog API key with Remote Configuration enabled"
-  type        = string
-  sensitive   = true
-}
+| | **Single Region** | **Multiple Regions** |
+|---|---|---|
+| **Single Project** | [single_project_single_region](./examples/single_project_single_region/) | [single_project_multi_region](./examples/single_project_multi_region/) |
+| **Multiple Projects** | [multi_project_single_region](./examples/multi_project_single_region/) | [multi_project_multi_region](./examples/multi_project_multi_region/) (recommended) |
 
-variable "datadog_app_key" {
-  description = "Datadog APP key needed to enable the product"
-  type        = string
-  sensitive   = true
-}
+**How to decide:**
+- **Projects** — Do you need to scan resources in more than one GCP project? If yes, choose a multi-project playbook.
+- **Regions** — Are your resources spread across multiple regions? If yes, choose a multi-region playbook to reduce cross-region data transfer costs.
 
-variable "datadog_site" {
-  description = "Datadog site (e.g., datadoghq.com, datadoghq.eu, us3.datadoghq.com, us5.datadoghq.com, ap1.datadoghq.com, ap2.datadoghq.com, ddog-gov.com)"
-  type        = string
-}
+> [!TIP]
+> If you are evaluating Agentless Scanning for the first time, [single_project_single_region](./examples/single_project_single_region/) is the fastest way to get started. You can migrate to a multi-project setup later.
 
-provider "google" {
-  project = var.project_id
-  region  = "us-central1"
-}
-
-provider "datadog" {
-  api_key = var.datadog_api_key
-  app_key = var.datadog_app_key
-  api_url = "https://api.${var.datadog_site}/"
-}
-
-resource "datadog_agentless_scanning_gcp_scan_options" "scan_options" {
-  gcp_project_id     = var.project_id
-  vuln_host_os       = true
-  vuln_containers_os = true
-}
-
-module "datadog_agentless_scanner" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp?ref=0.11.12"
-
-  site     = var.datadog_site
-  vpc_name = "datadog-agentless-scanner"
-  api_key  = var.datadog_api_key
-}
-```
-
-First, authenticate with Google Cloud:
-```sh
-gcloud auth application-default login
-```
-
-Then run:
-```sh
-terraform init
-terraform apply \
-  -var="project_id=<your-project-id>" \
-  -var="datadog_api_key=$DD_API_KEY" \
-  -var="datadog_app_key=$DD_APP_KEY" \
-  -var="datadog_site=<your-datadog-site>"
-```
+Each playbook includes step-by-step instructions and complete Terraform code. See the [examples](./examples/) directory for a full comparison.
 
 > [!IMPORTANT]
 > Datadog strongly recommends [pinning](https://developer.hashicorp.com/terraform/language/modules/sources#selecting-a-revision) the version of the module to keep repeatable deployment and to avoid unexpected changes. Use a specific tag instead of a branch name.
@@ -101,27 +53,6 @@ terraform apply \
 - **Service Accounts**: The module automatically creates two service accounts:
   - **Scanner Service Account**: Attached to the compute instances, with permissions to read secrets and impersonate the target service account.
   - **Impersonated Service Account**: Used for scanning resources, with read permissions on compute disks and snapshots.
-
-## Examples
-
-For complete examples, refer to the [examples](./examples/) directory:
-
-### [Single Region](./examples/single_region/) - Simple Setup
-Deploy scanners in a single GCP region and project. **Ideal for single-project setups.**
-
-- ✅ Simple deployment model
-- ✅ Single project, single region
-- ✅ Multi-zone high availability
-
-### [Cross Project](./examples/cross_project/) - Advanced Setup
-Deploy scanners across multiple regions and scan multiple projects. **For enterprise deployments.**
-
-- ✅ Multi-region deployment (US + EU by default, customizable)
-- ✅ Cross-project scanning capability
-- ✅ Minimized cross-region costs
-- ✅ Centralized management
-
-Each example includes detailed README instructions and complete Terraform code. **Start with single_region** if you're new to Agentless scanning.
 
 ## Uninstall
 
