@@ -27,6 +27,21 @@ Before using this module, make sure you have the following:
 This is a quick example showing how to use this module. For more detailed examples with different deployment scenarios, refer to the [examples](./examples/) directory.
 
 ```hcl
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = ">= 5.0"
+    }
+    datadog = {
+      source  = "DataDog/datadog"
+      version = ">= 3.81.0"
+    }
+  }
+}
+
 variable "project_id" {
   description = "GCP project ID"
   type        = string
