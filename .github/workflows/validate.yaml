@@ -1,0 +1,51 @@
+name: terraform-validate
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate all Terraform configurations
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
+
+      - name: Validate
+        run: |
+          failed=0
+          passed=0
+          dirs=$(find . -name '*.tf' -not -path '*/.terraform/*' -exec dirname {} \; | sort -u)
+
+          for dir in $dirs; do
+            echo "::group::Validating $dir"
+
+            if ! terraform -chdir="$dir" init -backend=false; then
+              echo "::endgroup::"
+              echo "::error::terraform init failed in $dir"
+              failed=$((failed + 1))
+              continue
+            fi
+
+            if ! terraform -chdir="$dir" validate; then
+              echo "::endgroup::"
+              echo "::error::terraform validate failed in $dir"
+              failed=$((failed + 1))
+              continue
+            fi
+
+            echo "::endgroup::"
+            passed=$((passed + 1))
+          done
+
+          echo ""
+          echo "Results: $passed passed, $failed failed"
+          if [ "$failed" -ne 0 ]; then
+            exit 1
+          fi
