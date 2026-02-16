@@ -131,7 +131,7 @@ resource "aws_s3_bucket_policy" "bucket_access_policy" {
   policy = data.aws_iam_policy_document.bucket_access_policy_document.json
 }
 
-// KMS Key for RDS S3 Exports
+// KMS Key for RDS S3 Exports.
 resource "aws_kms_key" "agentless_kms_key" {
   description         = "This key is used to encrypt bucket objects"
   tags                = merge(var.tags, local.dd_tags)

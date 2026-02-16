@@ -62,8 +62,8 @@ module "agentless_scanner_eu" {
 module "agentless_s3_bucket_us" {
   source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-s3-bucket?ref=0.11.12"
 
-  iam_delegate_role_name  = module.delegate_role.role.name
-  iam_rds_assume_role_arn = module.agentless_scanner_us.role.arn
+  iam_delegate_role_arn = module.delegate_role.role.arn
+  rds_service_role_arn  = module.delegate_role.rds_service_role_arn
 
   providers = {
     aws = aws.us
@@ -73,8 +73,8 @@ module "agentless_s3_bucket_us" {
 module "agentless_s3_bucket_eu" {
   source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-s3-bucket?ref=0.11.12"
 
-  iam_delegate_role_name  = module.delegate_role.role.name
-  iam_rds_assume_role_arn = module.agentless_scanner_eu.role.arn
+  iam_delegate_role_arn = module.delegate_role.role.arn
+  rds_service_role_arn  = module.delegate_role.rds_service_role_arn
 
   providers = {
     aws = aws.eu
