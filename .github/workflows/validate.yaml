@@ -2,28 +2,81 @@ name: terraform-validate
 
 on:
   pull_request:
+    paths:
+      - '**/*.tf'
   push:
     branches: [main]
+    paths:
+      - '**/*.tf'
 
 permissions:
   contents: read
 
 jobs:
   validate:
-    name: Validate all Terraform configurations
+    name: Validate Terraform configurations
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          fetch-depth: 0
 
       - uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
+
+      - name: Detect affected providers
+        id: providers
+        run: |
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            base="${{ github.event.pull_request.base.sha }}"
+          else
+            base="${{ github.event.before }}"
+          fi
+
+          # If base is unknown (e.g. initial push), validate everything
+          if [ -z "$base" ] || [ "$base" = "0000000000000000000000000000000000000000" ]; then
+            echo "aws=true" >> "$GITHUB_OUTPUT"
+            echo "azure=true" >> "$GITHUB_OUTPUT"
+            echo "gcp=true" >> "$GITHUB_OUTPUT"
+            echo "Validating all providers (no base commit to compare)"
+            exit 0
+          fi
+
+          aws=false
+          azure=false
+          gcp=false
+
+          changed=$(git diff --name-only "$base"...HEAD -- '*.tf')
+          for f in $changed; do
+            case "$f" in
+              azure/*) azure=true ;;
+              gcp/*)   gcp=true ;;
+              *)       aws=true ;;
+            esac
+          done
+
+          echo "aws=$aws" >> "$GITHUB_OUTPUT"
+          echo "azure=$azure" >> "$GITHUB_OUTPUT"
+          echo "gcp=$gcp" >> "$GITHUB_OUTPUT"
+
+          echo "Changed .tf files:"
+          echo "$changed"
+          echo ""
+          echo "Providers to validate: aws=$aws azure=$azure gcp=$gcp"
 
       - name: Validate
         run: |
           failed=0
           passed=0
-          dirs=$(find . -name '*.tf' -not -path '*/.terraform/*' -exec dirname {} \; | sort -u)
+          skipped=0
+          all_dirs=$(find . -name '*.tf' -not -path '*/.terraform/*' -exec dirname {} \; | sort -u)
 
-          for dir in $dirs; do
+          for dir in $all_dirs; do
+            case "$dir" in
+              ./azure*) [ "${{ steps.providers.outputs.azure }}" = "true" ] || { skipped=$((skipped + 1)); continue; } ;;
+              ./gcp*)   [ "${{ steps.providers.outputs.gcp }}" = "true" ]   || { skipped=$((skipped + 1)); continue; } ;;
+              *)        [ "${{ steps.providers.outputs.aws }}" = "true" ]   || { skipped=$((skipped + 1)); continue; } ;;
+            esac
+
             echo "::group::Validating $dir"
 
             if ! terraform -chdir="$dir" init -backend=false; then
@@ -45,7 +98,7 @@ jobs:
           done
 
           echo ""
-          echo "Results: $passed passed, $failed failed"
+          echo "Results: $passed passed, $failed failed, $skipped skipped"
           if [ "$failed" -ne 0 ]; then
             exit 1
           fi
