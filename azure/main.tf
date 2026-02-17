@@ -60,6 +60,7 @@ module "managed_identity" {
 module "roles" {
   count             = var.create_roles ? 1 : 0
   source            = "./modules/roles"
+  role_name_prefix  = var.role_name_prefix
   resource_group_id = module.resource_group.resource_group.id
   principal_id      = module.managed_identity.identity.principal_id
   api_key_secret_id = one(data.azapi_resource_id.api_key_id[*].resource_id)
