@@ -30,17 +30,10 @@ resource "datadog_agentless_scanning_gcp_scan_options" "scanned_project" {
   vuln_containers_os = true
 }
 
-# Create impersonated service accounts for each scanner service account (US and EU)
-# This allows both the US and EU scanners to scan resources in this project
+# Create an impersonated service account for the shared scanner service account
+# This allows the scanner (deployed in multiple regions) to scan resources in this project
+module "agentless_impersonated_service_account" {
+  source = "../../../modules/agentless-impersonated-service-account"
 
-module "agentless_impersonated_service_account_us" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp/modules/agentless-impersonated-service-account?ref=0.11.12"
-
-  scanner_service_account_email = var.scanner_service_account_email_us
-}
-
-module "agentless_impersonated_service_account_eu" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp/modules/agentless-impersonated-service-account?ref=0.11.12"
-
-  scanner_service_account_email = var.scanner_service_account_email_eu
+  scanner_service_account_email = var.scanner_service_account_email
 }
