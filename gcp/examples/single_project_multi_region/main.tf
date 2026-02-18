@@ -37,6 +37,16 @@ resource "datadog_agentless_scanning_gcp_scan_options" "scan_options" {
   vuln_containers_os = true
 }
 
+# Create a single shared service account for all scanner deployments
+module "scanner_service_account" {
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp/modules/agentless-scanner-service-account?ref=0.11.12"
+
+  api_key_secret_ids = [
+    module.datadog_agentless_scanner_us.api_key_secret_id,
+    module.datadog_agentless_scanner_eu.api_key_secret_id,
+  ]
+}
+
 # Deploy the scanner infrastructure in US region
 module "datadog_agentless_scanner_us" {
   source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp?ref=0.11.12"
@@ -45,9 +55,10 @@ module "datadog_agentless_scanner_us" {
     google = google.us
   }
 
-  site     = var.datadog_site
-  api_key  = var.datadog_api_key
-  vpc_name = "datadog-agentless-scanner-us"
+  site                  = var.datadog_site
+  api_key               = var.datadog_api_key
+  vpc_name              = "datadog-agentless-scanner-us"
+  service_account_email = module.scanner_service_account.scanner_service_account_email
 }
 
 # Deploy the scanner infrastructure in EU region
@@ -58,7 +69,8 @@ module "datadog_agentless_scanner_eu" {
     google = google.eu
   }
 
-  site     = var.datadog_site
-  api_key  = var.datadog_api_key
-  vpc_name = "datadog-agentless-scanner-eu"
+  site                  = var.datadog_site
+  api_key               = var.datadog_api_key
+  vpc_name              = "datadog-agentless-scanner-eu"
+  service_account_email = module.scanner_service_account.scanner_service_account_email
 }
