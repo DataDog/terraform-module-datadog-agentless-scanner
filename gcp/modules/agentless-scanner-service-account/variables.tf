@@ -8,11 +8,11 @@ variable "unique_suffix" {
   }
 }
 
-variable "api_key_secret_id" {
-  description = "Identifier of the Secret Manager secret containing the Datadog API key in the format projects/[project_id]/secrets/[secret_name]"
-  type        = string
+variable "api_key_secret_ids" {
+  description = "List of Secret Manager secret identifiers containing the Datadog API keys in the format projects/[project_id]/secrets/[secret_name]"
+  type        = list(string)
   validation {
-    condition     = can(regex("^projects/[a-zA-Z0-9-]+/secrets/[a-zA-Z0-9-]+$", var.api_key_secret_id))
-    error_message = "The ID must be in the format 'projects/[project_id]/secrets/[secret_name]'."
+    condition     = alltrue([for id in var.api_key_secret_ids : can(regex("^projects/[a-zA-Z0-9-]+/secrets/[a-zA-Z0-9-]+$", id))])
+    error_message = "Each ID must be in the format 'projects/[project_id]/secrets/[secret_name]'."
   }
 }

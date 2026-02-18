@@ -9,8 +9,8 @@ locals {
   project_id = data.google_client_config.current.project
   # Use provided unique_suffix or generate random one
   effective_suffix = var.unique_suffix != "" ? var.unique_suffix : random_id.deployment_suffix.hex
-  # Extract secret name from full path (projects/PROJECT_ID/secrets/SECRET_NAME -> SECRET_NAME)
-  secret_name = regex("^projects/[a-zA-Z0-9-]+/secrets/([a-zA-Z0-9-]+)$", var.api_key_secret_id)[0]
+  # Extract secret names from full paths (projects/PROJECT_ID/secrets/SECRET_NAME -> SECRET_NAME)
+  secret_names = { for id in var.api_key_secret_ids : id => regex("^projects/[a-zA-Z0-9-]+/secrets/([a-zA-Z0-9-]+)$", id)[0] }
 }
 
 # Service account for the scanner
@@ -70,10 +70,11 @@ resource "google_project_iam_member" "zone_operations_binding" {
   member  = "serviceAccount:${google_service_account.scanner_service_account.email}"
 }
 
-# Binding the secretmanager secret accessor role to the scanner service account
+# Binding the secretmanager secret accessor role to the scanner service account for each secret
 resource "google_secret_manager_secret_iam_member" "scanner_secret_access" {
+  for_each  = local.secret_names
   project   = local.project_id
-  secret_id = local.secret_name
+  secret_id = each.value
   role      = "roles/secretmanager.secretAccessor"
   member    = "serviceAccount:${google_service_account.scanner_service_account.email}"
 }
