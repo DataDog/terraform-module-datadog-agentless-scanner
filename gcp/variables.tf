@@ -120,6 +120,12 @@ variable "api_key_secret_id" {
   }
 }
 
+variable "service_account_email" {
+  description = "Email of an existing scanner service account to use. When provided, the module skips creating a new service account and uses the provided one instead. The caller is responsible for setting up the service account with proper permissions (using the agentless-scanner-service-account submodule)."
+  type        = string
+  default     = null
+}
+
 variable "unique_suffix" {
   description = "Unique suffix to append to resource names to avoid collisions. Must be alphanumeric only (no hyphens or underscores) and maximum 8 characters. If not provided, a random suffix is generated."
   type        = string

@@ -139,6 +139,7 @@ The main module provided in this directory is a wrapper around these modules wit
 | <a name="input_scanner_configuration"></a> [scanner\_configuration](#input\_scanner\_configuration) | Specifies a custom configuration for the scanner. The specified object is passed directly as a configuration input for the scanner. Warning: this is an advanced feature and can break the scanner if not used correctly. | `any` | `{}` | no |
 | <a name="input_scanner_repository"></a> [scanner\_repository](#input\_scanner\_repository) | Repository URL to install the scanner from. | `string` | `"https://apt.datadoghq.com/"` | no |
 | <a name="input_scanner_version"></a> [scanner\_version](#input\_scanner\_version) | Specifies the version of the scanner to install | `string` | `"0.11"` | no |
+| <a name="input_service_account_email"></a> [service\_account\_email](#input\_service\_account\_email) | Email of an existing scanner service account to use. When provided, the module skips creating a new service account and uses the provided one instead. The caller is responsible for setting up the service account with proper permissions (using the agentless-scanner-service-account submodule). | `string` | `null` | no |
 | <a name="input_site"></a> [site](#input\_site) | The Datadog site of your organization where scanner data will be sent (for example, datadoghq.com, datadoghq.eu, us5.datadoghq.com). See https://docs.datadoghq.com/getting_started/site/ | `string` | n/a | yes |
 | <a name="input_ssh_public_key"></a> [ssh\_public\_key](#input\_ssh\_public\_key) | SSH public key for instance access | `string` | `null` | no |
 | <a name="input_ssh_username"></a> [ssh\_username](#input\_ssh\_username) | Username for SSH access | `string` | `null` | no |
@@ -151,6 +152,7 @@ The main module provided in this directory is a wrapper around these modules wit
 
 | Name | Description |
 |------|-------------|
+| <a name="output_api_key_secret_id"></a> [api\_key\_secret\_id](#output\_api\_key\_secret\_id) | The ID of the Secret Manager secret containing the Datadog API key |
 | <a name="output_health_check"></a> [health\_check](#output\_health\_check) | The health check for auto-healing |
 | <a name="output_instance_group_manager"></a> [instance\_group\_manager](#output\_instance\_group\_manager) | The managed instance group manager |
 | <a name="output_instance_template"></a> [instance\_template](#output\_instance\_template) | The instance template used by the MIG |

@@ -23,6 +23,8 @@ locals {
   api_key_validation = (var.api_key != null && var.api_key_secret_id == null) || (var.api_key == null && var.api_key_secret_id != null)
   # Validation to ensure both SSH variables are provided or neither
   ssh_validation = (var.ssh_public_key != null && var.ssh_username != null) || (var.ssh_public_key == null && var.ssh_username == null)
+  # Use provided service account or the one created by this module
+  effective_service_account_email = coalesce(var.service_account_email, try(module.agentless_scanner_service_account[0].scanner_service_account_email, null))
 }
 
 # VPC Module - Creates network infrastructure for scanner instances
@@ -37,18 +39,20 @@ module "vpc" {
 }
 
 # Agentless Scanner Service Account Module - Service account for compute instances
+# Skipped when an existing service_account_email is provided
 module "agentless_scanner_service_account" {
+  count  = var.service_account_email == null ? 1 : 0
   source = "./modules/agentless-scanner-service-account"
 
-  unique_suffix     = local.unique_suffix
-  api_key_secret_id = module.instance.api_key_secret_id
+  unique_suffix      = local.unique_suffix
+  api_key_secret_ids = [module.instance.api_key_secret_id]
 }
 
 # Agentless Impersonated Service Account Module - IAM resources for disk scanning
 module "agentless_impersonated_service_account" {
   source = "./modules/agentless-impersonated-service-account"
 
-  scanner_service_account_email = module.agentless_scanner_service_account.scanner_service_account_email
+  scanner_service_account_email = local.effective_service_account_email
   unique_suffix                 = local.unique_suffix
 }
 
@@ -59,7 +63,7 @@ module "instance" {
   zones                 = local.zones
   network_name          = module.vpc.vpc_name
   subnetwork_name       = module.vpc.subnet_name
-  service_account_email = module.agentless_scanner_service_account.scanner_service_account_email
+  service_account_email = local.effective_service_account_email
 
   api_key               = var.api_key
   api_key_secret_id     = var.api_key_secret_id
