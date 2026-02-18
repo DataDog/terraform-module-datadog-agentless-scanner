@@ -121,6 +121,7 @@ The main module provided in this directory is a wrapper around these modules wit
 | Name | Type |
 |------|------|
 | [null_resource.api_key_validation](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
+| [null_resource.scanner_sa_validation](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [null_resource.ssh_validation](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [random_id.deployment_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [google_client_config.current](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/client_config) | data source |
@@ -138,6 +139,7 @@ The main module provided in this directory is a wrapper around these modules wit
 | <a name="input_scanner_channel"></a> [scanner\_channel](#input\_scanner\_channel) | Specifies the channel to use for installing the scanner | `string` | `"stable"` | no |
 | <a name="input_scanner_configuration"></a> [scanner\_configuration](#input\_scanner\_configuration) | Specifies a custom configuration for the scanner. The specified object is passed directly as a configuration input for the scanner. Warning: this is an advanced feature and can break the scanner if not used correctly. | `any` | `{}` | no |
 | <a name="input_scanner_repository"></a> [scanner\_repository](#input\_scanner\_repository) | Repository URL to install the scanner from. | `string` | `"https://apt.datadoghq.com/"` | no |
+| <a name="input_scanner_service_account_email"></a> [scanner\_service\_account\_email](#input\_scanner\_service\_account\_email) | Email of a pre-existing scanner service account to use instead of creating a new one. When provided, the module skips creating service accounts and IAM resources, deploying only regional infrastructure (VPC, instances). Use this for multi-region deployments to share a single service account across regions. When set, 'api\_key\_secret\_id' must also be provided. | `string` | `null` | no |
 | <a name="input_scanner_version"></a> [scanner\_version](#input\_scanner\_version) | Specifies the version of the scanner to install | `string` | `"0.11"` | no |
 | <a name="input_site"></a> [site](#input\_site) | The Datadog site of your organization where scanner data will be sent (for example, datadoghq.com, datadoghq.eu, us5.datadoghq.com). See https://docs.datadoghq.com/getting_started/site/ | `string` | n/a | yes |
 | <a name="input_ssh_public_key"></a> [ssh\_public\_key](#input\_ssh\_public\_key) | SSH public key for instance access | `string` | `null` | no |
@@ -151,12 +153,13 @@ The main module provided in this directory is a wrapper around these modules wit
 
 | Name | Description |
 |------|-------------|
+| <a name="output_api_key_secret_id"></a> [api\_key\_secret\_id](#output\_api\_key\_secret\_id) | The ID of the Secret Manager secret containing the Datadog API key |
 | <a name="output_health_check"></a> [health\_check](#output\_health\_check) | The health check for auto-healing |
 | <a name="output_instance_group_manager"></a> [instance\_group\_manager](#output\_instance\_group\_manager) | The managed instance group manager |
 | <a name="output_instance_template"></a> [instance\_template](#output\_instance\_template) | The instance template used by the MIG |
 | <a name="output_mig_target_size"></a> [mig\_target\_size](#output\_mig\_target\_size) | Target size of the managed instance group |
 | <a name="output_scanner_service_account_email"></a> [scanner\_service\_account\_email](#output\_scanner\_service\_account\_email) | Email of the scanner service account |
-| <a name="output_target_service_account_email"></a> [target\_service\_account\_email](#output\_target\_service\_account\_email) | Email of the target service account |
+| <a name="output_target_service_account_email"></a> [target\_service\_account\_email](#output\_target\_service\_account\_email) | Email of the target service account (null when scanner\_service\_account\_email is provided) |
 | <a name="output_unique_suffix"></a> [unique\_suffix](#output\_unique\_suffix) | Unique suffix used in resource names |
 | <a name="output_vpc_network"></a> [vpc\_network](#output\_vpc\_network) | The VPC network created for the scanner |
 | <a name="output_vpc_network_name"></a> [vpc\_network\_name](#output\_vpc\_network\_name) | The name of the VPC network |
