@@ -57,12 +57,16 @@ resource "google_secret_manager_secret_version" "dd_api_key" {
   secret_data = var.datadog_api_key
 }
 
+# The scanner service account is the identity used by scanner VMs to run scans
+# and report results to Datadog.
 module "scanner_service_account" {
   source = "../../../modules/agentless-scanner-service-account"
 
   api_key_secret_id = google_secret_manager_secret.dd_api_key.id
 }
 
+# The impersonated service account grants the scanner cross-project access
+# to scan resources in this project.
 module "impersonated_service_account" {
   source = "../../../modules/agentless-impersonated-service-account"
 
