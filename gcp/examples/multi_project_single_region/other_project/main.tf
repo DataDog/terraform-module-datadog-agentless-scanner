@@ -33,7 +33,7 @@ resource "datadog_agentless_scanning_gcp_scan_options" "scanned_project" {
 # Create an impersonated service account for the scanner service account
 # This allows the scanner to scan resources in this project
 module "agentless_impersonated_service_account" {
-  source = "../../../modules/agentless-impersonated-service-account"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp/modules/agentless-impersonated-service-account?ref=4ecd78b38ac0a2794542eb2ed6fad5a25bccd14c"
 
   scanner_service_account_email = var.scanner_service_account_email
 }
