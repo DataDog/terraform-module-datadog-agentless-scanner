@@ -116,3 +116,16 @@ resource "null_resource" "scanner_sa_validation" {
     error = "When 'scanner_service_account_email' is provided, 'api_key_secret_id' must also be provided because service account creation (and its secret access binding) is skipped."
   }
 }
+
+# Moved blocks for backward compatibility: adding count to these modules changes
+# their state address from module.X to module.X[0]. These blocks tell Terraform
+# to migrate existing state automatically instead of destroying and recreating.
+moved {
+  from = module.agentless_scanner_service_account
+  to   = module.agentless_scanner_service_account[0]
+}
+
+moved {
+  from = module.agentless_impersonated_service_account
+  to   = module.agentless_impersonated_service_account[0]
+}
