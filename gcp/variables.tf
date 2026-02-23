@@ -131,7 +131,7 @@ variable "unique_suffix" {
 }
 
 variable "scanner_service_account_email" {
-  description = "Email of a pre-existing scanner service account to use instead of creating a new one. When provided, the module skips creating service accounts and IAM resources, deploying only regional infrastructure (VPC, instances). Use this for multi-region deployments to share a single service account across regions. When set, 'api_key_secret_id' must also be provided."
+  description = "Email of a pre-existing scanner service account to use instead of creating a new one. When provided, the module skips creating service accounts and IAM resources, deploying only regional infrastructure (VPC, instances). Use this for multi-region deployments to share a single service account across scanners deployed in multiple regions. When set, 'api_key_secret_id' must also be provided."
   type        = string
   default     = null
 }
