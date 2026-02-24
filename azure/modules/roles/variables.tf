@@ -1,3 +1,10 @@
+variable "role_name_prefix" {
+  description = "Prefix to use for custom role names. Used to create 'Orchestrator Role' and 'Worker Role'."
+  type        = string
+  default     = "Datadog Agentless Scanner"
+  nullable    = false
+}
+
 variable "resource_group_id" {
   description = "The ID of the resource group where the Datadog Agentless Scanner exists."
   type        = string
