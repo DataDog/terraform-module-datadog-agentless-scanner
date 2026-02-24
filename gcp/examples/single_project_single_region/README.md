@@ -85,7 +85,7 @@ To reference a **pre-existing** Secret Manager secret instead, modify the module
 
 ```hcl
 module "datadog_agentless_scanner" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp?ref=0.11.12"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp?ref=0.11.13"
 
   site             = var.datadog_site
   vpc_name         = "datadog-agentless-scanner"

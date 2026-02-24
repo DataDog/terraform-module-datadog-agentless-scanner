@@ -6,7 +6,7 @@ Add the module to your Terraform configuration and provide the name of the Datad
 
 ```hcl
 module "autoscaling_scanners" {
-  source                   = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanners-autoscaling?ref=0.11.12"
+  source                   = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanners-autoscaling?ref=0.11.13"
   datadog_integration_role = var.datadog_integration_role
 }
 ```
