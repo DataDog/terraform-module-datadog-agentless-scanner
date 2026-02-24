@@ -5,8 +5,8 @@
   "metadata": {
     "_generator": {
       "name": "bicep",
-      "version": "0.38.33.27573",
-      "templateHash": "11763594633116394451"
+      "version": "0.40.2.10011",
+      "templateHash": "1062114889357711452"
     }
   },
   "functions": [
@@ -365,9 +365,9 @@
     "scannerRole": {
       "type": "Microsoft.Authorization/roleDefinitions",
       "apiVersion": "2022-04-01",
-      "name": "[guid(variables('name'), 'scannerRole', resourceGroup().id, subscription().id)]",
+      "name": "[guid(variables('name'), 'scannerRole', resourceGroup().id)]",
       "properties": {
-        "roleName": "Datadog Agentless Scanner Role",
+        "roleName": "[format('Datadog Agentless Scanner Role ({0})', uniqueString(variables('name'), resourceGroup().id))]",
         "description": "Role used by the Datadog Agentless Scanner to manage resources in its own resource group.",
         "type": "customRole",
         "permissions": [
@@ -405,9 +405,9 @@
     "delegateRole": {
       "type": "Microsoft.Authorization/roleDefinitions",
       "apiVersion": "2022-04-01",
-      "name": "[guid(variables('name'), 'delegateRole', resourceGroup().id, subscription().id)]",
+      "name": "[guid(variables('name'), 'delegateRole', resourceGroup().id)]",
       "properties": {
-        "roleName": "Datadog Agentless Scanner Delegate Role",
+        "roleName": "[format('Datadog Agentless Scanner Delegate Role ({0})', uniqueString(variables('name'), resourceGroup().id))]",
         "description": "Role used by the Datadog Agentless Scanner to scan resources.",
         "type": "customRole",
         "permissions": [
@@ -433,9 +433,9 @@
     "scannerRoleAssignment": {
       "type": "Microsoft.Authorization/roleAssignments",
       "apiVersion": "2022-04-01",
-      "name": "[guid(resourceId('Microsoft.Authorization/roleDefinitions', guid(variables('name'), 'scannerRole', resourceGroup().id, subscription().id)), resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('identityName')))]",
+      "name": "[guid(resourceId('Microsoft.Authorization/roleDefinitions', guid(variables('name'), 'scannerRole', resourceGroup().id)), resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('identityName')))]",
       "properties": {
-        "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', guid(variables('name'), 'scannerRole', resourceGroup().id, subscription().id))]",
+        "roleDefinitionId": "[resourceId('Microsoft.Authorization/roleDefinitions', guid(variables('name'), 'scannerRole', resourceGroup().id))]",
         "principalId": "[reference('managedIdentity').principalId]",
         "principalType": "ServicePrincipal"
       },
@@ -571,7 +571,7 @@
       },
       "type": "Microsoft.Resources/deployments",
       "apiVersion": "2025-04-01",
-      "name": "[format('delegateRoleAssignment-{0}', guid(resourceId('Microsoft.Authorization/roleDefinitions', guid(variables('name'), 'delegateRole', resourceGroup().id, subscription().id)), resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('identityName')), map(filter(parameters('scanScopes'), lambda('s', startsWith(lambdaVariables('s'), '/subscriptions/'))), lambda('s', skip(lambdaVariables('s'), length('/subscriptions/'))))[copyIndex()]))]",
+      "name": "[format('delegateRoleAssignment-{0}', guid(resourceId('Microsoft.Authorization/roleDefinitions', guid(variables('name'), 'delegateRole', resourceGroup().id)), resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('identityName')), map(filter(parameters('scanScopes'), lambda('s', startsWith(lambdaVariables('s'), '/subscriptions/'))), lambda('s', skip(lambdaVariables('s'), length('/subscriptions/'))))[copyIndex()]))]",
       "subscriptionId": "[map(filter(parameters('scanScopes'), lambda('s', startsWith(lambdaVariables('s'), '/subscriptions/'))), lambda('s', skip(lambdaVariables('s'), length('/subscriptions/'))))[copyIndex()]]",
       "location": "[resourceGroup().location]",
       "properties": {
@@ -581,10 +581,10 @@
         "mode": "Incremental",
         "parameters": {
           "name": {
-            "value": "[guid(resourceId('Microsoft.Authorization/roleDefinitions', guid(variables('name'), 'delegateRole', resourceGroup().id, subscription().id)), resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('identityName')), map(filter(parameters('scanScopes'), lambda('s', startsWith(lambdaVariables('s'), '/subscriptions/'))), lambda('s', skip(lambdaVariables('s'), length('/subscriptions/'))))[copyIndex()])]"
+            "value": "[guid(resourceId('Microsoft.Authorization/roleDefinitions', guid(variables('name'), 'delegateRole', resourceGroup().id)), resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', parameters('identityName')), map(filter(parameters('scanScopes'), lambda('s', startsWith(lambdaVariables('s'), '/subscriptions/'))), lambda('s', skip(lambdaVariables('s'), length('/subscriptions/'))))[copyIndex()])]"
           },
           "roleDefinitionId": {
-            "value": "[resourceId('Microsoft.Authorization/roleDefinitions', guid(variables('name'), 'delegateRole', resourceGroup().id, subscription().id))]"
+            "value": "[resourceId('Microsoft.Authorization/roleDefinitions', guid(variables('name'), 'delegateRole', resourceGroup().id))]"
           },
           "principalId": {
             "value": "[reference('managedIdentity').principalId]"
@@ -596,8 +596,8 @@
           "metadata": {
             "_generator": {
               "name": "bicep",
-              "version": "0.38.33.27573",
-              "templateHash": "4400777875424963630"
+              "version": "0.40.2.10011",
+              "templateHash": "15003202632888158117"
             }
           },
           "parameters": {

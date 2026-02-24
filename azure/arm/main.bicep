@@ -258,9 +258,9 @@ resource managedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-
 }
 
 resource scannerRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' = {
-  name: guid(name, 'scannerRole', resourceGroup().id, subscription().id)
+  name: guid(name, 'scannerRole', resourceGroup().id)
   properties: {
-    roleName: 'Datadog Agentless Scanner Role'
+    roleName: 'Datadog Agentless Scanner Role (${uniqueString(name, resourceGroup().id)})'
     description: 'Role used by the Datadog Agentless Scanner to manage resources in its own resource group.'
     type: 'customRole'
     permissions: [
@@ -299,9 +299,9 @@ resource scannerRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' = {
 }
 
 resource delegateRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' = {
-  name: guid(name, 'delegateRole', resourceGroup().id, subscription().id)
+  name: guid(name, 'delegateRole', resourceGroup().id)
   properties: {
-    roleName: 'Datadog Agentless Scanner Delegate Role'
+    roleName: 'Datadog Agentless Scanner Delegate Role (${uniqueString(name, resourceGroup().id)})'
     description: 'Role used by the Datadog Agentless Scanner to scan resources.'
     type: 'customRole'
     permissions: [
