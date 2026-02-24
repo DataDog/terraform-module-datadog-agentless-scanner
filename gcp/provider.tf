@@ -1,6 +1,6 @@
 # GCP module for Datadog Agentless Scanner
 terraform {
-  required_version = ">= 1.0"
+  required_version = ">= 1.1"
 
   required_providers {
     google = {

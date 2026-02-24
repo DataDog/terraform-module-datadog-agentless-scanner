@@ -19,10 +19,6 @@ locals {
   region        = data.google_client_config.current.region
   project_id    = data.google_client_config.current.project
   zones         = length(var.zones) > 0 ? var.zones : slice(data.google_compute_zones.available.names, 0, min(3, length(data.google_compute_zones.available.names)))
-  # Validation to ensure exactly one of api_key or api_key_secret_id is provided
-  api_key_validation = (var.api_key != null && var.api_key_secret_id == null) || (var.api_key == null && var.api_key_secret_id != null)
-  # Validation to ensure both SSH variables are provided or neither
-  ssh_validation = (var.ssh_public_key != null && var.ssh_username != null) || (var.ssh_public_key == null && var.ssh_username == null)
   # When an external scanner service account is provided, skip creating service accounts
   create_service_accounts = var.scanner_service_account_email == null
   scanner_service_account_email = (
@@ -30,6 +26,10 @@ locals {
     ? var.scanner_service_account_email
     : module.agentless_scanner_service_account[0].scanner_service_account_email
   )
+  # Validation to ensure exactly one of api_key or api_key_secret_id is provided
+  api_key_validation = (var.api_key != null && var.api_key_secret_id == null) || (var.api_key == null && var.api_key_secret_id != null)
+  # Validation to ensure both SSH variables are provided or neither
+  ssh_validation = (var.ssh_public_key != null && var.ssh_username != null) || (var.ssh_public_key == null && var.ssh_username == null)
   # Validation: when using an external SA, api_key_secret_id must be provided
   scanner_sa_validation = var.scanner_service_account_email == null || var.api_key_secret_id != null
 }
