@@ -21,13 +21,18 @@ output "mig_target_size" {
 
 # Outputs from Agentless Impersonated Service Account Module
 output "target_service_account_email" {
-  description = "Email of the target service account"
-  value       = module.agentless_impersonated_service_account.service_account_email
+  description = "Email of the target service account (null when scanner_service_account_email is provided)"
+  value       = local.create_service_accounts ? module.agentless_impersonated_service_account[0].service_account_email : null
 }
 
 output "scanner_service_account_email" {
   description = "Email of the scanner service account"
-  value       = module.agentless_scanner_service_account.scanner_service_account_email
+  value       = local.scanner_service_account_email
+}
+
+output "api_key_secret_id" {
+  description = "The ID of the Secret Manager secret containing the Datadog API key"
+  value       = module.instance.api_key_secret_id
 }
 
 # Outputs from VPC Module

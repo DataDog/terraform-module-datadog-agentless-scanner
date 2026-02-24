@@ -129,3 +129,21 @@ variable "unique_suffix" {
     error_message = "The unique_suffix must contain only alphanumeric characters (letters and numbers, no hyphens or underscores) and be maximum 8 characters long."
   }
 }
+
+variable "scanner_service_account_email" {
+  description = "Email of a pre-existing scanner service account to use instead of creating a new one. When provided, the module skips creating service accounts and IAM resources, deploying only regional infrastructure (VPC, instances). Use this for multi-region deployments to share a single service account across scanners deployed in multiple regions. When set, 'api_key_secret_id' must also be provided."
+  type        = string
+  default     = null
+
+  validation {
+    condition = (
+      var.scanner_service_account_email == null ||
+      can(regex(
+        "^[a-z][a-z0-9-]{4,28}[a-z0-9]@[a-z][a-z0-9-]{4,28}[a-z0-9]\\.iam\\.gserviceaccount\\.com$",
+        var.scanner_service_account_email
+      ))
+    )
+
+    error_message = "scanner_service_account_email must be a valid GCP service account email (SERVICE_ACCOUNT@PROJECT_ID.iam.gserviceaccount.com)."
+  }
+}

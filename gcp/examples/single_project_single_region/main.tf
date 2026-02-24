@@ -31,7 +31,7 @@ resource "datadog_agentless_scanning_gcp_scan_options" "scan_options" {
 }
 
 module "datadog_agentless_scanner" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp?ref=0.11.12"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp?ref=4ecd78b38ac0a2794542eb2ed6fad5a25bccd14c"
 
   site     = var.datadog_site
   api_key  = var.datadog_api_key
