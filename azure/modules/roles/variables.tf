@@ -1,7 +1,7 @@
-variable "role_name_prefix" {
-  description = "Prefix to use for custom role names. Used to create 'Orchestrator Role' and 'Worker Role'."
+variable "role_name_suffix" {
+  description = "Suffix to use for custom role names. Used to create 'Orchestrator Role' and 'Worker Role'."
   type        = string
-  default     = "Datadog Agentless Scanner"
+  default     = ""
   nullable    = false
 }
 
