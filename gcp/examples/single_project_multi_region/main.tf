@@ -81,7 +81,6 @@ module "datadog_agentless_scanner_us" {
     google = google.us
   }
 
-  create_service_accounts       = false
   scanner_service_account_email = module.scanner_service_account.scanner_service_account_email
   api_key_secret_id             = google_secret_manager_secret.dd_api_key.id
   site                          = var.datadog_site
@@ -95,7 +94,6 @@ module "datadog_agentless_scanner_eu" {
     google = google.eu
   }
 
-  create_service_accounts       = false
   scanner_service_account_email = module.scanner_service_account.scanner_service_account_email
   api_key_secret_id             = google_secret_manager_secret.dd_api_key.id
   site                          = var.datadog_site

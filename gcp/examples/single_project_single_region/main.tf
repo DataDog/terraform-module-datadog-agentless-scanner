@@ -30,10 +30,39 @@ resource "datadog_agentless_scanning_gcp_scan_options" "scan_options" {
   vuln_containers_os = true
 }
 
+# ── Project-scoped resources (created once) ──
+
+resource "google_secret_manager_secret" "dd_api_key" {
+  secret_id = "datadog-agentless-scanner-api-key"
+  replication {
+    auto {}
+  }
+}
+
+resource "google_secret_manager_secret_version" "dd_api_key" {
+  secret      = google_secret_manager_secret.dd_api_key.id
+  secret_data = var.datadog_api_key
+}
+
+module "scanner_service_account" {
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp/modules/agentless-scanner-service-account?ref=0.11.13"
+
+  api_key_secret_id = google_secret_manager_secret.dd_api_key.id
+}
+
+module "impersonated_service_account" {
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp/modules/agentless-impersonated-service-account?ref=0.11.13"
+
+  scanner_service_account_email = module.scanner_service_account.scanner_service_account_email
+}
+
+# ── Scanner infrastructure ──
+
 module "datadog_agentless_scanner" {
   source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp?ref=0.11.13"
 
-  site     = var.datadog_site
-  api_key  = var.datadog_api_key
-  vpc_name = "datadog-agentless-scanner"
+  scanner_service_account_email = module.scanner_service_account.scanner_service_account_email
+  api_key_secret_id             = google_secret_manager_secret.dd_api_key.id
+  site                          = var.datadog_site
+  vpc_name                      = "datadog-agentless-scanner"
 }
