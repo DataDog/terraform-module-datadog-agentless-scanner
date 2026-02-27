@@ -18,13 +18,6 @@ variable "service_account_email" {
   type        = string
 }
 
-variable "api_key" {
-  description = "Datadog API key. Either api_key or api_key_secret_id must be provided, but not both."
-  type        = string
-  default     = null
-  sensitive   = true
-}
-
 variable "site" {
   description = "The Datadog site of your organization where scanner data will be sent (for example, datadoghq.com, datadoghq.eu, us5.datadoghq.com). See https://docs.datadoghq.com/getting_started/site/"
   type        = string
@@ -104,11 +97,10 @@ variable "agent_configuration" {
 }
 
 variable "api_key_secret_id" {
-  description = "Identifier of the Secret Manager secret containing the Datadog API key in the format projects/[project_id]/secrets/[secret_name]"
+  description = "Identifier of the Secret Manager secret containing the Datadog API key in the format projects/[project_id]/secrets/[secret_name]."
   type        = string
-  default     = null
   validation {
-    condition     = var.api_key_secret_id == null || can(regex("^projects/[a-zA-Z0-9-]+/secrets/[a-zA-Z0-9-]+$", var.api_key_secret_id))
+    condition     = can(regex("^projects/[a-zA-Z0-9-]+/secrets/[a-zA-Z0-9-]+$", var.api_key_secret_id))
     error_message = "The ID must be in the format 'projects/[project_id]/secrets/[secret_name]'."
   }
 }
