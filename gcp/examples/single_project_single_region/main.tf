@@ -66,29 +66,3 @@ module "datadog_agentless_scanner" {
   site                          = var.datadog_site
   vpc_name                      = "datadog-agentless-scanner"
 }
-
-# ── State migration ──
-# These moved blocks migrate resources that were previously created inside
-# the scanner module to their new top-level addresses. They allow Terraform
-# to update the state in-place instead of destroying and recreating resources.
-# You can safely remove these blocks after the first successful apply.
-
-moved {
-  from = module.datadog_agentless_scanner.module.agentless_scanner_service_account[0]
-  to   = module.scanner_service_account
-}
-
-moved {
-  from = module.datadog_agentless_scanner.module.agentless_impersonated_service_account[0]
-  to   = module.impersonated_service_account
-}
-
-moved {
-  from = module.datadog_agentless_scanner.module.instance.google_secret_manager_secret.api_key_secret[0]
-  to   = google_secret_manager_secret.dd_api_key
-}
-
-moved {
-  from = module.datadog_agentless_scanner.module.instance.google_secret_manager_secret_version.api_key_version[0]
-  to   = google_secret_manager_secret_version.dd_api_key
-}
