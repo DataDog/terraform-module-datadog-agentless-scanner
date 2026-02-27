@@ -14,13 +14,13 @@ Before using this module, make sure you have the following:
    - VPC networks and subnets
    - Compute Engine instances and instance templates
    - Service accounts and IAM bindings
-   - Secret Manager secrets (if using api_key parameter)
+   - Secret Manager secrets
 4. Ensure the GCP project is onboarded in your Datadog organization before deploying this module. You can verify your project is listed in the [Cloud Security Setup page](https://app.datadoghq.com/security/configuration/csm/setup?active_steps=cloud-accounts&active_sub_step=gcp).
 5. A Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/) with Remote Configuration enabled and a Datadog [APP key](https://docs.datadoghq.com/account_management/api-app-keys/). All three are available in the [Cloud Security Setup page](https://app.datadoghq.com/security/configuration/csm/setup?active_steps=cloud-accounts&active_sub_step=gcp) — select your GCP project, click **Enable**, choose **Terraform**, then copy from steps 2-4.
 6. A GCP project with the following APIs enabled:
    - Compute Engine API
    - IAM Service Account Credentials API
-   - Secret Manager API (if using api_key parameter)
+   - Secret Manager API
 
 ## Choosing a Deployment Model
 
@@ -49,10 +49,8 @@ Each playbook includes step-by-step instructions and complete Terraform code. Se
 
 - **`site`**: Must match the Datadog site parameter of your account (see [Datadog site documentation](https://docs.datadoghq.com/getting_started/site/#access-the-datadog-site)). Common values: `datadoghq.com`, `datadoghq.eu`, `us3.datadoghq.com`, `us5.datadoghq.com`, `ap1.datadoghq.com`, `ap2.datadoghq.com`, `ddog-gov.com`.
 - **`vpc_name`**: Name prefix for the VPC resources where the Agentless scanner is created. For security reasons, this VPC should be reserved for the exclusive use of the scanner.
-- **`api_key`**: The Datadog API key is stored in Google Secret Manager and accessed by the scanner instances. Alternatively, you can use `api_key_secret_id` to reference an existing secret.
-- **Service Accounts**: The module automatically creates two service accounts:
-  - **Scanner Service Account**: Attached to the compute instances, with permissions to read secrets and impersonate the target service account.
-  - **Impersonated Service Account**: Used for scanning resources, with read permissions on compute disks and snapshots.
+- **`api_key_secret_id`**: The ID of a pre-provisioned Secret Manager secret containing the Datadog API key, in the format `projects/[project_id]/secrets/[secret_name]`.
+- **`scanner_service_account_email`**: The email of the scanner service account. Create it using the [agentless-scanner-service-account](./modules/agentless-scanner-service-account/) submodule before deploying this module. See the [examples](./examples/) for the full setup pattern.
 
 ## Uninstall
 
@@ -70,7 +68,7 @@ The Agentless Scanner deployment on GCP is split into different modules to allow
 - **[instance](./modules/instance/)**: Creates the Managed Instance Group (MIG) with compute instances that run the agentless scanner. The MIG provides auto-healing and distributes instances across multiple zones for high availability.
 - **[vpc](./modules/vpc/)**: Creates the VPC network, subnet, Cloud Router, Cloud NAT, and firewall rules required for the agentless scanner. The scanner runs in a private subnet with outbound internet access through Cloud NAT.
 
-The main module provided in this directory is a wrapper around these modules with simplified inputs. It creates a complete, production-ready deployment of the Agentless scanner.
+The main module provided in this directory orchestrates the **instance** and **vpc** modules. Service accounts and secrets must be created externally using the submodules above (see the [examples](./examples/) for the full pattern).
 
 ### Architecture Diagram
 
@@ -111,8 +109,6 @@ The main module provided in this directory is a wrapper around these modules wit
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_agentless_impersonated_service_account"></a> [agentless\_impersonated\_service\_account](#module\_agentless\_impersonated\_service\_account) | ./modules/agentless-impersonated-service-account | n/a |
-| <a name="module_agentless_scanner_service_account"></a> [agentless\_scanner\_service\_account](#module\_agentless\_scanner\_service\_account) | ./modules/agentless-scanner-service-account | n/a |
 | <a name="module_instance"></a> [instance](#module\_instance) | ./modules/instance | n/a |
 | <a name="module_vpc"></a> [vpc](#module\_vpc) | ./modules/vpc | n/a |
 
@@ -120,8 +116,6 @@ The main module provided in this directory is a wrapper around these modules wit
 
 | Name | Type |
 |------|------|
-| [null_resource.api_key_validation](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
-| [null_resource.scanner_sa_validation](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [null_resource.ssh_validation](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [random_id.deployment_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [google_client_config.current](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/client_config) | data source |
@@ -132,14 +126,13 @@ The main module provided in this directory is a wrapper around these modules wit
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_agent_configuration"></a> [agent\_configuration](#input\_agent\_configuration) | Specifies a custom configuration for the Datadog Agent. The specified object is passed directly as a configuration input for the Datadog Agent. For more details: https://docs.datadoghq.com/agent/configuration/agent-configuration-files/. Warning: this is an advanced feature and can break the Datadog Agent if not used correctly. | `any` | `{}` | no |
-| <a name="input_api_key"></a> [api\_key](#input\_api\_key) | Datadog API key. Required when not using api\_key\_secret\_id. | `string` | `null` | no |
-| <a name="input_api_key_secret_id"></a> [api\_key\_secret\_id](#input\_api\_key\_secret\_id) | Identifier of the pre-provisioned Secret Manager secret containing the Datadog API key. Alternative to api\_key. | `string` | `null` | no |
+| <a name="input_api_key_secret_id"></a> [api\_key\_secret\_id](#input\_api\_key\_secret\_id) | Identifier of the Secret Manager secret containing the Datadog API key in the format projects/[project\_id]/secrets/[secret\_name]. | `string` | n/a | yes |
 | <a name="input_enable_ssh"></a> [enable\_ssh](#input\_enable\_ssh) | Whether to enable SSH firewall rule | `bool` | `false` | no |
 | <a name="input_instance_count"></a> [instance\_count](#input\_instance\_count) | Number of instances in the managed instance group | `number` | `1` | no |
 | <a name="input_scanner_channel"></a> [scanner\_channel](#input\_scanner\_channel) | Specifies the channel to use for installing the scanner | `string` | `"stable"` | no |
 | <a name="input_scanner_configuration"></a> [scanner\_configuration](#input\_scanner\_configuration) | Specifies a custom configuration for the scanner. The specified object is passed directly as a configuration input for the scanner. Warning: this is an advanced feature and can break the scanner if not used correctly. | `any` | `{}` | no |
 | <a name="input_scanner_repository"></a> [scanner\_repository](#input\_scanner\_repository) | Repository URL to install the scanner from. | `string` | `"https://apt.datadoghq.com/"` | no |
-| <a name="input_scanner_service_account_email"></a> [scanner\_service\_account\_email](#input\_scanner\_service\_account\_email) | Email of a pre-existing scanner service account to use instead of creating a new one. When provided, the module skips creating service accounts and IAM resources, deploying only regional infrastructure (VPC, instances). Use this for multi-region deployments to share a single service account across scanners deployed in multiple regions. When set, 'api\_key\_secret\_id' must also be provided. | `string` | `null` | no |
+| <a name="input_scanner_service_account_email"></a> [scanner\_service\_account\_email](#input\_scanner\_service\_account\_email) | Email of the scanner service account to attach to scanner instances. Create it using the agentless-scanner-service-account submodule. | `string` | n/a | yes |
 | <a name="input_scanner_version"></a> [scanner\_version](#input\_scanner\_version) | Specifies the version of the scanner to install | `string` | `"0.11"` | no |
 | <a name="input_site"></a> [site](#input\_site) | The Datadog site of your organization where scanner data will be sent (for example, datadoghq.com, datadoghq.eu, us5.datadoghq.com). See https://docs.datadoghq.com/getting_started/site/ | `string` | n/a | yes |
 | <a name="input_ssh_public_key"></a> [ssh\_public\_key](#input\_ssh\_public\_key) | SSH public key for instance access | `string` | `null` | no |
@@ -153,13 +146,11 @@ The main module provided in this directory is a wrapper around these modules wit
 
 | Name | Description |
 |------|-------------|
-| <a name="output_api_key_secret_id"></a> [api\_key\_secret\_id](#output\_api\_key\_secret\_id) | The ID of the Secret Manager secret containing the Datadog API key |
 | <a name="output_health_check"></a> [health\_check](#output\_health\_check) | The health check for auto-healing |
 | <a name="output_instance_group_manager"></a> [instance\_group\_manager](#output\_instance\_group\_manager) | The managed instance group manager |
 | <a name="output_instance_template"></a> [instance\_template](#output\_instance\_template) | The instance template used by the MIG |
 | <a name="output_mig_target_size"></a> [mig\_target\_size](#output\_mig\_target\_size) | Target size of the managed instance group |
 | <a name="output_scanner_service_account_email"></a> [scanner\_service\_account\_email](#output\_scanner\_service\_account\_email) | Email of the scanner service account |
-| <a name="output_target_service_account_email"></a> [target\_service\_account\_email](#output\_target\_service\_account\_email) | Email of the target service account (null when scanner\_service\_account\_email is provided) |
 | <a name="output_unique_suffix"></a> [unique\_suffix](#output\_unique\_suffix) | Unique suffix used in resource names |
 | <a name="output_vpc_network"></a> [vpc\_network](#output\_vpc\_network) | The VPC network created for the scanner |
 | <a name="output_vpc_network_name"></a> [vpc\_network\_name](#output\_vpc\_network\_name) | The name of the VPC network |
