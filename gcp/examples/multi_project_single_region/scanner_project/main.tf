@@ -48,7 +48,7 @@ resource "google_secret_manager_secret_version" "dd_api_key" {
 # The scanner service account is the identity used by scanner VMs to run scans
 # and report results to Datadog.
 module "scanner_service_account" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp/modules/agentless-scanner-service-account?ref=0.12.1"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp/modules/agentless-scanner-service-account?ref=0.11.13"
 
   api_key_secret_id = google_secret_manager_secret.dd_api_key.id
 }
@@ -56,7 +56,7 @@ module "scanner_service_account" {
 # The impersonated service account grants the scanner cross-project access
 # to scan resources in this project.
 module "impersonated_service_account" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp/modules/agentless-impersonated-service-account?ref=0.12.1"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp/modules/agentless-impersonated-service-account?ref=0.11.13"
 
   scanner_service_account_email = module.scanner_service_account.scanner_service_account_email
 }
@@ -65,7 +65,7 @@ module "impersonated_service_account" {
 
 # Deploy the scanner infrastructure in a single region
 module "datadog_agentless_scanner" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp?ref=0.12.1"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp?ref=0.11.13"
 
   scanner_service_account_email = module.scanner_service_account.scanner_service_account_email
   api_key_secret_id             = google_secret_manager_secret.dd_api_key.id
