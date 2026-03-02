@@ -60,6 +60,9 @@ resource "azurerm_role_definition" "worker_role" {
       "Microsoft.ContainerRegistry/registries/pull/read"
     ]
     not_actions = []
+    data_actions = [
+      "Microsoft.ContainerRegistry/registries/repositories/content/read"
+    ]
   }
 }
 

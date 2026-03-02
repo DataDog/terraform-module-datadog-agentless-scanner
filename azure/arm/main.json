@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.40.2.10011",
-      "templateHash": "1062114889357711452"
+      "templateHash": "9710395698566069615"
     }
   },
   "functions": [
@@ -424,7 +424,10 @@
               "Microsoft.Compute/disks/endGetAccess/action",
               "Microsoft.ContainerRegistry/registries/pull/read"
             ],
-            "notActions": []
+            "notActions": [],
+            "dataActions": [
+              "Microsoft.ContainerRegistry/registries/repositories/content/read"
+            ]
           }
         ],
         "assignableScopes": "[union(createArray(resourceGroup().id), parameters('scanScopes'))]"
