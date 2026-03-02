@@ -19,11 +19,6 @@ output "mig_target_size" {
   value       = module.instance.mig_target_size
 }
 
-output "scanner_service_account_email" {
-  description = "Email of the scanner service account"
-  value       = var.scanner_service_account_email
-}
-
 # Outputs from VPC Module
 output "vpc_network" {
   description = "The VPC network created for the scanner"

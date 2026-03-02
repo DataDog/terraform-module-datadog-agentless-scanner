@@ -150,7 +150,6 @@ The main module provided in this directory orchestrates the **instance** and **v
 | <a name="output_instance_group_manager"></a> [instance\_group\_manager](#output\_instance\_group\_manager) | The managed instance group manager |
 | <a name="output_instance_template"></a> [instance\_template](#output\_instance\_template) | The instance template used by the MIG |
 | <a name="output_mig_target_size"></a> [mig\_target\_size](#output\_mig\_target\_size) | Target size of the managed instance group |
-| <a name="output_scanner_service_account_email"></a> [scanner\_service\_account\_email](#output\_scanner\_service\_account\_email) | Email of the scanner service account |
 | <a name="output_unique_suffix"></a> [unique\_suffix](#output\_unique\_suffix) | Unique suffix used in resource names |
 | <a name="output_vpc_network"></a> [vpc\_network](#output\_vpc\_network) | The VPC network created for the scanner |
 | <a name="output_vpc_network_name"></a> [vpc\_network\_name](#output\_vpc\_network\_name) | The name of the VPC network |
