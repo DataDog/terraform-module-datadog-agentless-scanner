@@ -322,8 +322,8 @@ resource delegateRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' = {
         ]
         notActions: []
         dataActions: [
-            'Microsoft.ContainerRegistry/registries/repositories/content/read'
-                        ]
+          'Microsoft.ContainerRegistry/registries/repositories/content/read'
+        ]
       }
     ]
     assignableScopes: union([resourceGroup().id], scanScopes)
