@@ -16,13 +16,6 @@ variable "enable_ssh" {
   default     = false
 }
 
-variable "api_key" {
-  description = "Datadog API key. Required when not using api_key_secret_id."
-  type        = string
-  default     = null
-  sensitive   = true
-}
-
 variable "site" {
   description = "The Datadog site of your organization where scanner data will be sent (for example, datadoghq.com, datadoghq.eu, us5.datadoghq.com). See https://docs.datadoghq.com/getting_started/site/"
   type        = string
@@ -111,11 +104,10 @@ variable "zones" {
 }
 
 variable "api_key_secret_id" {
-  description = "Identifier of the pre-provisioned Secret Manager secret containing the Datadog API key. Alternative to api_key."
+  description = "Identifier of the Secret Manager secret containing the Datadog API key in the format projects/[project_id]/secrets/[secret_name]."
   type        = string
-  default     = null
   validation {
-    condition     = var.api_key_secret_id == null || can(regex("^projects/[a-zA-Z0-9-]+/secrets/[a-zA-Z0-9-]+$", var.api_key_secret_id))
+    condition     = can(regex("^projects/[a-zA-Z0-9-]+/secrets/[a-zA-Z0-9-]+$", var.api_key_secret_id))
     error_message = "The ID must be in the format 'projects/[project_id]/secrets/[secret_name]'."
   }
 }
@@ -131,18 +123,14 @@ variable "unique_suffix" {
 }
 
 variable "scanner_service_account_email" {
-  description = "Email of a pre-existing scanner service account to use instead of creating a new one. When provided, the module skips creating service accounts and IAM resources, deploying only regional infrastructure (VPC, instances). Use this for multi-region deployments to share a single service account across scanners deployed in multiple regions. When set, 'api_key_secret_id' must also be provided."
+  description = "Email of the scanner service account to attach to scanner instances. Create it using the agentless-scanner-service-account submodule."
   type        = string
-  default     = null
 
   validation {
-    condition = (
-      var.scanner_service_account_email == null ||
-      can(regex(
-        "^[a-z][a-z0-9-]{4,28}[a-z0-9]@[a-z][a-z0-9-]{4,28}[a-z0-9]\\.iam\\.gserviceaccount\\.com$",
-        var.scanner_service_account_email
-      ))
-    )
+    condition = can(regex(
+      "^[a-z][a-z0-9-]{4,28}[a-z0-9]@[a-z][a-z0-9-]{4,28}[a-z0-9]\\.iam\\.gserviceaccount\\.com$",
+      var.scanner_service_account_email
+    ))
 
     error_message = "scanner_service_account_email must be a valid GCP service account email (SERVICE_ACCOUNT@PROJECT_ID.iam.gserviceaccount.com)."
   }

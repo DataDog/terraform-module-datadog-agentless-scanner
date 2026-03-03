@@ -7,7 +7,6 @@ This module creates a Google Cloud Managed Instance Group (MIG) with Datadog Age
 The module creates:
 - Instance template and startup script for scanner installation
 - Regional Managed Instance Group for high availability and auto-healing
-- Secret Manager secret for storing the Datadog API key (if not provided)
 - Proper distribution across multiple zones for fault tolerance
 
 ## Usage
@@ -21,7 +20,7 @@ module "instance" {
   subnetwork_name       = "datadog-agentless-scanner-subnet"
   service_account_email = "scanner-sa@project.iam.gserviceaccount.com"
   
-  api_key            = var.datadog_api_key
+  api_key_secret_id  = "projects/my-project/secrets/datadog-api-key"
   site               = "datadoghq.com"
   ssh_public_key     = var.ssh_public_key
   ssh_username       = "ubuntu"
@@ -62,9 +61,6 @@ No modules.
 | [google_compute_region_health_check.agentless_scanner_health](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_region_health_check) | resource |
 | [google_compute_region_instance_group_manager.agentless_scanner_mig](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_region_instance_group_manager) | resource |
 | [google_compute_region_instance_template.agentless_scanner_template](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/compute_region_instance_template) | resource |
-| [google_secret_manager_secret.api_key_secret](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret) | resource |
-| [google_secret_manager_secret_version.api_key_version](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/secret_manager_secret_version) | resource |
-| [null_resource.api_key_validation](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [null_resource.ssh_validation](https://registry.terraform.io/providers/hashicorp/null/latest/docs/resources/resource) | resource |
 | [random_id.deployment_suffix](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/id) | resource |
 | [google_client_config.current](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/client_config) | data source |
@@ -74,8 +70,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_agent_configuration"></a> [agent\_configuration](#input\_agent\_configuration) | Specifies a custom configuration for the Datadog Agent. The specified object is passed directly as a configuration input for the Datadog Agent. For more details: https://docs.datadoghq.com/agent/configuration/agent-configuration-files/. Warning: this is an advanced feature and can break the Datadog Agent if not used correctly. | `any` | `{}` | no |
-| <a name="input_api_key"></a> [api\_key](#input\_api\_key) | Datadog API key. Either api\_key or api\_key\_secret\_id must be provided, but not both. | `string` | `null` | no |
-| <a name="input_api_key_secret_id"></a> [api\_key\_secret\_id](#input\_api\_key\_secret\_id) | Identifier of the Secret Manager secret containing the Datadog API key in the format projects/[project\_id]/secrets/[secret\_name] | `string` | `null` | no |
+| <a name="input_api_key_secret_id"></a> [api\_key\_secret\_id](#input\_api\_key\_secret\_id) | Identifier of the Secret Manager secret containing the Datadog API key in the format projects/[project\_id]/secrets/[secret\_name]. | `string` | n/a | yes |
 | <a name="input_instance_count"></a> [instance\_count](#input\_instance\_count) | Number of instances in the managed instance group | `number` | `1` | no |
 | <a name="input_network_name"></a> [network\_name](#input\_network\_name) | The name of the network | `string` | n/a | yes |
 | <a name="input_scanner_channel"></a> [scanner\_channel](#input\_scanner\_channel) | Specifies the channel to use for installing the scanner | `string` | n/a | yes |
@@ -94,7 +89,6 @@ No modules.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_api_key_secret_id"></a> [api\_key\_secret\_id](#output\_api\_key\_secret\_id) | The name of the Secret Manager secret containing the Datadog API key |
 | <a name="output_health_check"></a> [health\_check](#output\_health\_check) | The health check for auto-healing |
 | <a name="output_instance_group_manager"></a> [instance\_group\_manager](#output\_instance\_group\_manager) | The managed instance group manager |
 | <a name="output_instance_template"></a> [instance\_template](#output\_instance\_template) | The instance template used by the MIG |

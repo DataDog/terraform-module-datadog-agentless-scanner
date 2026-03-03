@@ -8,13 +8,10 @@ resource "random_id" "deployment_suffix" {
 }
 
 locals {
-  project_id        = data.google_client_config.current.project
-  region            = data.google_client_config.current.region
-  api_key_secret_id = var.api_key_secret_id != null ? var.api_key_secret_id : google_secret_manager_secret.api_key_secret[0].id
+  project_id = data.google_client_config.current.project
+  region     = data.google_client_config.current.region
   # Use provided unique_suffix or generate random one
   effective_suffix = var.unique_suffix != "" ? var.unique_suffix : random_id.deployment_suffix.hex
-  # Validation for api_key XOR api_key_secret_id
-  api_key_validation = (var.api_key != null && var.api_key_secret_id == null) || (var.api_key == null && var.api_key_secret_id != null)
   # Validation to ensure both SSH variables are provided or neither
   ssh_validation = (var.ssh_public_key != null && var.ssh_username != null) || (var.ssh_public_key == null && var.ssh_username == null)
 }
@@ -49,7 +46,7 @@ resource "google_compute_region_instance_template" "agentless_scanner_template" 
     ssh-keys       = var.ssh_public_key != null ? "${var.ssh_username}:${var.ssh_public_key}" : null
     enable-oslogin = "FALSE"
     startup-script = templatefile("${path.module}/startup-script.sh.tftpl", {
-      api_key_secret_id     = local.api_key_secret_id
+      api_key_secret_id     = var.api_key_secret_id
       site                  = var.site
       scanner_version       = var.scanner_version
       scanner_repository    = var.scanner_repository
@@ -119,32 +116,6 @@ resource "google_compute_region_instance_group_manager" "agentless_scanner_mig" 
     max_surge_fixed       = length(var.zones) # Allow one instance per zone during surge
     max_unavailable_fixed = 0                 # Must be 0 or >= number of zones for regional MIG
     replacement_method    = "SUBSTITUTE"      # Use SUBSTITUTE for better availability during updates
-  }
-}
-
-resource "google_secret_manager_secret" "api_key_secret" {
-  count     = var.api_key_secret_id != null ? 0 : 1
-  secret_id = "datadog-agentless-scanner-api-key-${local.effective_suffix}"
-  replication {
-    auto {}
-  }
-}
-
-resource "google_secret_manager_secret_version" "api_key_version" {
-  count       = var.api_key_secret_id != null ? 0 : 1
-  secret      = google_secret_manager_secret.api_key_secret[0].id
-  secret_data = var.api_key
-}
-
-# Validation to ensure exactly one of api_key or api_key_secret_id is provided
-# NOTE: Using count-based validation instead of preconditions because preconditions were
-# introduced in Terraform 1.2, which is too recent for our requirements.
-# See: https://github.com/hashicorp/terraform/blob/v1.2/CHANGELOG.md
-resource "null_resource" "api_key_validation" {
-  count = local.api_key_validation ? 0 : 1
-
-  triggers = {
-    error = "Exactly one of 'api_key' or 'api_key_secret_id' must be provided, but not both."
   }
 }
 
