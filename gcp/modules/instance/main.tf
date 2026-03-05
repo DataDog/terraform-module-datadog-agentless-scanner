@@ -14,6 +14,17 @@ locals {
   effective_suffix = var.unique_suffix != "" ? var.unique_suffix : random_id.deployment_suffix.hex
   # Validation to ensure both SSH variables are provided or neither
   ssh_validation = (var.ssh_public_key != null && var.ssh_username != null) || (var.ssh_public_key == null && var.ssh_username == null)
+  # Auto-detect machine type: prefer N4, fall back to N2 if unavailable in any zone
+  n4_available = alltrue([for check in data.google_compute_machine_types.n4_check : length(check.machine_types) > 0])
+  machine_type = local.n4_available ? "n4-standard-2" : "n2-standard-2"
+}
+
+# Check if n4-standard-2 is available in all zones used by the MIG
+data "google_compute_machine_types" "n4_check" {
+  for_each = toset(var.zones)
+  project  = local.project_id
+  zone     = each.value
+  filter   = "name = n4-standard-2"
 }
 
 # Instance Template for Managed Instance Group (Regional)
@@ -22,7 +33,7 @@ resource "google_compute_region_instance_template" "agentless_scanner_template" 
   name_prefix  = "datadog-agentless-tmpl-${local.effective_suffix}-"
   region       = local.region
   description  = "Template for Datadog Agentless Scanner instances"
-  machine_type = "n4-standard-2"
+  machine_type = local.machine_type
 
   disk {
     source_image = "ubuntu-os-cloud/ubuntu-minimal-2404-lts-amd64"
