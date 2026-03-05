@@ -14,16 +14,17 @@ locals {
   effective_suffix = var.unique_suffix != "" ? var.unique_suffix : random_id.deployment_suffix.hex
   # Validation to ensure both SSH variables are provided or neither
   ssh_validation = (var.ssh_public_key != null && var.ssh_username != null) || (var.ssh_public_key == null && var.ssh_username == null)
-  # Auto-detect machine type: prefer N4, fall back to N2 if unavailable in the region
-  n4_available = length(data.google_compute_machine_types.n4_check.machine_types) > 0
+  # Auto-detect machine type: prefer N4, fall back to N2 if unavailable in any zone
+  n4_available = alltrue([for check in data.google_compute_machine_types.n4_check : length(check.machine_types) > 0])
   machine_type = local.n4_available ? "n4-standard-2" : "n2-standard-2"
 }
 
-# Check if n4-standard-2 is available in the first zone of the region
+# Check if n4-standard-2 is available in all zones used by the MIG
 data "google_compute_machine_types" "n4_check" {
-  project = local.project_id
-  zone    = var.zones[0]
-  filter  = "name = n4-standard-2"
+  for_each = toset(var.zones)
+  project  = local.project_id
+  zone     = each.value
+  filter   = "name = n4-standard-2"
 }
 
 # Instance Template for Managed Instance Group (Regional)
