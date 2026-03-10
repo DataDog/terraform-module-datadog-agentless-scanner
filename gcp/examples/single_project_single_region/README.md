@@ -10,13 +10,15 @@ With this deployment, a single Agentless scanner is deployed in a single region 
 
 ## Architecture
 
-The module deploys:
-- Managed Instance Group (MIG) with scanner instances distributed across zones
-- VPC network with private subnet in the configured region
-- Cloud Router and Cloud NAT for outbound connectivity
-- Two service accounts:
+This example deploys:
+- A Secret Manager secret containing the Datadog API key
+- Two service accounts (via dedicated submodules):
   - Scanner service account (attached to instances)
   - Impersonated service account (for resource scanning)
+- Scanner infrastructure (via the main GCP module):
+  - Managed Instance Group (MIG) with scanner instances distributed across zones
+  - VPC network with private subnet in the configured region
+  - Cloud Router and Cloud NAT for outbound connectivity
 
 ## Prerequisites
 
@@ -79,22 +81,34 @@ To deploy a Datadog Agentless scanner:
 
 ### API Key Configuration
 
-By default, this example passes the Datadog API key directly via `api_key`. The module stores it in Google Secret Manager automatically.
+This example creates a Secret Manager secret from the `datadog_api_key` variable and passes its ID to both the scanner service account module and the main scanner module via `api_key_secret_id`.
 
-To reference a **pre-existing** Secret Manager secret instead, modify the module block in `main.tf`:
+To reference a **pre-existing** Secret Manager secret instead, remove the `google_secret_manager_secret` and `google_secret_manager_secret_version` resources from `main.tf` and update the module references:
 
 ```hcl
-module "datadog_agentless_scanner" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp?ref=0.11.13"
+module "scanner_service_account" {
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp/modules/agentless-scanner-service-account?ref=0.12.1"
 
-  site             = var.datadog_site
-  vpc_name         = "datadog-agentless-scanner"
   api_key_secret_id = "projects/YOUR_PROJECT/secrets/YOUR_SECRET_NAME"
-  # Remove the api_key argument when using api_key_secret_id
+}
+
+module "impersonated_service_account" {
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp/modules/agentless-impersonated-service-account?ref=0.12.1"
+
+  scanner_service_account_email = module.scanner_service_account.scanner_service_account_email
+}
+
+module "datadog_agentless_scanner" {
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp?ref=0.12.1"
+
+  scanner_service_account_email = module.scanner_service_account.scanner_service_account_email
+  api_key_secret_id             = "projects/YOUR_PROJECT/secrets/YOUR_SECRET_NAME"
+  site                          = var.datadog_site
+  vpc_name                      = "datadog-agentless-scanner"
 }
 ```
 
-> **Note**: The `datadog_api_key` variable is still required even when using `api_key_secret_id`, because the Datadog Terraform provider needs it to call the Datadog API.
+> **Note**: The `datadog_api_key` variable is still required even when using a pre-existing secret, because the Datadog Terraform provider needs it to call the Datadog API.
 
 ## Cleanup
 
