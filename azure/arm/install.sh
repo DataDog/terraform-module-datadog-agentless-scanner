@@ -115,6 +115,7 @@ site: $DD_SITE
 hostname: $DD_HOSTNAME
 logs_enabled: true
 ec2_prefer_imdsv2: true
+tags: ["Datadog:true","DatadogAgentlessScanner:true"]
 secret_backend_command: /usr/local/bin/dd-secret-backend
 EOF
 

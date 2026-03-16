@@ -17,6 +17,17 @@ locals {
   # Auto-detect machine type: prefer N4, fall back to N2 if unavailable in any zone
   n4_available = alltrue([for check in data.google_compute_machine_types.n4_check : length(check.machine_types) > 0])
   machine_type = local.n4_available ? "n4-standard-2" : "n2-standard-2"
+
+  # Merge Datadog tags into the agent configuration
+  agent_configuration = merge(
+    var.agent_configuration,
+    {
+      tags = concat(
+        lookup(var.agent_configuration, "tags", []),
+        ["Datadog:true", "DatadogAgentlessScanner:true"]
+      )
+    }
+  )
 }
 
 # Check if n4-standard-2 is available in all zones used by the MIG
@@ -63,7 +74,7 @@ resource "google_compute_region_instance_template" "agentless_scanner_template" 
       scanner_repository    = var.scanner_repository
       scanner_channel       = var.scanner_channel
       scanner_configuration = var.scanner_configuration
-      agent_configuration   = var.agent_configuration
+      agent_configuration   = local.agent_configuration
     })
   }
 
