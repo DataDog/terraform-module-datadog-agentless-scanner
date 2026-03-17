@@ -1,3 +1,16 @@
+locals {
+  # Merge Datadog tags into the agent configuration
+  agent_configuration = merge(
+    var.agent_configuration,
+    {
+      tags = concat(
+        lookup(var.agent_configuration, "tags", []),
+        ["Datadog:true", "DatadogAgentlessScanner:true"]
+      )
+    }
+  )
+}
+
 resource "terraform_data" "template" {
   input = templatefile("${path.module}/templates/install.sh.tftpl", {
     api_key               = var.api_key
@@ -7,6 +20,6 @@ resource "terraform_data" "template" {
     scanner_channel       = var.scanner_channel,
     scanner_repository    = var.scanner_repository,
     scanner_configuration = var.scanner_configuration,
-    agent_configuration   = var.agent_configuration,
+    agent_configuration   = local.agent_configuration,
   })
 }
