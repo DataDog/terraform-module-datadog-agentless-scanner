@@ -1,7 +1,7 @@
 variable "name" {
   description = "Name tag, e.g stack"
   type        = string
-  default     = "DatatogAgentlessScanner"
+  default     = "DatadogAgentlessScanner"
 }
 
 variable "cidr" {

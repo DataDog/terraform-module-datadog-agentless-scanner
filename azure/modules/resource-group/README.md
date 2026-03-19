@@ -27,7 +27,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_location"></a> [location](#input\_location) | The location of the resource group where the Datadog Agentless Scanner resources will be created | `string` | n/a | yes |
-| <a name="input_name"></a> [name](#input\_name) | The name of the resource group where the Datadog Agentless Scanner resources will be created | `string` | `"DatatogAgentlessScanner"` | no |
+| <a name="input_name"></a> [name](#input\_name) | The name of the resource group where the Datadog Agentless Scanner resources will be created | `string` | `"DatadogAgentlessScanner"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of additional tags to add to the resource group | `map(string)` | `{}` | no |
 
 ## Outputs

@@ -27,7 +27,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_location"></a> [location](#input\_location) | The Azure region where the managed identity should exist. | `string` | n/a | yes |
-| <a name="input_name"></a> [name](#input\_name) | The name of the user-assigned managed identity to be used by the Datadog Agentless Scanner virtual machine instances. | `string` | `"DatatogAgentlessScannerIdentity"` | no |
+| <a name="input_name"></a> [name](#input\_name) | The name of the user-assigned managed identity to be used by the Datadog Agentless Scanner virtual machine instances. | `string` | `"DatadogAgentlessScannerIdentity"` | no |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | The name of the resource group within which the managed identity should exist. | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of additional tags to add to the managed identity. | `map(string)` | `{}` | no |
 

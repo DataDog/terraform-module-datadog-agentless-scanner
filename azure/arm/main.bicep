@@ -31,7 +31,7 @@ param instanceCount int = 1
 param instanceSize string = 'Standard_B2ps_v2'
 
 @description('The name of the user-assigned managed identity to be used by the Datadog Agentless Scanner virtual machine instances.')
-param identityName string = 'DatatogAgentlessScannerIdentity'
+param identityName string = 'DatadogAgentlessScannerIdentity'
 
 @description('The set of scopes that the Datadog Agentless Scanner is allowed to scan')
 param scanScopes string[] = [subscription().id]
@@ -71,7 +71,7 @@ var tags = union(resourceTags, {
   Datadog: 'true'
   DatadogAgentlessScanner: 'true'
 })
-var name = 'DatatogAgentlessScanner'
+var name = 'DatadogAgentlessScanner'
 
 // Virtual machine scale set
 resource vmss 'Microsoft.Compute/virtualMachineScaleSets@2024-07-01' = {

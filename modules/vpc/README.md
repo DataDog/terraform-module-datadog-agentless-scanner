@@ -53,7 +53,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_cidr"></a> [cidr](#input\_cidr) | The CIDR block for the VPC | `string` | `"10.0.0.0/16"` | no |
 | <a name="input_enable_ssm_vpc_endpoint"></a> [enable\_ssm\_vpc\_endpoint](#input\_enable\_ssm\_vpc\_endpoint) | Whether to enable AWS SSM VPC endpoint | `bool` | `false` | no |
-| <a name="input_name"></a> [name](#input\_name) | Name tag, e.g stack | `string` | `"DatatogAgentlessScanner"` | no |
+| <a name="input_name"></a> [name](#input\_name) | Name tag, e.g stack | `string` | `"DatadogAgentlessScanner"` | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of additional tags to add to the instance/volume created | `map(string)` | `{}` | no |
 
 ## Outputs

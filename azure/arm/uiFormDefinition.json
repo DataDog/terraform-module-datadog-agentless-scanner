@@ -149,7 +149,7 @@
                             "type": "Microsoft.Common.TextBox",
                             "label": "Identity Name",
                             "subLabel": "",
-                            "defaultValue": "DatatogAgentlessScannerIdentity",
+                            "defaultValue": "DatadogAgentlessScannerIdentity",
                             "toolTip": "The name of the user-assigned managed identity to be used by the Datadog Agentless Scanner virtual machine instances.",
                             "constraints": {
                                 "required": false,

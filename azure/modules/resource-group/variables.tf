@@ -1,7 +1,7 @@
 variable "name" {
   description = "The name of the resource group where the Datadog Agentless Scanner resources will be created"
   type        = string
-  default     = "DatatogAgentlessScanner"
+  default     = "DatadogAgentlessScanner"
 }
 
 variable "location" {
