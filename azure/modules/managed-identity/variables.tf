@@ -2,7 +2,7 @@ variable "name" {
   description = "The name of the user-assigned managed identity to be used by the Datadog Agentless Scanner virtual machine instances."
   type        = string
   nullable    = false
-  default     = "DatatogAgentlessScannerIdentity"
+  default     = "DatadogAgentlessScannerIdentity"
 }
 
 variable "location" {

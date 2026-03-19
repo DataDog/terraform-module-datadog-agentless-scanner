@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.41.2.15936",
-      "templateHash": "4440780443844397771"
+      "templateHash": "5183009847016939453"
     }
   },
   "functions": [
@@ -82,7 +82,7 @@
     },
     "identityName": {
       "type": "string",
-      "defaultValue": "DatatogAgentlessScannerIdentity",
+      "defaultValue": "DatadogAgentlessScannerIdentity",
       "metadata": {
         "description": "The name of the user-assigned managed identity to be used by the Datadog Agentless Scanner virtual machine instances."
       }
@@ -160,7 +160,7 @@
     "sshMockPublicKey": "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJWFDAB+VRKsHvHjIyiEN9izvhaosXAUMG1jPMo9hcnE",
     "sshAuthorizedKeysFile": "[format('/home/{0}/.ssh/authorized_keys', parameters('adminUsername'))]",
     "tags": "[union(parameters('resourceTags'), createObject('Datadog', 'true', 'DatadogAgentlessScanner', 'true'))]",
-    "name": "DatatogAgentlessScanner",
+    "name": "DatadogAgentlessScanner",
     "restartMinute": "[mod(int(substring(join(split(guid(resourceId('Microsoft.Compute/virtualMachineScaleSets', variables('name'))), createArray('a', 'b', 'c', 'd', 'e', 'f', '-')), ''), 0, 9)), mul(24, 60))]"
   },
   "resources": {
