@@ -39,6 +39,7 @@ No modules.
 | <a name="input_location"></a> [location](#input\_location) | The location of the resource group where the Datadog Agentless Scanner network resources will be created | `string` | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | The name of the resource group where the Datadog Agentless Scanner network resources will be created | `string` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | A map of additional tags to add to the network resources created | `map(string)` | `{}` | no |
+| <a name="input_unique_suffix"></a> [unique\_suffix](#input\_unique\_suffix) | Optional suffix appended to all resource names (e.g. the location). Enables multiple instances of this module in the same resource group. | `string` | `""` | no |
 
 ## Outputs
 

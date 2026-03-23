@@ -3,10 +3,11 @@ locals {
     Datadog                 = "true"
     DatadogAgentlessScanner = "true"
   }
+  name_suffix = var.unique_suffix != "" ? "-${var.unique_suffix}" : ""
 }
 
 resource "azurerm_virtual_network" "vnet" {
-  name                = "vnet"
+  name                = "vnet${local.name_suffix}"
   location            = var.location
   resource_group_name = var.resource_group_name
   address_space       = [var.cidr]
@@ -21,7 +22,7 @@ resource "azurerm_subnet" "default_subnet" {
 }
 
 resource "azurerm_nat_gateway" "natgw" {
-  name                = "natgw"
+  name                = "natgw${local.name_suffix}"
   location            = azurerm_virtual_network.vnet.location
   resource_group_name = azurerm_virtual_network.vnet.resource_group_name
   sku_name            = "Standard"
@@ -29,7 +30,7 @@ resource "azurerm_nat_gateway" "natgw" {
 }
 
 resource "azurerm_public_ip" "natgw_ip" {
-  name                = "natgw-ip"
+  name                = "natgw-ip${local.name_suffix}"
   location            = azurerm_virtual_network.vnet.location
   resource_group_name = azurerm_virtual_network.vnet.resource_group_name
   sku                 = "Standard"
@@ -53,7 +54,7 @@ resource "azurerm_subnet_nat_gateway_association" "subnet_natgw_assoc" {
 resource "azurerm_bastion_host" "bastion" {
   count = var.bastion ? 1 : 0
 
-  name                = "bastion"
+  name                = "bastion${local.name_suffix}"
   location            = azurerm_virtual_network.vnet.location
   resource_group_name = azurerm_virtual_network.vnet.resource_group_name
   ip_configuration {
@@ -78,7 +79,7 @@ resource "azurerm_subnet" "bastion_subnet" {
 resource "azurerm_public_ip" "bastion_ip" {
   count = var.bastion ? 1 : 0
 
-  name                = "bastion-ip"
+  name                = "bastion-ip${local.name_suffix}"
   location            = azurerm_virtual_network.vnet.location
   resource_group_name = azurerm_virtual_network.vnet.resource_group_name
   sku                 = "Standard"
