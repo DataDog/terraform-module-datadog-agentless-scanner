@@ -8,6 +8,12 @@ variable "resource_group_name" {
   type        = string
 }
 
+variable "unique_suffix" {
+  description = "Optional suffix appended to all resource names (e.g. the location). Enables multiple instances of this module in the same resource group."
+  type        = string
+  default     = ""
+}
+
 variable "cidr" {
   description = "The CIDR block for the Virtual Network"
   type        = string
