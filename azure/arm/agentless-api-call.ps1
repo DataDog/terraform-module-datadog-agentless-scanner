@@ -9,7 +9,7 @@ function Set-AzureAgentlessOptions {
         [ValidatePattern("^[0-9a-f]{32}$")]
         [string]$APIKey,
         [Parameter(Mandatory, HelpMessage = "Datadog Application Key")]
-        [ValidatePattern("^[0-9a-f]{40}$")]
+        [ValidatePattern("^([0-9a-f]{40}|ddapp_[a-zA-Z0-9]{34})$")]
         [string]$ApplicationKey
     )
     begin {
