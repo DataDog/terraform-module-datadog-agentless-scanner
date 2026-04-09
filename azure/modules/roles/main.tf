@@ -57,7 +57,10 @@ resource "azurerm_role_definition" "worker_role" {
       "Microsoft.Compute/disks/beginGetAccess/action",
       "Microsoft.Compute/disks/endGetAccess/action",
 
-      "Microsoft.ContainerRegistry/registries/pull/read"
+      "Microsoft.ContainerRegistry/registries/pull/read",
+
+      "Microsoft.Web/sites/read",
+      "Microsoft.Web/sites/functions/read"
     ]
     not_actions = []
     data_actions = [

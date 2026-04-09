@@ -319,6 +319,9 @@ resource delegateRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' = {
           'Microsoft.Compute/disks/endGetAccess/action'
 
           'Microsoft.ContainerRegistry/registries/pull/read'
+
+          'Microsoft.Web/sites/read'
+          'Microsoft.Web/sites/functions/read'
         ]
         notActions: []
         dataActions: [
