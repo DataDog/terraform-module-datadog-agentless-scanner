@@ -13,7 +13,7 @@ variable "iam_role_path" {
 variable "sensitive_data_scanning_enabled" {
   description = "Installs specific permissions to enable scanning of S3 buckets"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "sensitive_data_scanning_rds_enabled" {
