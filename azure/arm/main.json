@@ -6,7 +6,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.41.2.15936",
-      "templateHash": "15828281282769090906"
+      "templateHash": "6196317245431361913"
     }
   },
   "functions": [
@@ -422,6 +422,10 @@
               "Microsoft.Compute/disks/read",
               "Microsoft.Compute/disks/beginGetAccess/action",
               "Microsoft.Compute/disks/endGetAccess/action",
+              "Microsoft.Compute/images/read",
+              "Microsoft.Compute/galleries/read",
+              "Microsoft.Compute/galleries/images/read",
+              "Microsoft.Compute/galleries/images/versions/read",
               "Microsoft.ContainerRegistry/registries/pull/read"
             ],
             "notActions": [],
