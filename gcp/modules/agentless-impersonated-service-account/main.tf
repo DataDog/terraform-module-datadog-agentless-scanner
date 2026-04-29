@@ -30,6 +30,15 @@ resource "google_project_iam_custom_role" "create_snapshot" {
     "compute.snapshots.setLabels",
 
     "compute.globalOperations.get",
+
+    "cloudfunctions.functions.list",
+    "cloudfunctions.functions.get",
+    "cloudfunctions.functions.sourceCodeGet",
+
+    "run.services.list",
+    "run.services.get",
+    "run.revisions.list",
+    "run.revisions.get",
   ]
 }
 
