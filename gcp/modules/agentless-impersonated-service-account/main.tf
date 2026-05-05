@@ -62,6 +62,14 @@ resource "google_project_iam_member" "agentless_artifactregistry_role_binding" {
   member  = "serviceAccount:${google_service_account.target_service_account.email}"
 }
 
+# Binding the storage object viewer role for GCR (legacy Container Registry) image pulls.
+# GCR stores images in Cloud Storage, so pulling requires storage.objects.get + storage.objects.list.
+resource "google_project_iam_member" "agentless_gcr_storage_role_binding" {
+  project = local.project_id
+  role    = "roles/storage.objectViewer"
+  member  = "serviceAccount:${google_service_account.target_service_account.email}"
+}
+
 # Binding the scanner service account to the impersonated service account
 resource "google_service_account_iam_member" "impersonation_binding" {
   service_account_id = google_service_account.target_service_account.name
