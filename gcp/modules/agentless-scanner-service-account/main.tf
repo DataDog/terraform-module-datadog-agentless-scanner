@@ -84,3 +84,10 @@ resource "google_service_account_iam_member" "self_impersonation_binding" {
   role               = "roles/iam.serviceAccountUser"
   member             = "serviceAccount:${google_service_account.scanner_service_account.email}"
 }
+
+# Required by the OCI/GCR private-auth path, which mints OAuth2 tokens via impersonate.CredentialsTokenSource.
+resource "google_service_account_iam_member" "self_token_creator_binding" {
+  service_account_id = google_service_account.scanner_service_account.name
+  role               = "roles/iam.serviceAccountTokenCreator"
+  member             = "serviceAccount:${google_service_account.scanner_service_account.email}"
+}
