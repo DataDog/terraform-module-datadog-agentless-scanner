@@ -53,6 +53,7 @@ DD_INSTALL_ONLY=true \
   DD_SITE="$DD_SITE" \
   DD_HOSTNAME="$DD_HOSTNAME" \
   bash -c "$(curl -L https://s3.amazonaws.com/dd-agent/scripts/install_script_agent7.sh)"
+usermod -a -G systemd-journal dd-agent
 
 # Install the agentless-scanner
 echo "deb [signed-by=/usr/share/keyrings/datadog-archive-keyring.gpg] https://apt.datadoghq.com/ $DD_AGENTLESS_CHANNEL agentless-scanner" >> /etc/apt/sources.list.d/datadog.list
