@@ -9,16 +9,18 @@ locals {
   # Azure region:
   #   1. Standard_B2ps_v2  ARM Burstable v2 - cheapest, ~major regions only
   #   2. Standard_D2pls_v6 ARM v6 D-series  - broad ARM coverage (e.g. brazilsouth)
-  #   3. Standard_D2s_v3   x86 D-series v3  - universal fallback for ARM-less
-  #                                           regions (e.g. qatarcentral). D2s_v3
-  #                                           is picked over Bsv2 because its
-  #                                           DSv3 family is one of the few Azure
-  #                                           pre-allocates with non-zero default
-  #                                           vCPU quota on fresh subscriptions.
+  #   3. Standard_D2as_v5  AMD x86 D-series - universal x86 fallback. Picked over
+  #                                           Intel v3/v4 because 2022+ regions
+  #                                           (qatarcentral, uaenorth, italynorth,
+  #                                           spaincentral, mexicocentral, israel,
+  #                                           poland, ...) skipped Intel v3 hardware
+  #                                           entirely. DASv5 is the most widely
+  #                                           deployed modern x86 family across
+  #                                           both legacy and new regions.
   sku_preference = [
     "Standard_B2ps_v2",
     "Standard_D2pls_v6",
-    "Standard_D2s_v3",
+    "Standard_D2as_v5",
   ]
 
   # Each candidate SKU is paired with the matching Ubuntu 24.04 LTS image SKU.
@@ -26,7 +28,7 @@ locals {
   sku_to_image_sku = {
     "Standard_B2ps_v2"  = "minimal-arm64"
     "Standard_D2pls_v6" = "minimal-arm64"
-    "Standard_D2s_v3"   = "minimal"
+    "Standard_D2as_v5"  = "minimal"
   }
 
   auto_select = var.instance_size == null

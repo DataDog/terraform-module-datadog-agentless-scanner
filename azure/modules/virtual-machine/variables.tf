@@ -21,8 +21,9 @@ variable "instance_size" {
     the target region:
       1. Standard_B2ps_v2  (ARM Burstable, cheapest, major regions)
       2. Standard_D2pls_v6 (ARM v6 D-series, modern ARM-capable regions)
-      3. Standard_D2s_v3   (x86 D-series, universal fallback for regions
-                            without ARM availability, e.g. qatarcentral)
+      3. Standard_D2as_v5  (AMD x86 D-series, universal fallback covering
+                            2022+ regions like qatarcentral, uaenorth,
+                            italynorth, spaincentral, etc.)
     Set this explicitly to bypass auto-selection. When overriding to an x86
     SKU, also set image_sku to a non-arm64 Ubuntu SKU (e.g. "minimal").
   EOT
