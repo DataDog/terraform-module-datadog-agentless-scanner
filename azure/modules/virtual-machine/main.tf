@@ -42,23 +42,15 @@ locals {
 
   # Names of all VM SKUs available in the canonical location with no
   # restrictions (filters out region/zone-level capacity holds).
-  available_skus = local.auto_select ? toset([
-    for sku in jsondecode(data.azapi_resource_action.vm_skus[0].output).value :
-    sku.name
-    if try(sku.resourceType, "") == "virtualMachines"
-    && contains(try(sku.locations, []), local.canonical_location)
-    && length(try(sku.restrictions, [])) == 0
-  ]) : toset([])
+  available_skus = local.auto_select ? toset(data.azapi_resource_list.vm_skus[0].output.available) : toset([])
 
   # Per-SKU vCPU family name (e.g. Standard_B2ps_v2 -> standardBpsv2Family).
   # Used to join against the per-family quotas returned by the usages API.
   # Restricted to candidates from our preference chain to keep the map small.
   candidate_sku_families = local.auto_select ? {
-    for sku in jsondecode(data.azapi_resource_action.vm_skus[0].output).value :
-    sku.name => try(sku.family, "")
-    if try(sku.resourceType, "") == "virtualMachines"
-    && contains(try(sku.locations, []), local.canonical_location)
-    && contains(local.sku_preference, sku.name)
+    for sku in data.azapi_resource_list.vm_skus[0].output.families :
+    sku.name => sku.family
+    if contains(local.sku_preference, sku.name)
   } : {}
 
   # Per-family vCPU headroom: limit - currentValue.
@@ -67,8 +59,8 @@ locals {
   # families to 0 and surface QuotaExceeded only at deploy time. Checking
   # quota here turns that runtime failure into a clear plan-time error.
   vcpu_headroom_by_family = local.auto_select ? {
-    for u in jsondecode(data.azapi_resource_action.vm_usages[0].output).value :
-    u.name.value => try(u.limit, 0) - try(u.currentValue, 0)
+    for q in data.azapi_resource_list.vm_usages[0].output.quotas :
+    q.family => try(q.limit, 0) - try(q.current, 0)
   } : {}
 
   # A SKU qualifies when it is offered in the region AND its family has
@@ -97,35 +89,32 @@ locals {
 
 data "azurerm_subscription" "current" {}
 
-# Lists all Microsoft.Compute SKUs visible to the current subscription.
-# We filter to virtualMachines + var.location client-side in `available_skus`
-# (the $filter URL parameter is intentionally omitted to keep this
-# compatible with azapi v1.x's response_export_values list form).
-# Modeled as an action on the subscription resource because
-# /providers/Microsoft.Compute/skus is a discovery endpoint with no
-# resource name, and azapi v1.x rejects that shape as an invalid
-# resource_id when passed directly.
+# Lists all Microsoft.Compute VM SKUs visible to the current subscription.
+# Filtering (resourceType, region, restrictions) is done in JMESPath so the
+# exported output is already shaped for `available_skus` / `candidate_sku_families`.
 # Requires Microsoft.Compute/skus/read on the subscription, which is
 # included in the built-in Reader role.
-data "azapi_resource_action" "vm_skus" {
-  count                  = local.auto_select ? 1 : 0
-  type                   = "Microsoft.Compute/skus@2021-07-01"
-  resource_id            = data.azurerm_subscription.current.id
-  action                 = "providers/Microsoft.Compute/skus"
-  method                 = "GET"
-  response_export_values = ["value"]
+data "azapi_resource_list" "vm_skus" {
+  count     = local.auto_select ? 1 : 0
+  type      = "Microsoft.Compute/skus@2021-07-01"
+  parent_id = data.azurerm_subscription.current.id
+  response_export_values = {
+    available = "value[?resourceType=='virtualMachines' && contains(locations, '${local.canonical_location}') && length(restrictions) == `0`].name"
+    families  = "value[?resourceType=='virtualMachines' && contains(locations, '${local.canonical_location}')].{name: name, family: family}"
+  }
 }
 
 # Per-region, per-family vCPU usage (currentValue) and quota (limit).
 # Used to filter SKU candidates whose family has zero or insufficient quota
 # in the subscription, preventing QuotaExceeded at apply time.
 # Requires Microsoft.Compute/locations/usages/read (included in Reader).
-data "azapi_resource_action" "vm_usages" {
-  count                  = local.auto_select ? 1 : 0
-  type                   = "Microsoft.Compute/locations/usages@2022-11-01"
-  resource_id            = "${data.azurerm_subscription.current.id}/providers/Microsoft.Compute/locations/${local.canonical_location}/usages"
-  method                 = "GET"
-  response_export_values = ["value"]
+data "azapi_resource_list" "vm_usages" {
+  count     = local.auto_select ? 1 : 0
+  type      = "Microsoft.Compute/locations/usages@2022-11-01"
+  parent_id = "${data.azurerm_subscription.current.id}/providers/Microsoft.Compute/locations/${local.canonical_location}"
+  response_export_values = {
+    quotas = "value[].{family: name.value, limit: limit, current: currentValue}"
+  }
 }
 
 resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
