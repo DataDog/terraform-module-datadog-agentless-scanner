@@ -28,6 +28,7 @@ No modules.
 | [azurerm_monitor_autoscale_setting.autoscale_setting](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_autoscale_setting) | resource |
 | [random_integer.restart_minute](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) | resource |
 | [azapi_resource_action.vm_skus](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource_action) | data source |
+| [azapi_resource_action.vm_usages](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/resource_action) | data source |
 | [azurerm_subscription.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/subscription) | data source |
 
 ## Inputs
