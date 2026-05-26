@@ -83,8 +83,12 @@ locals {
     && try(local.vcpu_headroom_by_family[local.candidate_sku_families[s]] < local.required_vcpus, true)
   ] : []
 
-  chosen_sku       = local.auto_select ? try(local.matched_skus[0], null) : var.instance_size
-  chosen_image_sku = coalesce(var.image_sku, lookup(local.sku_to_image_sku, local.chosen_sku, "minimal-arm64"))
+  chosen_sku = local.auto_select ? try(local.matched_skus[0], null) : var.instance_size
+  # try() guards the map lookup when chosen_sku is null: lookup() rejects a
+  # null key at plan time, which would mask the precondition's diagnostic
+  # error and also break `terraform destroy` (locals must evaluate cleanly
+  # even when the SKU search produced no match).
+  chosen_image_sku = coalesce(var.image_sku, try(local.sku_to_image_sku[local.chosen_sku], "minimal-arm64"))
 }
 
 data "azurerm_subscription" "current" {}
