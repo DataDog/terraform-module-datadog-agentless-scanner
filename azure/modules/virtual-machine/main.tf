@@ -101,12 +101,17 @@ data "azurerm_subscription" "current" {}
 # We filter to virtualMachines + var.location client-side in `available_skus`
 # (the $filter URL parameter is intentionally omitted to keep this
 # compatible with azapi v1.x's response_export_values list form).
+# Modeled as an action on the subscription resource because
+# /providers/Microsoft.Compute/skus is a discovery endpoint with no
+# resource name, and azapi v1.x rejects that shape as an invalid
+# resource_id when passed directly.
 # Requires Microsoft.Compute/skus/read on the subscription, which is
 # included in the built-in Reader role.
 data "azapi_resource_action" "vm_skus" {
   count                  = local.auto_select ? 1 : 0
   type                   = "Microsoft.Compute/skus@2021-07-01"
-  resource_id            = "${data.azurerm_subscription.current.id}/providers/Microsoft.Compute/skus"
+  resource_id            = data.azurerm_subscription.current.id
+  action                 = "providers/Microsoft.Compute/skus"
   method                 = "GET"
   response_export_values = ["value"]
 }
