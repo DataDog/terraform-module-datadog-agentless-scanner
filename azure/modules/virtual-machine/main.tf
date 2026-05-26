@@ -34,13 +34,19 @@ locals {
   # Each candidate VM in the chain is 2 vCPUs; total vCPUs needed = count x 2.
   required_vcpus = var.instance_count * 2
 
-  # Names of all VM SKUs available in var.location with no restrictions
-  # (filters out region/zone-level capacity holds reported by ARM).
+  # azurerm accepts both the canonical short name ("eastus") and the display
+  # name ("East US") for var.location, but the Microsoft.Compute/skus API
+  # only returns canonical names in sku.locations. Normalize once here so
+  # the SKU filter and the usages URL match either input style.
+  canonical_location = lower(replace(var.location, " ", ""))
+
+  # Names of all VM SKUs available in the canonical location with no
+  # restrictions (filters out region/zone-level capacity holds).
   available_skus = local.auto_select ? toset([
     for sku in jsondecode(data.azapi_resource_action.vm_skus[0].output).value :
     sku.name
     if try(sku.resourceType, "") == "virtualMachines"
-    && contains(try(sku.locations, []), var.location)
+    && contains(try(sku.locations, []), local.canonical_location)
     && length(try(sku.restrictions, [])) == 0
   ]) : toset([])
 
@@ -51,7 +57,7 @@ locals {
     for sku in jsondecode(data.azapi_resource_action.vm_skus[0].output).value :
     sku.name => try(sku.family, "")
     if try(sku.resourceType, "") == "virtualMachines"
-    && contains(try(sku.locations, []), var.location)
+    && contains(try(sku.locations, []), local.canonical_location)
     && contains(local.sku_preference, sku.name)
   } : {}
 
@@ -112,7 +118,7 @@ data "azapi_resource_action" "vm_skus" {
 data "azapi_resource_action" "vm_usages" {
   count                  = local.auto_select ? 1 : 0
   type                   = "Microsoft.Compute/locations/usages@2022-11-01"
-  resource_id            = "${data.azurerm_subscription.current.id}/providers/Microsoft.Compute/locations/${var.location}/usages"
+  resource_id            = "${data.azurerm_subscription.current.id}/providers/Microsoft.Compute/locations/${local.canonical_location}/usages"
   method                 = "GET"
   response_export_values = ["value"]
 }
