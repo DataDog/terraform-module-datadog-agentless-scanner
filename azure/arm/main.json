@@ -423,7 +423,8 @@
               "Microsoft.Compute/disks/beginGetAccess/action",
               "Microsoft.Compute/disks/endGetAccess/action",
               "Microsoft.Compute/galleries/images/versions/read",
-              "Microsoft.ContainerRegistry/registries/pull/read"
+              "Microsoft.ContainerRegistry/registries/pull/read",
+              "Microsoft.Web/sites/read"
             ],
             "notActions": [],
             "dataActions": [
