@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 0.12.2-rc.1 - 2026-06-01
+## Version 0.12.2 - 2026-06-01
 
 - GCP: grant the scanner service account token-creator on itself to support OCI private registry authentication
 - GCP: grant the target service account read access to Cloud Functions and Cloud Run
