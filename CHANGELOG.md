@@ -1,5 +1,15 @@
 # Changelog
 
+## Version 0.12.2 - 2026-06-01
+
+- GCP: grant the scanner service account token-creator on itself to support OCI private registry authentication
+- GCP: grant the target service account read access to Cloud Functions and Cloud Run
+- Azure: support identifiable app keys in the ARM template
+- Azure: add a unique name suffix to the virtual network
+- AWS: always include sensitive data scanning permissions in the delegate IAM role
+- Set standard Datadog tags in the Azure and GCP agent configuration
+- Allow the Datadog Agent to read the systemd journal
+
 ## Version 0.11.12 - 2025-11-10
 
 - Add initial GCP support with Terraform modules and examples (`single_region` and `cross_project`)

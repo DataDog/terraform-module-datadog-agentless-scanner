@@ -87,19 +87,19 @@ To reference a **pre-existing** Secret Manager secret instead, remove the `googl
 
 ```hcl
 module "scanner_service_account" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp/modules/agentless-scanner-service-account?ref=0.12.1"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp/modules/agentless-scanner-service-account?ref=0.12.2"
 
   api_key_secret_id = "projects/YOUR_PROJECT/secrets/YOUR_SECRET_NAME"
 }
 
 module "impersonated_service_account" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp/modules/agentless-impersonated-service-account?ref=0.12.1"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp/modules/agentless-impersonated-service-account?ref=0.12.2"
 
   scanner_service_account_email = module.scanner_service_account.scanner_service_account_email
 }
 
 module "datadog_agentless_scanner" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp?ref=0.12.1"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//gcp?ref=0.12.2"
 
   scanner_service_account_email = module.scanner_service_account.scanner_service_account_email
   api_key_secret_id             = "projects/YOUR_PROJECT/secrets/YOUR_SECRET_NAME"
