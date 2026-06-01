@@ -74,7 +74,7 @@ To scan multiple subscriptions from a single scanner deployment:
 
 ```hcl
 module "datadog-agentless-scanner" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//azure?ref=0.12.2"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//azure?ref=0.12.2-rc.1"
 
   # ... other configuration ...
 
