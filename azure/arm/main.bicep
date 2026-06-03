@@ -318,12 +318,12 @@ resource delegateRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' = {
           'Microsoft.Compute/disks/beginGetAccess/action'
           'Microsoft.Compute/disks/endGetAccess/action'
 
-          'Microsoft.Compute/images/read'
-          'Microsoft.Compute/galleries/read'
-          'Microsoft.Compute/galleries/images/read'
-          'Microsoft.Compute/galleries/images/versions/read'
+        'Microsoft.Compute/galleries/images/versions/read'
 
-          'Microsoft.ContainerRegistry/registries/pull/read'
+		'Microsoft.Compute/snapshots/read'
+		'Microsoft.Compute/snapshots/beginGetAccess/action'
+
+         'Microsoft.ContainerRegistry/registries/pull/read'
         ]
         notActions: []
         dataActions: [
