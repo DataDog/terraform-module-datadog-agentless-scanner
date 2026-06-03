@@ -91,3 +91,14 @@ resource "google_service_account_iam_member" "self_token_creator_binding" {
   role               = "roles/iam.serviceAccountTokenCreator"
   member             = "serviceAccount:${google_service_account.scanner_service_account.email}"
 }
+
+# The scanner pulls Cloud Functions / Cloud Run container images directly from
+# Artifact Registry, authenticating as itself through the OCI private-auth path
+# (see self_token_creator_binding above). The artifactregistry.reader role on the
+# impersonated target SA does not apply to these pulls because they are performed
+# as the scanner SA, so the scanner SA needs to read Artifact Registry directly.
+resource "google_project_iam_member" "artifactregistry_reader_binding" {
+  project = local.project_id
+  role    = "roles/artifactregistry.reader"
+  member  = "serviceAccount:${google_service_account.scanner_service_account.email}"
+}
