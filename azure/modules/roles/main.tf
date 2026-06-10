@@ -58,8 +58,6 @@ resource "azurerm_role_definition" "worker_role" {
       "Microsoft.Compute/disks/endGetAccess/action",
 
       "Microsoft.Compute/galleries/images/versions/read",
-      "Microsoft.Compute/snapshots/read",
-      "Microsoft.Compute/snapshots/beginGetAccess/action",
 
       "Microsoft.ContainerRegistry/registries/pull/read"
     ]

@@ -320,10 +320,7 @@ resource delegateRole 'Microsoft.Authorization/roleDefinitions@2022-04-01' = {
 
         'Microsoft.Compute/galleries/images/versions/read'
 
-		'Microsoft.Compute/snapshots/read'
-		'Microsoft.Compute/snapshots/beginGetAccess/action'
-
-         'Microsoft.ContainerRegistry/registries/pull/read'
+          'Microsoft.ContainerRegistry/registries/pull/read'
         ]
         notActions: []
         dataActions: [
