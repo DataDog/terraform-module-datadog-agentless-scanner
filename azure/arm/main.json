@@ -425,7 +425,7 @@
               "Microsoft.Compute/galleries/images/versions/read",
               "Microsoft.ContainerRegistry/registries/pull/read",
               "Microsoft.Web/sites/read",
-              "Microsoft.Web/sites/basicPublishingCredentials/action"
+              "Microsoft.Web/sites/publish/Action"
             ],
             "notActions": [],
             "dataActions": [

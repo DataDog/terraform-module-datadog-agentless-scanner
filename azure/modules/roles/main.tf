@@ -62,7 +62,7 @@ resource "azurerm_role_definition" "worker_role" {
       "Microsoft.ContainerRegistry/registries/pull/read",
 
       "Microsoft.Web/sites/read",
-      "Microsoft.Web/sites/basicPublishingCredentials/action"
+      "Microsoft.Web/sites/publish/Action"
     ]
     not_actions = []
     data_actions = [
