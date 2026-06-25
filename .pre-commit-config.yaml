@@ -21,6 +21,9 @@ repos:
         name: terraform docs for the 'user_data' module
         args: ["markdown", "table", "--output-file", "README.md", "./modules/user_data"]
       - id: terraform-docs-go
+        name: terraform docs for the 'health-check' module
+        args: ["markdown", "table", "--output-file", "README.md", "./modules/health-check"]
+      - id: terraform-docs-go
         name: terraform docs for the 'vpc' module
         args: ["markdown", "table", "--output-file", "README.md", "./modules/vpc"]
       - id: terraform-docs-go
