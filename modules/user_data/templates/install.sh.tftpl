@@ -53,8 +53,14 @@ usermod -a -G systemd-journal dd-agent
 # Install the agentless-scanner
 echo "deb [signed-by=/usr/share/keyrings/datadog-archive-keyring.gpg] $DD_AGENTLESS_REPOSITORY $DD_AGENTLESS_CHANNEL agentless-scanner" >> /etc/apt/sources.list.d/datadog.list
 apt-get update
-agentless_pkg_pattern="([[:digit:]]:)?$DD_AGENTLESS_VERSION(\.[[:digit:]]+){0,1}(~rc\.[[:digit:]]+)?(-[[:digit:]])?"
-agentless_version_custom="$(apt-cache madison datadog-agentless-scanner | grep -E "$agentless_pkg_pattern" -om1)" || true
+if [ "$DD_AGENTLESS_CHANNEL" = "nightly" ]; then
+  # Nightly builds are versioned unpredictably (e.g. 1:0.11.45~nightly.<timestamp>.git.<hash>-1),
+  # so instead of pattern-matching a version, always install whatever is newest.
+  agentless_version_custom="$(apt-cache madison datadog-agentless-scanner | awk -F' \\| ' '{print $2}' | sort -V | tail -n1)"
+else
+  agentless_pkg_pattern="([[:digit:]]:)?$DD_AGENTLESS_VERSION(\.[[:digit:]]+){0,1}(~rc\.[[:digit:]]+)?(-[[:digit:]])?"
+  agentless_version_custom="$(apt-cache madison datadog-agentless-scanner | grep -E "$agentless_pkg_pattern" -om1)" || true
+fi
 if [ -z "$agentless_version_custom" ]; then
   printf "Could not find a version of datadog-agentless-scanner from %s" "$DD_AGENTLESS_VERSION"
   exit 1

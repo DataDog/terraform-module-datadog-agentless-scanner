@@ -12,7 +12,7 @@ variable "api_key_secret_arn" {
 }
 
 variable "scanner_version" {
-  description = "Version of the scanner to install"
+  description = "Version of the scanner to install. Ignored when scanner_channel is \"nightly\", which always installs the latest available nightly build."
   type        = string
   default     = "0.11"
   validation {
