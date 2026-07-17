@@ -28,6 +28,8 @@ resource "datadog_agentless_scanning_gcp_scan_options" "scanned_project" {
   gcp_project_id     = var.scanned_project_id
   vuln_host_os       = true
   vuln_containers_os = true
+  cloud_function     = true
+  compliance_host    = true
 }
 
 # Create an impersonated service account for the scanner service account

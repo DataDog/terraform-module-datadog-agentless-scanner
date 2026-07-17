@@ -31,6 +31,7 @@ resource "datadog_agentless_scanning_aws_scan_options" "scan_options" {
   vuln_containers_os = true
   lambda             = true
   sensitive_data     = false
+  compliance_host    = true
 }
 
 module "scanner_role" {

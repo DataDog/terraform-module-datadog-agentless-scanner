@@ -28,6 +28,8 @@ resource "datadog_agentless_scanning_gcp_scan_options" "scan_options" {
   gcp_project_id     = var.project_id
   vuln_host_os       = true
   vuln_containers_os = true
+  cloud_function     = true
+  compliance_host    = true
 }
 
 # ── Project-scoped resources (created once) ──
