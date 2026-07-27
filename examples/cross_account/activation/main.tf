@@ -4,7 +4,7 @@ terraform {
   required_providers {
     datadog = {
       source  = "DataDog/datadog"
-      version = ">= 3.72.0"
+      version = ">= 4.16.0"
     }
   }
 }
@@ -23,4 +23,5 @@ resource "datadog_agentless_scanning_aws_scan_options" "scan_options" {
   vuln_containers_os = true
   lambda             = true
   sensitive_data     = false
+  compliance_host    = true
 }
