@@ -113,7 +113,7 @@ To uninstall, remove the Agentless scanner module from your Terraform code. Remo
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.2.0 |
 | <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) | >= 1.13.1 |
 | <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) | >= 3.101.0 |
 
@@ -154,7 +154,9 @@ To uninstall, remove the Agentless scanner module from your Terraform code. Remo
 | <a name="input_api_key_secret_id"></a> [api\_key\_secret\_id](#input\_api\_key\_secret\_id) | The versionless resource ID of the Azure Key Vault secret holding the Datadog API key. Ignored if api\_key is specified - Make sure the API key is Remote Configuration enabled. | `string` | `null` | no |
 | <a name="input_bastion"></a> [bastion](#input\_bastion) | Create a bastion in the subnet. | `bool` | `false` | no |
 | <a name="input_create_roles"></a> [create\_roles](#input\_create\_roles) | Specifies whether to create the role definitions and assignments required to scan resources. | `bool` | `true` | no |
+| <a name="input_image_sku"></a> [image\_sku](#input\_image\_sku) | Override the Ubuntu 24.04 LTS image SKU. Leave null to match the architecture of the chosen instance\_size ("minimal-arm64" for ARM, "minimal" for x86). | `string` | `null` | no |
 | <a name="input_instance_count"></a> [instance\_count](#input\_instance\_count) | Size of the scale set the scanner instance is in (i.e. number of instances to run) | `number` | `1` | no |
+| <a name="input_instance_size"></a> [instance\_size](#input\_instance\_size) | Override the auto-detected scanner VM SKU. Leave null to let the module pick the cheapest available SKU in var.location from a 3-tier fallback chain (B2ps\_v2 -> D2pls\_v6 -> D2s\_v3). When overriding to an x86 SKU, also set image\_sku to a non-arm64 Ubuntu SKU. | `string` | `null` | no |
 | <a name="input_location"></a> [location](#input\_location) | The location where the Datadog Agentless Scanner resources will be created. | `string` | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | The name of the resource group where the Datadog Agentless Scanner resources will be created. | `string` | n/a | yes |
 | <a name="input_role_name_suffix"></a> [role\_name\_suffix](#input\_role\_name\_suffix) | Suffix to use for custom role names. Used to create 'Orchestrator Role' and 'Worker Role'. | `string` | `""` | no |
