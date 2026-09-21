@@ -3,6 +3,12 @@ variable "api_key" {
   type        = string
 }
 
+variable "datadog_site" {
+  description = "The site of your Datadog account. See https://docs.datadoghq.com/getting_started/site/"
+  type        = string
+  default     = "datadoghq.com"
+}
+
 variable "datadog_integration_role" {
   description = "Role name of the Datadog integration that was used to integrate the AWS account to Datadog"
   type        = string

@@ -20,7 +20,7 @@ provider "aws" {
 }
 
 module "agentless_scanner_role" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanner-role?ref=0.12.1"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanner-role?ref=0.12.4"
 
   api_key_secret_arns = [
     module.agentless_scanner_us.api_key_secret_arn,
@@ -29,34 +29,36 @@ module "agentless_scanner_role" {
 }
 
 module "delegate_role" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/scanning-delegate-role?ref=0.12.1"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/scanning-delegate-role?ref=0.12.4"
 
   scanner_roles = [module.agentless_scanner_role.role.arn]
 }
 
 module "agentless_scanner_us" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner?ref=0.12.1"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner?ref=0.12.4"
 
   providers = {
     aws = aws.us
   }
 
   api_key               = var.api_key
+  site                  = var.datadog_site
   instance_profile_name = module.agentless_scanner_role.instance_profile.name
 }
 
 module "agentless_scanner_eu" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner?ref=0.12.1"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner?ref=0.12.4"
 
   providers = {
     aws = aws.eu
   }
 
   api_key               = var.api_key
+  site                  = var.datadog_site
   instance_profile_name = module.agentless_scanner_role.instance_profile.name
 }
 
 module "autoscaling_scanners" {
-  source                   = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanners-autoscaling?ref=0.12.1"
+  source                   = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanners-autoscaling?ref=0.12.4"
   datadog_integration_role = var.datadog_integration_role
 }
