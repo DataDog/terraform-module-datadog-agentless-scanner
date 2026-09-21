@@ -8,8 +8,10 @@ To deploy a Datadog agentless scanner:
 
 1. Run `terraform init`.
 1. Run `terraform apply`.
-1. Set your Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/).
-1. Set the `subnet_ids` list with the subnet IDs you want the agentless scanner to be deployed in.
+1. Set your Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/) (`api_key`).
+1. Set `datadog_site` to your Datadog site (e.g. `datadoghq.eu`) if your organization is not on the default US site.
+1. Set the `vpc_id` and the `subnet_ids` list with the VPC and subnet IDs you want the agentless scanner to be deployed in.
+1. Set `datadog_integration_role` to the AWS role name used by your Datadog AWS integration (required by the autoscaling module).
 
 ## Warning
 
