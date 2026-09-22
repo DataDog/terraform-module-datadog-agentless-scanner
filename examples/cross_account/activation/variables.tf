@@ -9,9 +9,8 @@ variable "datadog_app_key" {
 }
 
 variable "datadog_site" {
-  description = "The site of your Datadog account. See https://docs.datadoghq.com/getting_started/site/"
+  description = "The site of your Datadog account, e.g. datadoghq.com (US1), datadoghq.eu (EU), ap1.datadoghq.com (AP1). See https://docs.datadoghq.com/getting_started/site/"
   type        = string
-  default     = "datadoghq.com"
 }
 
 variable "aws_account_ids" {
