@@ -3,6 +3,124 @@ locals {
     Datadog                 = "true"
     DatadogAgentlessScanner = "true"
   }
+
+  # 3-tier VM SKU preference chain, tried in order. The first SKU available
+  # (no restrictions) in var.location wins. Designed to cover every commercial
+  # Azure region:
+  #   1. Standard_B2ps_v2  ARM Burstable v2 - cheapest, ~major regions only
+  #   2. Standard_D2pls_v6 ARM v6 D-series  - broad ARM coverage (e.g. brazilsouth)
+  #   3. Standard_D2as_v5  AMD x86 D-series - universal x86 fallback. Picked over
+  #                                           Intel v3/v4 because 2022+ regions
+  #                                           (qatarcentral, uaenorth, italynorth,
+  #                                           spaincentral, mexicocentral, israel,
+  #                                           poland, ...) skipped Intel v3 hardware
+  #                                           entirely. DASv5 is the most widely
+  #                                           deployed modern x86 family across
+  #                                           both legacy and new regions.
+  sku_preference = [
+    "Standard_B2ps_v2",
+    "Standard_D2pls_v6",
+    "Standard_D2as_v5",
+  ]
+
+  # Each candidate SKU is paired with the matching Ubuntu 24.04 LTS image SKU.
+  # ARM SKUs require the -arm64 image; x86 SKUs require the plain "minimal".
+  sku_to_image_sku = {
+    "Standard_B2ps_v2"  = "minimal-arm64"
+    "Standard_D2pls_v6" = "minimal-arm64"
+    "Standard_D2as_v5"  = "minimal"
+  }
+
+  auto_select = var.instance_size == null
+
+  # Each candidate VM in the chain is 2 vCPUs; total vCPUs needed = count x 2.
+  required_vcpus = var.instance_count * 2
+
+  # azurerm accepts both the canonical short name ("eastus") and the display
+  # name ("East US") for var.location, but the Microsoft.Compute/skus API
+  # only returns canonical names in sku.locations. Normalize once here so
+  # the SKU filter and the usages URL match either input style.
+  canonical_location = lower(replace(var.location, " ", ""))
+
+  # Names of all VM SKUs available in the canonical location with no
+  # restrictions (filters out region/zone-level capacity holds).
+  available_skus = local.auto_select ? toset(data.azapi_resource_list.vm_skus[0].output.available) : toset([])
+
+  # Per-SKU vCPU family name (e.g. Standard_B2ps_v2 -> standardBpsv2Family).
+  # Used to join against the per-family quotas returned by the usages API.
+  # Restricted to candidates from our preference chain to keep the map small.
+  candidate_sku_families = local.auto_select ? {
+    for sku in data.azapi_resource_list.vm_skus[0].output.families :
+    sku.name => sku.family
+    if contains(local.sku_preference, sku.name)
+  } : {}
+
+  # Per-family vCPU headroom: limit - currentValue.
+  # Azure assigns vCPU quota per-family per-region; many subscription types
+  # (CSP, MSDN, Visual Studio, freshly-provisioned EA) default several
+  # families to 0 and surface QuotaExceeded only at deploy time. Checking
+  # quota here turns that runtime failure into a clear plan-time error.
+  vcpu_headroom_by_family = local.auto_select ? {
+    for q in data.azapi_resource_list.vm_usages[0].output.quotas :
+    q.family => try(q.limit, 0) - try(q.current, 0)
+  } : {}
+
+  # A SKU qualifies when it is offered in the region AND its family has
+  # enough vCPU headroom in the subscription. try() defaults to false when
+  # the usages API doesn't return the family for any reason.
+  matched_skus = [
+    for s in local.sku_preference : s
+    if contains(local.available_skus, s)
+    && try(local.vcpu_headroom_by_family[local.candidate_sku_families[s]] >= local.required_vcpus, false)
+  ]
+
+  # Diagnostics surfaced in the precondition error so the user can tell
+  # at a glance whether the failure is a regional or a quota issue.
+  unavailable_skus = local.auto_select ? [
+    for s in local.sku_preference : s if !contains(local.available_skus, s)
+  ] : []
+  quota_blocked_skus = local.auto_select ? [
+    for s in local.sku_preference : s
+    if contains(local.available_skus, s)
+    && try(local.vcpu_headroom_by_family[local.candidate_sku_families[s]] < local.required_vcpus, true)
+  ] : []
+
+  chosen_sku = local.auto_select ? try(local.matched_skus[0], null) : var.instance_size
+  # try() guards the map lookup when chosen_sku is null: lookup() rejects a
+  # null key at plan time, which would mask the precondition's diagnostic
+  # error and also break `terraform destroy` (locals must evaluate cleanly
+  # even when the SKU search produced no match).
+  chosen_image_sku = coalesce(var.image_sku, try(local.sku_to_image_sku[local.chosen_sku], "minimal-arm64"))
+}
+
+data "azurerm_subscription" "current" {}
+
+# Lists all Microsoft.Compute VM SKUs visible to the current subscription.
+# Filtering (resourceType, region, restrictions) is done in JMESPath so the
+# exported output is already shaped for `available_skus` / `candidate_sku_families`.
+# Requires Microsoft.Compute/skus/read on the subscription, which is
+# included in the built-in Reader role.
+data "azapi_resource_list" "vm_skus" {
+  count     = local.auto_select ? 1 : 0
+  type      = "Microsoft.Compute/skus@2021-07-01"
+  parent_id = data.azurerm_subscription.current.id
+  response_export_values = {
+    available = "value[?resourceType=='virtualMachines' && contains(locations, '${local.canonical_location}') && length(restrictions) == `0`].name"
+    families  = "value[?resourceType=='virtualMachines' && contains(locations, '${local.canonical_location}')].{name: name, family: family}"
+  }
+}
+
+# Per-region, per-family vCPU usage (currentValue) and quota (limit).
+# Used to filter SKU candidates whose family has zero or insufficient quota
+# in the subscription, preventing QuotaExceeded at apply time.
+# Requires Microsoft.Compute/locations/usages/read (included in Reader).
+data "azapi_resource_list" "vm_usages" {
+  count     = local.auto_select ? 1 : 0
+  type      = "Microsoft.Compute/locations/usages@2022-11-01"
+  parent_id = "${data.azurerm_subscription.current.id}/providers/Microsoft.Compute/locations/${local.canonical_location}"
+  response_export_values = {
+    quotas = "value[].{family: name.value, limit: limit, current: currentValue}"
+  }
 }
 
 resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
@@ -11,8 +129,22 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   resource_group_name = var.resource_group_name
   tags                = merge(var.tags, local.dd_tags)
 
-  sku       = var.instance_size
+  sku       = local.chosen_sku != null ? local.chosen_sku : "Standard_B2ps_v2"
   instances = var.instance_count
+
+  lifecycle {
+    precondition {
+      condition = local.chosen_sku != null
+      error_message = format(
+        "No VM SKU from preference chain %s is usable in location '%s' (need %d vCPUs). Not offered in region: %s. Available but insufficient vCPU quota: %s. Request quota at https://aka.ms/azurequotaincrease for the corresponding family, or set var.instance_size and var.image_sku explicitly.",
+        jsonencode(local.sku_preference),
+        var.location,
+        local.required_vcpus,
+        jsonencode(local.unavailable_skus),
+        jsonencode(local.quota_blocked_skus),
+      )
+    }
+  }
 
   identity {
     type = "UserAssigned"
@@ -39,7 +171,7 @@ resource "azurerm_linux_virtual_machine_scale_set" "vmss" {
   source_image_reference {
     publisher = "canonical"
     offer     = "ubuntu-24_04-lts"
-    sku       = "minimal-arm64"
+    sku       = local.chosen_image_sku
     version   = "latest"
   }
 

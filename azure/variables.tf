@@ -74,6 +74,18 @@ variable "instance_count" {
   default     = 1
 }
 
+variable "instance_size" {
+  description = "Override the auto-detected scanner VM SKU. Leave null to let the module pick the cheapest available SKU in var.location from a 3-tier fallback chain (B2ps_v2 -> D2pls_v6 -> D2s_v3). When overriding to an x86 SKU, also set image_sku to a non-arm64 Ubuntu SKU."
+  type        = string
+  default     = null
+}
+
+variable "image_sku" {
+  description = "Override the Ubuntu 24.04 LTS image SKU. Leave null to match the architecture of the chosen instance_size (\"minimal-arm64\" for ARM, \"minimal\" for x86)."
+  type        = string
+  default     = null
+}
+
 variable "tags" {
   description = "A map of additional tags to add to the resources created."
   type        = map(string)
