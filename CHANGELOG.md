@@ -1,5 +1,30 @@
 # Changelog
 
+## Version 0.12.4 - 2026-06-23
+
+- azure: grant the scanner read and publish access to Function Apps (including the Kudu/SCM endpoint) and regenerate the ARM template
+
+## Version 0.12.3 - 2026-06-10
+
+- azure: grant scanner permissions for VM image reads, support identifiable app keys, and add a name suffix to the Azure VPC
+- gcp: grant the scanner service account token creator on itself for OCI private auth, and grant the target service account read access to Cloud Functions and Cloud Run
+- Always add the sensitive data scanning permissions to the delegate IAM role
+- Allow the datadog-agent to read the systemd journal
+- Set standard tags in the Azure/GCP agent configuration
+
+## Version 0.12.1 - 2026-03-05
+
+- gcp: fall back to `n2-standard-2` when `n4-standard-2` is not available in the target region
+
+## Version 0.12.0 - 2026-03-03
+
+- gcp: fully extract service accounts out of the scanner module and support shared service accounts for multi-region deployments
+- azure: add a `role_name_prefix` variable, make ARM role names unique, and add ACR image pull permissions (ABAC model)
+- aws: ensure `user_data` compatibility with AWS provider v5/v6/v7, remove the Lambda VPC endpoint, and add a scanner health check
+- cloud-init: enable retries when installing packages and set the logs `start_position` to `beginning`
+- Fix the `custom_vpc` example (`instance_profile` output reference, missing `api_key_secret_arns`, `subnet_ids` variable name)
+- ci: add a Terraform validate check, run per cloud provider on relevant changes
+
 ## Version 0.11.12 - 2025-11-10
 
 - Add initial GCP support with Terraform modules and examples (`single_region` and `cross_project`)

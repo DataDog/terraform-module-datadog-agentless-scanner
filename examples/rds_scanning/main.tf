@@ -20,7 +20,7 @@ provider "aws" {
 }
 
 module "agentless_scanner_role" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanner-role?ref=0.12.1"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanner-role?ref=0.12.4"
 
   account_roles = [module.delegate_role.role.arn]
   api_key_secret_arns = [
@@ -30,37 +30,39 @@ module "agentless_scanner_role" {
 }
 
 module "delegate_role" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/scanning-delegate-role?ref=0.12.1"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/scanning-delegate-role?ref=0.12.4"
 
   scanner_roles                       = [module.agentless_scanner_role.role.arn]
   sensitive_data_scanning_rds_enabled = true
 }
 
 module "agentless_scanner_us" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner?ref=0.12.1"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner?ref=0.12.4"
 
   providers = {
     aws = aws.us
   }
 
   api_key               = var.api_key
+  site                  = var.datadog_site
   instance_profile_name = module.agentless_scanner_role.instance_profile.name
 }
 
 module "agentless_scanner_eu" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner?ref=0.12.1"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner?ref=0.12.4"
 
   providers = {
     aws = aws.eu
   }
 
   api_key               = var.api_key
+  site                  = var.datadog_site
   instance_profile_name = module.agentless_scanner_role.instance_profile.name
 }
 
 
 module "agentless_s3_bucket_us" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-s3-bucket?ref=0.12.1"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-s3-bucket?ref=0.12.4"
 
   iam_delegate_role_arn = module.delegate_role.role.arn
   rds_service_role_arn  = module.delegate_role.rds_service_role_arn
@@ -71,7 +73,7 @@ module "agentless_s3_bucket_us" {
 }
 
 module "agentless_s3_bucket_eu" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-s3-bucket?ref=0.12.1"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-s3-bucket?ref=0.12.4"
 
   iam_delegate_role_arn = module.delegate_role.role.arn
   rds_service_role_arn  = module.delegate_role.rds_service_role_arn
@@ -82,6 +84,6 @@ module "agentless_s3_bucket_eu" {
 }
 
 module "autoscaling_scanners" {
-  source                   = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanners-autoscaling?ref=0.12.1"
+  source                   = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanners-autoscaling?ref=0.12.4"
   datadog_integration_role = var.datadog_integration_role
 }
