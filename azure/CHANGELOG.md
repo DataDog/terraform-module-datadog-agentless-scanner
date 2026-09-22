@@ -2,6 +2,7 @@
 
 ## Version TBD
 
+- Allow the scanner role to read Azure images and image galleries
 - Add instance_count variable to the main module
 - Install semgrep dependency
 - Fix constant Terraform drift when multiple scan scopes are specified
