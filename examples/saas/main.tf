@@ -28,8 +28,16 @@ provider "datadog" {
 module "agentless_scanning_policy" {
   // TODO: switch to the git source pinned to the release shipping this module.
   source = "../../modules/agentless-scanning-policy"
+}
 
-  role_name = var.datadog_integration_role
+resource "aws_iam_policy" "agentless_scanning" {
+  name_prefix = "DatadogAgentlessScanningPolicy"
+  policy      = module.agentless_scanning_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "agentless_scanning" {
+  role       = var.datadog_integration_role
+  policy_arn = aws_iam_policy.agentless_scanning.arn
 }
 
 resource "datadog_agentless_scanning_aws_scan_options" "scan_options" {
@@ -40,5 +48,5 @@ resource "datadog_agentless_scanning_aws_scan_options" "scan_options" {
   sensitive_data     = true
   compliance_host    = true
 
-  depends_on = [module.agentless_scanning_policy]
+  depends_on = [aws_iam_role_policy_attachment.agentless_scanning]
 }

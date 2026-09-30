@@ -50,25 +50,31 @@ resource "aws_iam_role" "role" {
 module "scanning_policy" {
   source = "../agentless-scanning-policy"
 
-  role_name                       = aws_iam_role.role.name
   sensitive_data_scanning_enabled = var.sensitive_data_scanning_enabled || var.sensitive_data_scanning_rds_enabled
-  // Keep the name prefix of the former orchestrator policy: changing it would
-  // force a replacement of the policy (and a permissions gap) on upgrade.
-  policy_name_prefix = "${var.iam_role_name}OrchestratorPolicy"
-  policy_path        = var.iam_role_path
 }
 
 // The orchestrator, worker and DSPM policies were merged into a single
-// policy. The orchestrator policy is updated in place to avoid detaching all
-// permissions from the role during the upgrade.
+// policy. The former orchestrator policy is updated in place, and keeps its
+// name prefix, to avoid detaching all permissions from the role on upgrade.
+resource "aws_iam_policy" "scanning_policy" {
+  name_prefix = "${var.iam_role_name}OrchestratorPolicy"
+  path        = var.iam_role_path
+  policy      = module.scanning_policy.json
+}
+
+resource "aws_iam_role_policy_attachment" "scanning_policy_attachment" {
+  policy_arn = aws_iam_policy.scanning_policy.arn
+  role       = aws_iam_role.role.name
+}
+
 moved {
   from = aws_iam_policy.scanning_orchestrator_policy
-  to   = module.scanning_policy.aws_iam_policy.policy
+  to   = aws_iam_policy.scanning_policy
 }
 
 moved {
   from = aws_iam_role_policy_attachment.orchestrator_attachment
-  to   = module.scanning_policy.aws_iam_role_policy_attachment.attachment
+  to   = aws_iam_role_policy_attachment.scanning_policy_attachment
 }
 
 // RDS Specific resources

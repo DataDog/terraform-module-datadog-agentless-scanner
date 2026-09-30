@@ -378,14 +378,3 @@ data "aws_iam_policy_document" "scanning_policy_document" {
     var.sensitive_data_scanning_enabled ? [data.aws_iam_policy_document.scanning_worker_dspm_policy_document.json] : [],
   )
 }
-
-resource "aws_iam_policy" "policy" {
-  name_prefix = var.policy_name_prefix
-  path        = var.policy_path
-  policy      = data.aws_iam_policy_document.scanning_policy_document.json
-}
-
-resource "aws_iam_role_policy_attachment" "attachment" {
-  policy_arn = aws_iam_policy.policy.arn
-  role       = var.role_name
-}

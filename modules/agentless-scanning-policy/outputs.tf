@@ -1,4 +1,4 @@
-output "policy" {
-  description = "The customer managed policy granting Agentless Scanning permissions"
-  value       = aws_iam_policy.policy
+output "json" {
+  description = "The IAM policy document granting Agentless Scanning permissions, to be used in a customer managed policy"
+  value       = data.aws_iam_policy_document.scanning_policy_document.json
 }

@@ -11,7 +11,7 @@ output "rds_service_role_arn" {
 output "managed_policies" {
   description = "The customer managed policies attached to the scanning role"
   value = {
-    scanning_policy     = module.scanning_policy.policy
+    scanning_policy     = aws_iam_policy.scanning_policy
     scanning_rds_policy = one(aws_iam_policy.scanning_rds_policy)
   }
 }
