@@ -29,7 +29,7 @@ Policies](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage
 
 | Name | Version |
 |------|---------|
-| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.1 |
 | <a name="requirement_aws"></a> [aws](#requirement\_aws) | >= 5.0 |
 
 ## Providers
@@ -40,31 +40,24 @@ Policies](https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage
 
 ## Modules
 
-No modules.
+| Name | Source | Version |
+|------|--------|---------|
+| <a name="module_scanning_policy"></a> [scanning\_policy](#module\_scanning\_policy) | ../agentless-scanning-policy | n/a |
 
 ## Resources
 
 | Name | Type |
 |------|------|
 | [aws_iam_policy.rds_service_role_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
-| [aws_iam_policy.scanning_orchestrator_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_policy.scanning_rds_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
-| [aws_iam_policy.scanning_worker_dspm_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
-| [aws_iam_policy.scanning_worker_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_policy) | resource |
 | [aws_iam_role.rds_service_role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role.role](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy_attachment.delegate_role_rds_policy_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
-| [aws_iam_role_policy_attachment.orchestrator_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_role_policy_attachment.rds_service_role_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
-| [aws_iam_role_policy_attachment.worker_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
-| [aws_iam_role_policy_attachment.workers_dspm_attachment](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
 | [aws_iam_policy_document.assume_role_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.rds_service_role_assume_policy](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.rds_service_role_policy_document](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
-| [aws_iam_policy_document.scanning_orchestrator_policy_document](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_iam_policy_document.scanning_rds_policy_document](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
-| [aws_iam_policy_document.scanning_worker_dspm_policy_document](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
-| [aws_iam_policy_document.scanning_worker_policy_document](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/iam_policy_document) | data source |
 | [aws_partition.current](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/data-sources/partition) | data source |
 
 ## Inputs
@@ -73,7 +66,7 @@ No modules.
 |------|-------------|------|---------|:--------:|
 | <a name="input_iam_role_name"></a> [iam\_role\_name](#input\_iam\_role\_name) | Name to use on IAM role created | `string` | `"DatadogAgentlessScannerDelegateRole"` | no |
 | <a name="input_iam_role_path"></a> [iam\_role\_path](#input\_iam\_role\_path) | IAM role and policies path | `string` | `"/"` | no |
-| <a name="input_scanner_organizational_unit_ids"></a> [scanner\_organizational\_unit\_ids](#input\_scanner\_organizational\_unit\_ids) | List of AWS Organizations organizational units (OUs) allowed to assume this role | `list(string)` | <pre>[<br>  "*"<br>]</pre> | no |
+| <a name="input_scanner_organizational_unit_ids"></a> [scanner\_organizational\_unit\_ids](#input\_scanner\_organizational\_unit\_ids) | List of AWS Organizations organizational units (OUs) allowed to assume this role | `list(string)` | <pre>[<br/>  "*"<br/>]</pre> | no |
 | <a name="input_scanner_roles"></a> [scanner\_roles](#input\_scanner\_roles) | List of roles ARN allowed to assume this role | `list(string)` | n/a | yes |
 | <a name="input_sensitive_data_scanning_enabled"></a> [sensitive\_data\_scanning\_enabled](#input\_sensitive\_data\_scanning\_enabled) | Installs specific permissions to enable scanning of S3 buckets | `bool` | `true` | no |
 | <a name="input_sensitive_data_scanning_rds_enabled"></a> [sensitive\_data\_scanning\_rds\_enabled](#input\_sensitive\_data\_scanning\_rds\_enabled) | Installs specific permissions to enable scanning of RDS databases | `bool` | `false` | no |

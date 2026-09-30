@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- aws: add the `agentless-scanning-saas` module to attach the agentless scanning permissions to the Datadog integration role (SaaS mode)
+- aws: merge the delegate role orchestrator, worker and DSPM policies into a single policy, provided by the new `agentless-scanning-policy` module. The orchestrator policy is updated in place on upgrade (`moved` blocks), the worker and DSPM policies are deleted
+- aws: **breaking** the `managed_policies` output of `scanning-delegate-role` now only exposes `scanning_policy` and `scanning_rds_policy`
+- aws: use the current partition in the S3, ECR and KMS policy ARNs
+- aws: require Terraform >= 1.1
+
 ## Version 0.12.4 - 2026-06-23
 
 - azure: grant the scanner read and publish access to Function Apps (including the Kudu/SCM endpoint) and regenerate the ARM template
