@@ -25,11 +25,11 @@ provider "datadog" {
   api_url = "https://api.${var.datadog_site}/"
 }
 
-module "agentless_scanning_saas" {
+module "agentless_scanning_policy" {
   // TODO: switch to the git source pinned to the release shipping this module.
-  source = "../../modules/agentless-scanning-saas"
+  source = "../../modules/agentless-scanning-policy"
 
-  datadog_integration_role = var.datadog_integration_role
+  role_name = var.datadog_integration_role
 }
 
 resource "datadog_agentless_scanning_aws_scan_options" "scan_options" {
@@ -40,5 +40,5 @@ resource "datadog_agentless_scanning_aws_scan_options" "scan_options" {
   sensitive_data     = true
   compliance_host    = true
 
-  depends_on = [module.agentless_scanning_saas]
+  depends_on = [module.agentless_scanning_policy]
 }

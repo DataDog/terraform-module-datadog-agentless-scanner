@@ -2,9 +2,16 @@
 
 The agentless-scanning-policy module creates the IAM managed policy holding all the permissions required to perform agentless scans (snapshot creation and cleanup, EBS direct APIs, Lambda and ECR images, and optionally S3 objects), and attaches it to the given IAM role.
 
-It is used by:
-- the [scanning-delegate-role](../scanning-delegate-role/) module (self-hosted mode), to attach the policy to the delegate role assumed by the scanners.
-- the [agentless-scanning-saas](../agentless-scanning-saas/) module (SaaS mode), to attach the policy to the Datadog integration role.
+It is used:
+- by the [scanning-delegate-role](../scanning-delegate-role/) module (self-hosted mode), to attach the policy to the delegate role assumed by the scanners.
+- directly in SaaS mode, to attach the policy to the Datadog integration role. Datadog then performs the scans from its own infrastructure by assuming that role, and no scanner infrastructure is deployed in your account:
+
+```hcl
+module "agentless_scanning_policy" {
+  source    = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanning-policy"
+  role_name = var.datadog_integration_role
+}
+```
 
 <!-- BEGIN_TF_DOCS -->
 ## Requirements

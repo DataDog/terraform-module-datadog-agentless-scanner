@@ -2,8 +2,8 @@
 
 ## Unreleased
 
-- aws: add the `agentless-scanning-saas` module to attach the agentless scanning permissions to the Datadog integration role (SaaS mode)
-- aws: merge the delegate role orchestrator, worker and DSPM policies into a single policy, provided by the new `agentless-scanning-policy` module. The orchestrator policy is updated in place on upgrade (`moved` blocks), the worker and DSPM policies are deleted
+- aws: add the `agentless-scanning-policy` module, providing the agentless scanning permissions as a single managed policy. Attach it to the Datadog integration role for SaaS-mode deployments
+- aws: merge the delegate role orchestrator, worker and DSPM policies into that single policy. The orchestrator policy is updated in place on upgrade (`moved` blocks), the worker and DSPM policies are deleted
 - aws: **breaking** the `managed_policies` output of `scanning-delegate-role` now only exposes `scanning_policy` and `scanning_rds_policy`
 - aws: use the current partition in the S3, ECR and KMS policy ARNs
 - aws: require Terraform >= 1.1

@@ -1,6 +1,6 @@
 # SaaS Example
 
-This folder shows an example of Terraform code that uses the [agentless-scanning-saas module](../../modules/agentless-scanning-saas/) to enable Datadog Agentless Scanning in SaaS mode in your [AWS](https://aws.amazon.com/) account.
+This folder shows an example of Terraform code that uses the [agentless-scanning-policy module](../../modules/agentless-scanning-policy/) to enable Datadog Agentless Scanning in SaaS mode in your [AWS](https://aws.amazon.com/) account.
 
 In SaaS mode, Datadog performs the scans from its own infrastructure by assuming the Datadog integration role: no scanner is deployed in your account. The module only attaches the scanning permissions to the Datadog integration role.
 
