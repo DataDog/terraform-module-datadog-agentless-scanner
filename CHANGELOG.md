@@ -1,5 +1,12 @@
 # Changelog
 
+## Version 0.13.0 - 2026-10-01
+
+- aws: introduce the Agentless SaaS mode, where Datadog performs the scans from its own infrastructure by assuming the Datadog integration role: only IAM permissions are deployed in your account, no scanner infrastructure (see `examples/saas`)
+- aws: add the `agentless-scanning-policy` module, providing the agentless scanning IAM policy documents. Its `json` output merges all the permissions in a single document, to use in a managed policy attached to the Datadog integration role for SaaS-mode deployments (see `examples/saas`)
+- aws: `scanning-delegate-role` uses the policy documents from `agentless-scanning-policy` (no change to the created policies)
+- aws: use the current partition in the S3, ECR and KMS policy ARNs
+
 ## Version 0.12.4 - 2026-06-23
 
 - azure: grant the scanner read and publish access to Function Apps (including the Kudu/SCM endpoint) and regenerate the ARM template

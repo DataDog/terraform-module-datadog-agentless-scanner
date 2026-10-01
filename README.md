@@ -92,6 +92,7 @@ To uninstall, remove the Agentless scanner module from your Terraform code. Remo
 The Agentless Scanner deployment is split into different modules to allow for more flexibility and customization. The following modules are available:
 
 - [scanning-delegate-role](./modules/scanning-delegate-role/): Creates the necessary IAM role and policies for the scanning delegate. It creates an IAM role in a specific account that the scanner can then assume to scan the account. This role allows read access to many different resources (EBS snapshots, Lambdas etc.) in the account to be able to scan them.
+- [agentless-scanning-policy](./modules/agentless-scanning-policy/): Provides the IAM policy document holding all the permissions required to perform agentless scans. It is used by the scanning-delegate-role module, and in a managed policy attached to the Datadog integration role for SaaS-mode deployments where Datadog performs the scans and no scanner infrastructure is deployed in your account.
 - [agentless-scanner-role](./modules/agentless-scanner-role/): Creates the necessary IAM role and policies for the agentless scanner instance. It creates an IAM role that allows the scanner to assume the role of the scanning delegate.
 - [instance](./modules/instance/): Creates the EC2 instance that runs the agentless scanner. This instance is launched as part of an Auto Scaling group to ensure high availability.
 - [user_data](./modules/user_data/): Creates the user data script that installs and configures the agentless scanner on the EC2 instance.

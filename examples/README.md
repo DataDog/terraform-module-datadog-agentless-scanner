@@ -10,6 +10,12 @@ With this option, Agentless scanners are deployed on a single cloud account and 
 
 To deploy in multiple regions, see the [example](multi_region/README.md).
 
+# SaaS Example
+
+With this option, no Agentless scanner is deployed in your account: Datadog performs the scans from its own infrastructure by assuming the Datadog integration role. Only the required IAM permissions are attached to that role.
+
+To install the Agentless SaaS permissions, see the [example](saas/README.md).
+
 # Cross Account Example
 
 With this option, an Agentless scanner is deployed in a single or multi-region set-up on a single account.
