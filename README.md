@@ -13,6 +13,8 @@ Terraform modules to set up [Datadog Agentless Scanning](https://docs.datadoghq.
 
 ## AWS Architecture
 
+Datadog offers two ways to deploy Agentless Scanning on AWS: SaaS mode, where scanners run in Datadog's infrastructure, or self-hosted mode, where scanners run in your own AWS account.
+
 ### SaaS mode
 
 Scanners run in Datadog's infrastructure: nothing is deployed in your account. The [agentless-scanning-policy](./modules/agentless-scanning-policy/) module provides the scanning permissions, which are attached as a managed policy to the Datadog integration role. Datadog assumes this role to perform the scans.
