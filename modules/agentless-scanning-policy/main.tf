@@ -219,9 +219,34 @@ data "aws_iam_policy_document" "scanning_orchestrator_policy_document" {
 }
 
 // The IAM policy for the scanning worker allows to read created resources, as
-// well as lambdas. EC2 describe permissions are shared with the orchestrator
-// document.
+// well as lambdas.
 data "aws_iam_policy_document" "scanning_worker_policy_document" {
+  statement {
+    sid    = "DatadogAgentlessScannerDescribeSnapshots"
+    effect = "Allow"
+    actions = [
+      // Required to be able to wait for snapshots completion and cleanup. It
+      // cannot be restricted.
+      "ec2:DescribeSnapshots",
+    ]
+    resources = [
+      "*",
+    ]
+  }
+
+  statement {
+    sid    = "DatadogAgentlessScannerDescribeVolumes"
+    effect = "Allow"
+    actions = [
+      // Required to be able to wait for volumes completion and cleanup. It
+      // cannot be restricted.
+      "ec2:DescribeVolumes",
+    ]
+    resources = [
+      "*",
+    ]
+  }
+
   statement {
     sid    = "DatadogAgentlessScannerSnapshotAccess"
     effect = "Allow"
@@ -263,6 +288,13 @@ data "aws_iam_policy_document" "scanning_worker_policy_document" {
       variable = "kms:ViaService"
       values   = ["ec2.*.amazonaws.com"]
     }
+  }
+
+  statement {
+    sid       = "DatadogAgentlessScannerKMSDescribe"
+    effect    = "Allow"
+    actions   = ["kms:DescribeKey"]
+    resources = ["arn:${data.aws_partition.current.partition}:kms:*:*:key/*"]
   }
 
   statement {
@@ -369,8 +401,10 @@ data "aws_iam_policy_document" "scanning_worker_dspm_policy_document" {
   }
 }
 
+// Single policy merging all the above, for SaaS mode. Overriding merges the
+// statements shared by the orchestrator and worker documents (same Sid).
 data "aws_iam_policy_document" "scanning_policy_document" {
-  source_policy_documents = concat(
+  override_policy_documents = concat(
     [
       data.aws_iam_policy_document.scanning_orchestrator_policy_document.json,
       data.aws_iam_policy_document.scanning_worker_policy_document.json,

@@ -7,6 +7,30 @@ locals {
 
 data "aws_partition" "current" {}
 
+module "scanning_policy" {
+  source = "../agentless-scanning-policy"
+}
+
+
+resource "aws_iam_policy" "scanning_orchestrator_policy" {
+  name_prefix = "${var.iam_role_name}OrchestratorPolicy"
+  path        = var.iam_role_path
+  policy      = module.scanning_policy.orchestrator_json
+}
+
+resource "aws_iam_policy" "scanning_worker_policy" {
+  name_prefix = "${var.iam_role_name}WorkerPolicy"
+  path        = var.iam_role_path
+  policy      = module.scanning_policy.worker_json
+}
+
+resource "aws_iam_policy" "scanning_worker_dspm_policy" {
+  count       = var.sensitive_data_scanning_enabled || var.sensitive_data_scanning_rds_enabled ? 1 : 0
+  name_prefix = "${var.iam_role_name}WorkerDSPMPolicy"
+  path        = var.iam_role_path
+  policy      = module.scanning_policy.dspm_json
+}
+
 data "aws_iam_policy_document" "assume_role_policy" {
   statement {
     sid     = "EC2AssumeRole"
@@ -47,34 +71,20 @@ resource "aws_iam_role" "role" {
   tags = merge(var.tags, local.dd_tags)
 }
 
-module "scanning_policy" {
-  source = "../agentless-scanning-policy"
-
-  sensitive_data_scanning_enabled = var.sensitive_data_scanning_enabled || var.sensitive_data_scanning_rds_enabled
-}
-
-// The orchestrator, worker and DSPM policies were merged into a single
-// policy. The former orchestrator policy is updated in place, and keeps its
-// name prefix, to avoid detaching all permissions from the role on upgrade.
-resource "aws_iam_policy" "scanning_policy" {
-  name_prefix = "${var.iam_role_name}OrchestratorPolicy"
-  path        = var.iam_role_path
-  policy      = module.scanning_policy.json
-}
-
-resource "aws_iam_role_policy_attachment" "scanning_policy_attachment" {
-  policy_arn = aws_iam_policy.scanning_policy.arn
+resource "aws_iam_role_policy_attachment" "orchestrator_attachment" {
+  policy_arn = aws_iam_policy.scanning_orchestrator_policy.arn
   role       = aws_iam_role.role.name
 }
 
-moved {
-  from = aws_iam_policy.scanning_orchestrator_policy
-  to   = aws_iam_policy.scanning_policy
+resource "aws_iam_role_policy_attachment" "worker_attachment" {
+  policy_arn = aws_iam_policy.scanning_worker_policy.arn
+  role       = aws_iam_role.role.name
 }
 
-moved {
-  from = aws_iam_role_policy_attachment.orchestrator_attachment
-  to   = aws_iam_role_policy_attachment.scanning_policy_attachment
+resource "aws_iam_role_policy_attachment" "workers_dspm_attachment" {
+  count      = length(aws_iam_policy.scanning_worker_dspm_policy)
+  policy_arn = aws_iam_policy.scanning_worker_dspm_policy[0].arn
+  role       = aws_iam_role.role.name
 }
 
 // RDS Specific resources

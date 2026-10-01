@@ -1,5 +1,5 @@
 variable "sensitive_data_scanning_enabled" {
-  description = "Includes specific permissions to enable scanning of S3 buckets"
+  description = "Includes the permissions to scan S3 buckets in the single policy document (json output)"
   type        = bool
   default     = true
 }
