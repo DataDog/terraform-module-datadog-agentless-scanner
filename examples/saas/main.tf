@@ -26,8 +26,7 @@ provider "datadog" {
 }
 
 module "agentless_scanning_policy" {
-  // TODO: switch to the git source pinned to the release shipping this module.
-  source = "../../modules/agentless-scanning-policy"
+  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanning-policy?ref=0.13.0"
 }
 
 resource "aws_iam_policy" "agentless_scanning" {
