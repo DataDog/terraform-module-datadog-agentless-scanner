@@ -2,6 +2,8 @@
 
 Terraform modules to set up [Datadog Agentless Scanning](https://docs.datadoghq.com/security/cloud_security_management/agentless_scanning/) on AWS, Azure and GCP.
 
+This document covers AWS. For [Azure](./azure) and [GCP](./gcp) instructions, please see their respective directories.
+
 ## Examples
 
 - **AWS**: see the [examples](./examples/) directory.
