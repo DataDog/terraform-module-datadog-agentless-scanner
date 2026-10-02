@@ -1,104 +1,50 @@
 # Terraform Module Datadog Agentless Scanner
 
-This Terraform module provides a simple and reusable configuration for installing a Datadog Agentless Scanner.
+Terraform modules to set up [Datadog Agentless Scanning](https://docs.datadoghq.com/security/cloud_security_management/agentless_scanning/) on AWS, Azure and GCP.
 
-This document covers installation on AWS. For [Azure](./azure) and [GCP](./gcp) instructions, please see their respective directories.
+This document covers AWS. For [Azure](./azure) and [GCP](./gcp) instructions, please see their respective directories.
 
-For more information about Agentless Scanning, see the [Datadog Agentless Scanning documentation](https://docs.datadoghq.com/security/cloud_security_management/agentless_scanning/).
+## Examples
 
-## Prerequisites
-
-Before using this module, make sure you have the following:
-
-1. [Terraform](https://www.terraform.io/) v1.2.0 or later installed on your local machine.
-2. AWS credentials configured with the necessary permissions.
-3. A Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/) with Remote Configuration enabled.
-
-## Usage
-
-To use this module in your Terraform configuration, add the following code in your existing Terraform code:
-
-```hcl
-# First we need to define the proper roles for our scanners. It consists of two different modules.
-
-# 1. The "scanning delegate role" defines all the policies and IAM roles necessary for the scanner to interact and scan some specific account resources.
-# It shall be created for every account that the agentless scanner will be able scan. These roles are meant to be assumed by the "agentless scanner role".
-module "delegate_role" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/scanning-delegate-role"
-
-  scanner_roles = [module.scanner_role.role.arn]
-}
-
-# 2. The "agentless scanner role" creates an EC2 instance profile along with an IAM role allowing the EC2 instance scanner to assume the scanning delegate role(s).
-# It shall be created in the same account as the agentless scanner instance.
-module "scanner_role" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanner-role"
-
-  api_key_secret_arns = [module.agentless_scanner.api_key_secret_arn]
-}
-
-# We can now create the agentless scanner instance. It requires the instance profile name that was created by the scanner_role.
-# This module will define the VPC, subnets, network and compute resources required for the agentless scanner.
-# See the documentation of each module for more information or our examples for a complete setup.
-module "agentless_scanner" {
-  source = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner"
-
-  api_key               = var.datadog-api-key
-  instance_profile_name = module.scanner_role.instance_profile.name
-}
-
-# Finally, we can enable automatic scaling of agentless scanners.
-# Agentless scanners will scale up when there are many resources to scan and scale down when fewer resources are present.
-# This ensures efficient performance and cost optimization.
-# It shall be created in the same account as the agentless scanner instance.
-module "autoscaling_scanners" {
-  source                   = "git::https://github.com/DataDog/terraform-module-datadog-agentless-scanner//modules/agentless-scanners-autoscaling"
-  datadog_integration_role = var.datadog-integration-role
-}
-
-# This is the AWS role name that was used to create the Datadog integration in AWS for the account where the agentless scanner is deployed.
-# In order to fetch the role name, please navigate to the AWS Integration page (https://app.datadoghq.com/integrations/amazon-web-services),
-# click on the account in which the agentless scanner will be running, then click on the "Account details" tab.
-# The role name could be found under the "AWS Role Name" section.
-variable "datadog-integration-role" {
-
-}
-
-variable "datadog-api-key" {
-
-}
-```
-
-And run:
-```sh
-terraform init
-terraform apply \
-  -var="datadog-api-key=$DD_API_KEY" \
-  -var="datadog-integration-role=$DD_INTEGRATION_ROLE"
-```
+- **AWS**: see the [examples](./examples/) directory.
+- **Azure**: see the [Azure module](./azure/README.md#usage), or the [ARM template](./azure/arm/).
+- **GCP**: see the [GCP examples](./gcp/examples/) directory.
 
 > [!IMPORTANT]
 > Datadog strongly recommends [pinning](https://developer.hashicorp.com/terraform/language/modules/sources#selecting-a-revision) the version of the module to keep repeatable deployment and to avoid unexpected changes.
 
-## Uninstall
+## AWS Architecture
 
-To uninstall, remove the Agentless scanner module from your Terraform code. Removing this module deletes all resources associated with the Agentless scanner. Alternatively, if you used a separate Terraform state for this setup, you can uninstall the Agentless scanner by executing `terraform destroy`.
+Datadog offers two ways to deploy Agentless Scanning on AWS: SaaS mode, where scanners run in Datadog's infrastructure, or self-hosted mode, where scanners run in your own AWS account.
 
-> [!WARNING]
-> Exercise caution when deleting Terraform resources. Review the plan carefully to ensure everything is in order.
+### SaaS mode
 
-## Architecture
+Scanners run in Datadog's infrastructure: nothing is deployed in your account. The [agentless-scanning-policy](./modules/agentless-scanning-policy/) module provides the scanning permissions, which are attached as a managed policy to the Datadog integration role. Datadog assumes this role to perform the scans.
 
-The Agentless Scanner deployment is split into different modules to allow for more flexibility and customization. The following modules are available:
+```mermaid
+flowchart LR
+    subgraph "Datadog"
+      S[Agentless scanners]
+    end
 
-- [scanning-delegate-role](./modules/scanning-delegate-role/): Creates the necessary IAM role and policies for the scanning delegate. It creates an IAM role in a specific account that the scanner can then assume to scan the account. This role allows read access to many different resources (EBS snapshots, Lambdas etc.) in the account to be able to scan them.
-- [agentless-scanning-policy](./modules/agentless-scanning-policy/): Provides the IAM policy document holding all the permissions required to perform agentless scans. It is used by the scanning-delegate-role module, and in a managed policy attached to the Datadog integration role for SaaS-mode deployments where Datadog performs the scans and no scanner infrastructure is deployed in your account.
-- [agentless-scanner-role](./modules/agentless-scanner-role/): Creates the necessary IAM role and policies for the agentless scanner instance. It creates an IAM role that allows the scanner to assume the role of the scanning delegate.
-- [instance](./modules/instance/): Creates the EC2 instance that runs the agentless scanner. This instance is launched as part of an Auto Scaling group to ensure high availability.
-- [user_data](./modules/user_data/): Creates the user data script that installs and configures the agentless scanner on the EC2 instance.
-- [vpc](./modules/vpc/): Creates the VPC, subnets and all network resources required for the agentless scanner.
+    subgraph "Your AWS account"
+      IR[Datadog integration role]
+      P[agentless-scanning-policy]
+      P-- attached to -->IR
+    end
 
-The main module provided at the root of this repository is a thin wrapper around the vpc, user_data and instance modules, with simplified inputs. The scanning-delegate-role and agentless-scanner-role modules are intended to be used in conjunction with this module, as they define the proper IAM permissions for the scanner.
+    S-- assumes -->IR
+```
+
+### Self-hosted mode
+
+Scanners run in your own AWS infrastructure. They require a Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/) with Remote Configuration enabled. The following modules are used:
+
+- [Main module](./main.tf): a thin wrapper around the [vpc](./modules/vpc/), [user_data](./modules/user_data/) and [instance](./modules/instance/) modules, which create the network, the scanner install script and the Auto Scaling group running the scanners.
+- [agentless-scanner-role](./modules/agentless-scanner-role/): IAM role and instance profile for the scanner instances, allowing them to assume the scanning delegate roles.
+- [scanning-delegate-role](./modules/scanning-delegate-role/): IAM role created in each scanned account, holding the permissions to scan its resources (EBS snapshots, Lambdas, etc.).
+- [agentless-scanners-autoscaling](./modules/agentless-scanners-autoscaling/): attaches the policy allowing Datadog to scale the scanners up or down based on load.
+- [agentless-s3-bucket](./modules/agentless-s3-bucket/): S3 bucket used to scan RDS snapshot exports (optional).
 
 ```mermaid
 flowchart TD
@@ -125,10 +71,6 @@ flowchart TD
       SR-- assumes -->DRB
     end
 ```
-
-## Examples
-
-For complete examples, refer to the [examples](./examples/) directory in this repository.
 
 ## Development
 
