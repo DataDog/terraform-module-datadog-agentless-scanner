@@ -38,7 +38,7 @@ flowchart LR
 
 ### Self-hosted mode
 
-Scanners run in your own AWS infrastructure. The following modules are used:
+Scanners run in your own AWS infrastructure. They require a Datadog [API key](https://docs.datadoghq.com/account_management/api-app-keys/) with Remote Configuration enabled. The following modules are used:
 
 - [Main module](./main.tf): a thin wrapper around the [vpc](./modules/vpc/), [user_data](./modules/user_data/) and [instance](./modules/instance/) modules, which create the network, the scanner install script and the Auto Scaling group running the scanners.
 - [agentless-scanner-role](./modules/agentless-scanner-role/): IAM role and instance profile for the scanner instances, allowing them to assume the scanning delegate roles.
