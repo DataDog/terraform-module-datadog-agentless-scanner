@@ -15,9 +15,31 @@ variable "resource_group_name" {
 }
 
 variable "instance_size" {
-  description = "The type of instance"
+  description = <<-EOT
+    The VM SKU to use for the scanner VMSS. When null (default), the module
+    auto-selects from a 3-tier fallback chain based on what is available in
+    the target region:
+      1. Standard_B2ps_v2  (ARM Burstable, cheapest, major regions)
+      2. Standard_D2pls_v6 (ARM v6 D-series, modern ARM-capable regions)
+      3. Standard_D2as_v5  (AMD x86 D-series, universal fallback covering
+                            2022+ regions like qatarcentral, uaenorth,
+                            italynorth, spaincentral, etc.)
+    Set this explicitly to bypass auto-selection. When overriding to an x86
+    SKU, also set image_sku to a non-arm64 Ubuntu SKU (e.g. "minimal").
+  EOT
   type        = string
-  default     = "Standard_B2ps_v2"
+  default     = null
+}
+
+variable "image_sku" {
+  description = <<-EOT
+    Ubuntu 24.04 LTS image SKU to use for the scanner VMSS. When null
+    (default), the module picks "minimal-arm64" for ARM SKUs and "minimal"
+    for x86 SKUs. Set explicitly to use a custom Ubuntu SKU; in that case
+    you must also set instance_size to a matching architecture.
+  EOT
+  type        = string
+  default     = null
 }
 
 variable "instance_root_volume_size" {
