@@ -1,38 +1,58 @@
-# Single Region Example
+# AWS Examples
 
-With this option, a single Agentless scanner is deployed in a single region. Datadog recommends this option. However, this option can incur higher costs, as it requires each Agentless scanner to perform cross-region scans per account.
+Pick a deployment mode first. Not sure which? See [Choose a deployment mode](../README.md#choose-a-deployment-mode-aws).
 
-To deploy in a single region, see the [example](single_region/README.md).
+| Example | Mode | Use it when |
+|---|---|---|
+| [Datadog-hosted (SaaS)](saas/README.md) | Datadog-hosted | You don't want any scanner infrastructure in your account |
+| [Single region](single_region/README.md) | Self-hosted | Getting started, or most of your hosts are in one region |
+| [Multi region](multi_region/README.md) | Self-hosted | You have significant workloads in several regions |
+| [Cross account](cross_account/README.md) | Self-hosted | One scanner account scans many AWS accounts |
+| [Custom VPC](custom_vpc/README.md) | Self-hosted | Reuse an existing VPC |
+| [Custom Agent configuration](custom_agent_configurations/README.md) | Self-hosted | Pass custom config to the Datadog Agent next to the scanners |
 
-# Multi Region Example
+## Datadog-hosted (SaaS) mode
 
-With this option, Agentless scanners are deployed on a single cloud account and are distributed across multiple regions within the account. With this deployment model, Agentless scanners are granted visibility without needing to perform cross-region scans, which are expensive in practice.
+### Datadog-hosted (SaaS)
 
-To deploy in multiple regions, see the [example](multi_region/README.md).
+No scanner is deployed in your account. Datadog performs the scans from its own infrastructure by assuming your Datadog integration role. Terraform only creates one IAM managed policy with the scanning permissions and attaches it to that role.
 
-# SaaS Example
+Requires an AWS account already integrated with Datadog. AWS only.
 
-With this option, no Agentless scanner is deployed in your account: Datadog performs the scans from its own infrastructure by assuming the Datadog integration role. Only the required IAM permissions are attached to that role.
+To set it up, see the [**Datadog-hosted (SaaS) example**](saas/README.md).
 
-To install the Agentless SaaS permissions, see the [example](saas/README.md).
+## Self-hosted mode
 
-# Cross Account Example
+All self-hosted examples need a Datadog API key with **Remote Configuration enabled**.
 
-With this option, an Agentless scanner is deployed in a single or multi-region set-up on a single account.
-You don't need to deploy the scanner in any of your other accounts. Instead, a single delegate role is created that allows the scanner access to that account.
+### Single region
 
-To scan across accounts, see the [example](cross_account/README.md)
+One scanner deployment in one region, scanning every region in the account. Simplest setup and the right starting point. Scanning hosts in other regions means cross-region data transfer, which you pay for, so it gets expensive as your footprint outside the scanner's region grows.
 
-# RDS Scanning Example
+See the [example](single_region/README.md).
 
-With this option, you can enable Agentless scanning for RDS databases. The scanner exports RDS snapshots to S3 and scans them for sensitive data without directly accessing your live databases.
+### Multi region
 
-To enable RDS scanning, see the [example](rds_scanning/README.md)
+Scanners deployed in several regions of the same account, so each region is scanned locally with no cross-region transfer. As a rule of thumb, deploy a scanner in any region with more than ~150 hosts: past that, cross-region transfer costs more than running a regional scanner (~$60/month).
 
-# Custom VPC Example
+<!-- TODO(PM): verify the 150-host rule matches public docs before publishing. -->
 
-If you want to avoid creating a new VPC for the Agentless scanners, and you want to reuse one of your own, see the [example](custom_vpc/README.md)
+See the [example](multi_region/README.md).
 
-# Custom Agent Configurations Example
+### Cross account
 
-If you want to add custom configurations for our Datadog Agent running alongside our scanners, see the [example](custom_agent_configurations/README.md)
+The full scanner setup lives in one account. Every other account only gets a delegate role that lets the scanner in. Works with single or multi-region scanner deployments.
+
+See the [example](cross_account/README.md).
+
+### Custom VPC
+
+Reuse one of your existing VPCs instead of letting the module create a new one.
+
+See the [example](custom_vpc/README.md).
+
+### Custom Agent configuration
+
+Pass custom configuration to the Datadog Agent that runs alongside the scanners.
+
+See the [example](custom_agent_configurations/README.md).
