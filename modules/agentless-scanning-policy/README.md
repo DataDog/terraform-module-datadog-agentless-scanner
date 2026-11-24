@@ -4,7 +4,7 @@ The agentless-scanning-policy module provides the IAM policy document holding al
 
 It is used:
 - by the [scanning-delegate-role](../scanning-delegate-role/) module (self-hosted mode), which creates separate orchestrator, worker and DSPM policies from the `orchestrator_json`, `worker_json` and `dspm_json` outputs on the delegate role assumed by the scanners.
-- directly in SaaS mode, where the `json` output merges all the permissions in a single document, used in one policy attached to the Datadog integration role. Datadog then performs the scans from its own infrastructure by assuming that role, and no scanner infrastructure is deployed in your account. See the [SaaS example](../../examples/saas/).
+- directly in Datadog-hosted (SaaS) mode, where the `json` output merges all the permissions in a single document, used in one policy attached to the Datadog integration role. Datadog then performs the scans from its own infrastructure by assuming that role, and no scanner infrastructure is deployed in your account. See the [Datadog-hosted (SaaS) example](../../examples/saas/).
 
 Use a managed policy (`aws_iam_policy`) rather than an inline one: the document is close to the size limit of inline policies on a role, and Datadog needs the ARN of the policy.
 
