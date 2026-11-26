@@ -114,6 +114,7 @@ resource "aws_autoscaling_group" "asg" {
   }
 
   lifecycle {
+    ignore_changes       = [desired_capacity]
     replace_triggered_by = [aws_security_group.default_scanner_security_group]
   }
 }
