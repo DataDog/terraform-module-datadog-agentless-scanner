@@ -17,6 +17,8 @@ locals {
   # Auto-detect machine type: prefer N4, fall back to N2 if unavailable in any zone
   n4_available = alltrue([for check in data.google_compute_machine_types.n4_check : length(check.machine_types) > 0])
   machine_type = local.n4_available ? "n4-standard-2" : "n2-standard-2"
+  # N4 only supports Hyperdisk; n2-standard-2 does not support Hyperdisk
+  boot_disk_type = local.n4_available ? "hyperdisk-balanced" : "pd-balanced"
 
   # Merge Datadog tags into the agent configuration
   agent_configuration = merge(
@@ -51,7 +53,7 @@ resource "google_compute_region_instance_template" "agentless_scanner_template" 
     auto_delete  = true
     boot         = true
     disk_size_gb = 30
-    disk_type    = "hyperdisk-balanced"
+    disk_type    = local.boot_disk_type
   }
 
   network_interface {
