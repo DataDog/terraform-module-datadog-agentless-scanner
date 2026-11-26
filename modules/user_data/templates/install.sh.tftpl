@@ -138,6 +138,16 @@ EOF
 chown dd-agent: /etc/datadog-agent/agentless-scanner.yaml
 chmod 600 /etc/datadog-agent/agentless-scanner.yaml
 
+# The upgrades at the top of this script leave a reboot pending when they
+# replace the kernel. Take it now, before the scanner starts, as the upgrade
+# timer would otherwise reboot the instance in the middle of its first scans.
+# The delay lets cloud-init record this script as done.
+if [ -f /var/run/reboot-required ]; then
+  systemctl enable datadog-agent datadog-agentless-scanner
+  shutdown -r +1
+  exit 0
+fi
+
 # Restart the agent
 systemctl restart datadog-agent
 
