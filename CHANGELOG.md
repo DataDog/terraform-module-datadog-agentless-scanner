@@ -1,5 +1,9 @@
 # Changelog
 
+## Version TBD
+
+- azure: grant the scanner read access to images and image galleries
+
 ## Version 0.13.0 - 2026-10-01
 
 - aws: introduce the Agentless SaaS mode, where Datadog performs the scans from its own infrastructure by assuming the Datadog integration role: only IAM permissions are deployed in your account, no scanner infrastructure (see `examples/saas`)
